@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -106,7 +107,10 @@ public class GetTablesServlet extends HttpServlet {
 			    rst.close();
 			}
 			else {
-			    result.put("TABLES", qsFromXML.keySet());
+				for(Entry<String, QuerySubject> qs: qsFromXML.entrySet()) {
+					tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
+				}
+			    result.put("TABLES", tables);
 			}
 			result.put("STATUS", "OK");
 			

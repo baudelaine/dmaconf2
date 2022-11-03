@@ -29,8 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 /**
  * Servlet implementation class GetTablesServlet
  */
@@ -50,7 +48,7 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	
-	@SuppressWarnings({ "resource", "unchecked" })
+	@SuppressWarnings({ "resource" })
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
@@ -70,7 +68,7 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 			result.put("PRJ", prj.toString());
 //			Map<String, Object> parms = Tools.fromJSON(request.getInputStream());
 			
-			Path path = Paths.get((String) request.getSession().getAttribute("projectPath") + "/dbmd.json");
+//			Path path = Paths.get((String) request.getSession().getAttribute("projectPath") + "/dbmd.json");
 			
 			Map<String, DBMDTable> dbmd = new HashMap<String, DBMDTable>();
 			
@@ -107,7 +105,8 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 		    while (rst0.next()) {
 
 		    	String table_name = rst0.getString("TABLE_NAME");
-		    	System.out.println("table_name=" + table_name);
+		    	String table_type = rst0.getString("TABLE_TYPE");
+		    	System.out.println("table_name=" + table_name + " -> " + table_type);
 		    	
 		    	ResultSet rst = null;
 		    	PreparedStatement stmt = null;
@@ -244,7 +243,7 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 	            
 	            DBMDTable table = new DBMDTable();
 	            
-		    	String table_type = rst0.getString("TABLE_TYPE");
+//		    	String table_type = rst0.getString("TABLE_TYPE");
 		    	String table_remarks = rst0.getString("REMARKS");
 		    	String table_schema = rst0.getString("TABLE_SCHEM");
 		    	table.setTable_name(table_name);

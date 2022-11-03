@@ -127,6 +127,7 @@ public class UploadXMLServlet extends HttpServlet {
 						System.out.println(table_name);
 						QuerySubject querySubject = new QuerySubject();
 						querySubject.setTable_name(table_name);
+						querySubject.setType("TABLE");
 						NodeList qs = qss.getChildNodes();
 						List<Field> fields = new ArrayList<Field>();
 						for(int i = 0; i < qs.getLength(); i++){

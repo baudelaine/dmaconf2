@@ -21,7 +21,7 @@ public class Test8 {
 
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
-		String schema = "DB2INST1";
+		String schema = "MAXIMO";
 		String lang = "fr";
 		
 		try{
@@ -32,7 +32,7 @@ public class Test8 {
 		}
 		
 		System.out.println("DB2 driver loaded.");
-		Connection conn = DriverManager.getConnection("jdbc:db2://localhost:50000/SAMPLE", "db2inst1", "spcspc");
+		Connection conn = DriverManager.getConnection("jdbc:db2://192.168.1.75:50000/ENNOVIA", "db2inst1", "spcspc");
 		PreparedStatement stmt = conn.prepareStatement("select current date from sysibm.sysdummy1");
 		ResultSet rst = stmt.executeQuery();
 		rst.next();
@@ -43,7 +43,7 @@ public class Test8 {
 	    DatabaseMetaData metaData = conn.getMetaData();
 	    //String[] types = {"TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM"};
 	    String[] types = {"TABLE"};
-	    rst = metaData.getTables(conn.getCatalog(), schema, "PROJECT", types);	
+	    rst = metaData.getTables(conn.getCatalog(), schema, "WORKORDER", types);	
 
 		Map<String, Object> recCount = new HashMap<String, Object>();
 		
