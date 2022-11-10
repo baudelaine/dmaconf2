@@ -230,18 +230,22 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 		    	long recCount = 0;
 	    		Statement stm = null;
 	    		ResultSet rs = null;
+	    		
+	    		
 	            try{
-		    		String query = "SELECT COUNT(*) FROM ";
-		    		if(!schema.isEmpty()){
-		    			query += schema + ".";
-		    		}
-		    		query += table_name;
-		    		stm = con.createStatement();
-		            rs = stm.executeQuery(query);
-		            while (rs.next()) {
-		            	recCount = rs.getLong(1);
-		            }
-	            }
+			    	if(table_type.equalsIgnoreCase("TABLE")) {
+			    		String query = "SELECT COUNT(*) FROM ";
+			    		if(!schema.isEmpty()){
+			    			query += schema + ".";
+			    		}
+			    		query += table_name;
+			    		stm = con.createStatement();
+			            rs = stm.executeQuery(query);
+			            while (rs.next()) {
+			            	recCount = rs.getLong(1);
+			            }
+			    	}
+		    	}
 	            catch(SQLException e){
 	            	System.out.println("CATCHING SQLEXEPTION...");
 	            	System.out.println(e.getSQLState());
