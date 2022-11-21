@@ -108,6 +108,10 @@ public class SetHiddenServlet extends HttpServlet {
 
 			    if(stmt != null) {stmt.close();}
 		        if(rst0 != null){rst0.close();}
+
+				for(Field field: qs.getFields()) {
+					field.setHidden(false);
+				}
 		        
 				for(Field field: qs.getFields()) {
 					if(rst0Result.contains(field.getField_name())) {

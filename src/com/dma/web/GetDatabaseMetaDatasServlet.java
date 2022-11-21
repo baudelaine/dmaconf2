@@ -284,7 +284,9 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 
 	    		String stats = "(" + pks.size() + ") (" + FKSet.size() + ") (" + FKSeqCount + ") (" + PKSet.size() +
 	    				") (" + PKSeqCount + ") (" +  indexes.size() + ") (" + recCount + ")";  
-		    	table.setTable_stats(stats);
+	    		if(table_type.equalsIgnoreCase("TABLE")) {
+	    			table.setTable_stats(stats);
+	    		}
 			    
 			    ResultSet rst1 = metaData.getColumns(con.getCatalog(), schema, table_name, "%");
 			    
