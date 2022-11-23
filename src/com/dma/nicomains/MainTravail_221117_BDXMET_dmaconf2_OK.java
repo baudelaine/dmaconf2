@@ -1,722 +1,545 @@
-package com.dma.web;
+package com.dma.nicomains;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.SAXWriter;
+import org.dom4j.io.XMLWriter;
+import org.xml.sax.SAXException;
+
 
 import com.dma.svc.CognosSVC;
 import com.dma.svc.FactorySVC;
+import com.dma.web.Field;
+import com.dma.web.Filter;
+import com.dma.web.QuerySubject;
+import com.dma.web.Relation;
+import com.dma.web.RelationShip;
+import com.dma.web.Tools;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/**
- * Servlet implementation class GetSelectionsServlet
- */
-@WebServlet(name = "SendQuerySubjects", urlPatterns = { "/SendQuerySubjects" })
-public class SendQuerySubjectsServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+public class MainTravail_221117_BDXMET_dmaconf2_OK {
 
-	Map<String, Integer> gRefMap;
-	List<RelationShip> rsList;
-	Map<String, QuerySubject> query_subjects;
-	Map<String, QuerySubject> query_subjects_views;
-	Map<String, Map<String, String>> labelMapRefAliasLabel;
-	Map<String, Map<String, String>> labelMap;
-	Map<String, Map<String, String>> qsScreenTipMap;
-	Map<String, Map<String, String>> qiScreenTipMap;
-	Map<String, Map<String, String>> qifScreenTipMap;
-	Map<String, Map<String, String>> viewsLabelMap;
-	Map<String, String> filterMap;
-	Map<String, String> filterMapApply;
-	Map<String, String> viewsFolders;
-	Map<String, Boolean> folderMap;
-	List<QuerySubject> qsList = null;
-	List<QuerySubject> viewList = null;
-	CognosSVC csvc;
-	FactorySVC fsvc;
-
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public SendQuerySubjectsServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	@SuppressWarnings("unchecked")
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	static Map<String, Integer> gRefMap;
+	static List<RelationShip> rsList;
+	static Map<String, QuerySubject> query_subjects;
+	static Map<String, QuerySubject> query_subjects_views;
+	static Map<String, Map<String, String>> labelMapRefAliasLabel;
+	static Map<String, Map<String, String>> labelMap;
+	static Map<String, Map<String, String>> qsScreenTipMap;
+	static Map<String, Map<String, String>> qiScreenTipMap;
+	static Map<String, Map<String, String>> qifScreenTipMap;
+	static Map<String, Map<String, String>> viewsLabelMap;
+	static Map<String, String> filterMap;
+	static Map<String, String> filterMapApply;
+	static Map<String, String> viewsFolders;
+	static Map<String, Boolean> folderMap;
+	static List<QuerySubject> qsList = null;
+	static List<QuerySubject> viewList = null;
+	static CognosSVC csvc;
+	static FactorySVC fsvc;
+	
+	
+	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
-		Map<String, Object> result = new HashMap<String, Object>();
 		
-		try{
-		
-			result.put("CLIENT", request.getRemoteAddr() + ":" + request.getRemotePort());
-			result.put("SERVER", request.getLocalAddr() + ":" + request.getLocalPort());
-			
-			result.put("FROM", this.getServletName());
-			
-			String user = request.getUserPrincipal().getName();
-			result.put("USER", user);
+		String json = null;
+		String model = "/opt/wks/v1/dmaNC/WebContent/models/BDXMET_V2_dmaconf2.json";
+		Path path = Paths.get(model);
+		Charset charset = StandardCharsets.UTF_8;
 
-			result.put("JSESSIONID", request.getSession().getId());
-			
-			Path wks = Paths.get(getServletContext().getRealPath("/datas") + "/" + user);			
-			result.put("WKS", wks.toString());
-			
-			Path prj = Paths.get((String) request.getSession().getAttribute("projectPath"));
-			result.put("PRJ", prj.toString());
-			
-			Map<String, Object> parms = Tools.fromJSON(request.getInputStream());
-			
-			String projectName = (String) parms.get("projectName");
-			String data = (String) parms.get("data");
-			String view = (String) parms.get("view");
-//			boolean applyActionLogs = Boolean.parseBoolean((String) parms.get("applyActionLogs"));
-			boolean applyActionLogs = (boolean) parms.get("applyActionLogs");
-//			System.out.println("applyActionLogs=" + applyActionLogs);
-			
-			ObjectMapper mapper = new ObjectMapper();
-	        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-	        qsList = Arrays.asList(mapper.readValue(data, QuerySubject[].class));
-	        viewList = Arrays.asList(mapper.readValue(view, QuerySubject[].class));
-	        
-	        query_subjects = new HashMap<String, QuerySubject>();
-	        Map<String, Integer> recurseCount = new HashMap<String, Integer>();
-	        
-	        for(QuerySubject qs: qsList){
-	        	query_subjects.put(qs.get_id(), qs);
-	        	recurseCount.put(qs.getTable_alias(), 0);
-	        }
-	        
-	        request.getSession().setAttribute("query_subjects", query_subjects);
-	        
-			query_subjects = (Map<String, QuerySubject>) request.getSession().getAttribute("query_subjects");
-			
-			System.out.println("query_subjects.size=" + query_subjects.size());
-			
-//views init
-			query_subjects_views = new HashMap<String, QuerySubject>();
-//	        Map<String, Integer> recurseCount = new HashMap<String, Integer>();
-	        
-	        for(QuerySubject qs: viewList){
-	        	query_subjects_views.put(qs.getTable_name(), qs);
-	        }
-			
-//end views
-			
-			// START SETUP COGNOS ENVIRONMENT
+		Map<String, Integer> recurseCount = null;
 
-			Path cognosModelsPath = Paths.get((String) request.getServletContext().getAttribute("cognosModelsPath") + "/" + user);
-			
-			if(!Files.exists(cognosModelsPath)) {
-				Files.createDirectories(cognosModelsPath);
-				cognosModelsPath.toFile().setExecutable(true, false);
-				cognosModelsPath.toFile().setWritable(true, false);
-				cognosModelsPath.toFile().setReadable(true, false);
-			}
-			
-			Path projectPath = null;
-			if(!Files.isWritable(cognosModelsPath)){
-				result.put("STATUS", "KO");
-				result.put("ERROR", "cognosModelsPath '" + cognosModelsPath + "' not writeable." );
-				result.put("TROUBLESHOOTING", "Check that '" + cognosModelsPath + "' exists on server and is writable.");
-				throw new Exception();
-			}
-			else {
-				projectPath = Paths.get(cognosModelsPath + "/" + projectName);
-				
-				if(Files.exists(projectPath)){
-					Files.walk(Paths.get(projectPath.toString()))
-		            .map(Path::toFile)
-		            .sorted((o1, o2) -> -o1.compareTo(o2))
-		            .forEach(File::delete);
-				}
-				
-		//		Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxrwxrwx");
-		//		FileAttribute<Set<PosixFilePermission>> attrs = PosixFilePermissions.asFileAttribute(perms);
-		
-				
-				Files.createDirectories(projectPath);
-				projectPath.toFile().setExecutable(true, false);
-				projectPath.toFile().setWritable(true, false);
-				projectPath.toFile().setReadable(true, false);
-			}
-			
+		if(Files.exists(path)){
+			try {
+				json = new String(Files.readAllBytes(path), charset);
+//				System.out.println("json =" + json);
+				@SuppressWarnings("unchecked")
+				Map<String, List<QuerySubject>> parms = (Map<String, List<QuerySubject>>) Tools.fromJSON(path.toFile(), new TypeReference<Map<String, List<QuerySubject>>>(){});
 
-			boolean isXML = false;
-			Project project = (Project) request.getSession().getAttribute("currentProject");
-			Resource resource = project.getResource();
-			if(resource.getJndiName().equalsIgnoreCase("XML")) {
-				isXML = true;
-			}
-			
-			
-			Path zip = Paths.get(getServletContext().getRealPath("/res/model.zip"));
-			if(!Files.exists(zip)){
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Generic model '" + zip + "' not found." );
-				result.put("TROUBLESHOOTING", "Check that '" + zip + "' exists on server.");
-				throw new Exception();
-			}
-			else {
-				
-				BufferedOutputStream dest = null;
-				int BUFFER = Long.bitCount(Files.size(zip));
-				ZipInputStream zis = new ZipInputStream(new BufferedInputStream(Files.newInputStream(zip))); 
-				ZipEntry entry;
-				while((entry = zis.getNextEntry()) != null) {
-						System.out.println("Extracting: " + entry);
-			            int count;
-			            byte datas[] = new byte[BUFFER];
-			            // write the files to the disk
-			            FileOutputStream fos = new FileOutputStream(projectPath + "/" + entry.getName());
-			            dest = new BufferedOutputStream(fos, BUFFER);
-			            while ((count = zis.read(datas, 0, BUFFER)) 
-			              != -1) {
-			               dest.write(datas, 0, count);
-			            }
-			            dest.flush();
-			            dest.close();
+		        qsList = parms.get("querySubjects");
+		        viewList = parms.get("views");
+		        
+		        query_subjects = new HashMap<String, QuerySubject>();
+		        recurseCount = new HashMap<String, Integer>();
+		        
+		        for(QuerySubject qs: qsList){
+		        	query_subjects.put(qs.get_id(), qs);
+		        	recurseCount.put(qs.getTable_alias(), 0);
 		        }
-				zis.close();
+		       
+		        query_subjects_views = new HashMap<String, QuerySubject>();
+		        for(QuerySubject qs: viewList){
+		        	query_subjects_views.put(qs.getTable_name(), qs);
+		        	recurseCount.put(qs.getTable_name(), 0);
+		        }
 				
-				Path XMLModel = Paths.get((String) request.getSession().getAttribute("projectPath") + "/model.xml");
-				if(Files.exists(XMLModel)){
-					Files.copy(XMLModel, Paths.get(projectPath + "/model.xml"), StandardCopyOption.REPLACE_EXISTING);
-					// Set to true to handle as disconnected
-					isXML = true;
-				}
-			}
-			
-			Path cpf = Paths.get(projectPath + "/model.cpf");
-			Path renamedCpf = Paths.get(projectPath + "/" + projectName + ".cpf"); 
-			if(!Files.exists(cpf)){
-				result.put("STATUS", "KO");
-				result.put("ERROR", renamedCpf + " not found in " + projectPath + ".");
-				result.put("TROUBLESHOOTING", "Check " + cpf + " exists in " + zip + ".");
-				throw new Exception();
-			}
-			else {
-				Files.move(cpf, renamedCpf);
-			}
-	
-			String pathToXML = getServletContext().getRealPath("/") + "/res/templates";
-	
-			if(!Files.exists(Paths.get(pathToXML))){
-				result.put("STATUS", "KO");
-				result.put("ERROR", "PathToXML " + pathToXML + " not found." );
-				result.put("TROUBLESHOOTING", "Check that " + pathToXML + " exists on server and contains XML templates.");
-				throw new Exception();
-			}
-			
-			try {
-				DirectoryStream<Path> ds = Files.newDirectoryStream(projectPath);
-				for(Path path: ds){
-					path.toFile().setExecutable(true, false);
-					path.toFile().setWritable(true, false);
-					path.toFile().setReadable(true, false);
-				}
-			}
-			catch (IOException e) {
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Not able to change permissions for " + projectPath + "." );
-				result.put("TROUBLESHOOTING", "Check application server process owner rights.");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
-				throw e;
-			}		
-			
-			
-			// END SETUP COGNOS ENVIRONMENT
-
-			// START ACTION LOGS WITHDRAWING	
-
-			List<String> actionLogList = new ArrayList<String>();
-			
-			if(applyActionLogs) {
-				Path prjPath = Paths.get((String) request.getSession().getAttribute("projectPath"));
-				File alDir = new File(prjPath + "/actionLogs");
-				Path alList = Paths.get(prjPath + "/actionLogs.json");
-				
-				if(Files.exists(alList)) {			
-					Map<String, Object> actionLogMap =  (Map<String, Object>) Tools.fromJSON(alList.toFile(), new TypeReference<Map<String, Object>>(){});
-					for(Entry<String, Object> al: actionLogMap.entrySet()) {
-						Path alPath = Paths.get(alDir + "/" + al.getKey());
-						if(Files.exists(alPath)) {
-							List<String> lines = Files.readAllLines(alPath);
-							actionLogList.add(String.join("", lines));
-						}
-					}
-				}		
 			}
-			
-			// END ACTION LOGS WITHDRAWING	
-			
-			
-	        //start();
-			String dBEngine = (String) request.getSession().getAttribute("dbEngine");
-			String cognosFolder = (String) request.getServletContext().getAttribute("cognosFolder") + "/" + user;
-			String cognosDispatcher = (String) request.getServletContext().getAttribute("cognosDispatcher");
-			String cognosLogin = (String) request.getServletContext().getAttribute("cognosLogin");
-			String cognosPassword = (String) request.getServletContext().getAttribute("cognosPassword");
-			String cognosNamespace = (String) request.getServletContext().getAttribute("cognosNamespace");
-			String cognosDataSource = (String) request.getSession().getAttribute("cognosDataSource");
-			String cognosCatalog = (String) request.getSession().getAttribute("cognosCatalog");
-			String cognosSchema = (String) request.getSession().getAttribute("cognosSchema");
-			String cognosDefaultLocale = (String) request.getServletContext().getAttribute("cognosDefaultLocale");
-			String cognosLocales = (String) request.getServletContext().getAttribute("cognosLocales");
-
-			csvc = new CognosSVC(cognosDispatcher);
-			csvc.setPathToXML(pathToXML);
-			fsvc = new FactorySVC(csvc);
-			try {
-				csvc.logon(cognosLogin, cognosPassword, cognosNamespace);
-			}
-			catch(Exception e) {
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Connexion to Cognos failed..");
-				result.put("TROUBLESHOOTING", "Check cognosLogin, cognosPassword and cognosNamespace parameters.");
-				throw e;
-			}
-			String modelName = projectName;
-			try {
-				csvc.openModel(modelName, cognosFolder);
-			}
-			catch(Exception e) {
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Opening Cognos model " + modelName + " failed.");
-				result.put("TROUBLESHOOTING", "Check modelName and cognosFolder parameters.");
-				throw e;
-			}
-
-			
-			fsvc.setLocale(cognosDefaultLocale);
-			
-			try {
-				if (!isXML) {
-					fsvc.createNamespace("PHYSICAL", "Model");
-				}
-				fsvc.createNamespace("PHYSICALUSED", "Model");
-				fsvc.createNamespace("AUTOGENERATION", "Model");
-				fsvc.createNamespace("FINAL", "AUTOGENERATION");
-				fsvc.createNamespace("REF", "AUTOGENERATION");
-				fsvc.createNamespace("SEC", "AUTOGENERATION");
-				fsvc.createNamespace("TRA", "AUTOGENERATION");
-				fsvc.createNamespace("FILTER_FINAL", "AUTOGENERATION");
-				fsvc.createNamespace("FILTER_REF", "AUTOGENERATION");
-				fsvc.createNamespace("DATA", "Model");
-				fsvc.createNamespace("DIMENSIONAL", "Model");
-				fsvc.createNamespace("VIEWS", "Model");
-			}
-			catch(Exception e) {
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Creating Cognos Namespaces failed.");
-				result.put("TROUBLESHOOTING", "Check NameSpace and Parent parameters.");
-				throw e;
-			}
-			
-			//Import();
-			try {
-				if (!isXML) {
-					fsvc.DBImport("PHYSICAL", cognosDataSource, cognosCatalog, cognosSchema, dBEngine);
-				}
-			}
-			catch(Exception e) {
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Cognos DBImport failed.");
-				result.put("TROUBLESHOOTING", "Check Namespace, dataSourceName, catalogName, schemaName and engineName parameters.");
-				throw e;
-			}
-			
-			
-			gRefMap = new HashMap<String, Integer>();
-			
-			rsList = new ArrayList<RelationShip>();
-
-			labelMapRefAliasLabel = new HashMap<String, Map<String, String>>();
-			labelMap = new HashMap<String, Map<String, String>>();
-			qsScreenTipMap = new HashMap<String, Map<String, String>>();
-			qiScreenTipMap = new HashMap<String, Map<String, String>>();
-			qifScreenTipMap = new HashMap<String, Map<String, String>>();
-			viewsLabelMap = new HashMap<String, Map<String, String>>();
-			filterMap = new HashMap<String, String>();
-			filterMapApply = new HashMap<String, String>();
-			folderMap = new HashMap<String, Boolean>();
-			viewsFolders = new HashMap<String, String>();
-			
-			//to get traductions from AliasRef to name Dimensions
-			for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
-				if (query_subject.getValue().getType().equalsIgnoreCase("Ref")){
-					//init language project one time
-					for(Entry<String, String> langKey: query_subject.getValue().getDescriptions().entrySet()){
-						// creer un for avec la liste des langues du projets pour créer le labelMap et le ScreenTipMap
-						String langue = langKey.getKey();
-						if (labelMapRefAliasLabel.get(langue)==null) {
-							Map<String, String> lm = new HashMap<String, String>();
-							labelMapRefAliasLabel.put(langue, lm);
-						}
-					}
-					for(Entry<String, String> langLabel: query_subject.getValue().getLabels().entrySet()){
-						if(langLabel.getValue() == null || langLabel.getValue().equals("")) {
-							labelMapRefAliasLabel.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_name());
-							} else {
-								labelMapRefAliasLabel.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), langLabel.getValue());
-							}
-					}
-				}
-			}
-			// end to get traductions from AliasRef to name Dimensions
-			
-			
-			for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
-				
-				if (query_subject.getValue().getType().equalsIgnoreCase("Final")){
-					
-					fsvc.copyQuerySubject("[PHYSICALUSED]", "[PHYSICAL].[" + query_subject.getValue().getTable_name() + "]");
-					fsvc.renameQuerySubject("[PHYSICALUSED].[" + query_subject.getValue().getTable_name() + "]", "FINAL_" + query_subject.getValue().getTable_alias());
-					
-					fsvc.createQuerySubject("PHYSICALUSED", "FINAL", "FINAL_" + query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias());
-					//ajout filter
-					String filterNameSpaceSource = "[FINAL]";
-					if (query_subject.getValue().getFilters()!=null && !query_subject.getValue().getFilters().isEmpty())
-					{
-						fsvc.createQuerySubject("FINAL", "FILTER_FINAL", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
-						
-						Map<String, Filter> qsFilters = query_subject.getValue().getFilters();
-						int y = 0;
-						for(Entry<String, Filter> f: qsFilters.entrySet()){
-							
-							String option = "always";
-							if (f.getValue().getOption().equals("Facultative")) {
-								option = "asNeeded";
-							}
-							fsvc.createQuerySubjectFilter("[FILTER_FINAL].[" + query_subject.getValue().getTable_alias() + "]" , f.getValue().getExpression(), f.getValue().getName(), option, y);
-							y++;
-						}
-
-						fsvc.createQuerySubject("FILTER_FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
-						filterNameSpaceSource = "[FILTER_FINAL]";
-					} else {
-						fsvc.createQuerySubject("FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
-					}
-					//end filter					//end filter
-					//folder pour les qs Finaux
-					if(query_subject.getValue().getFolder()!=null && !query_subject.getValue().getFolder().equals("")) {
-						
-						if(folderMap.get(query_subject.getValue().getFolder())==null) {
-							fsvc.createFolder("[DATA]", query_subject.getValue().getFolder());
-							folderMap.put(query_subject.getValue().getFolder(), true);
-						}
-						fsvc.moveQuerySubjectInFolder("[DATA].[" + query_subject.getValue().getTable_alias() + "]", "[DATA].[" + query_subject.getValue().getFolder() + "]");
-					}
-					//end folder
-
-					//init language project one time
-					for(Entry<String, String> langKey: query_subject.getValue().getDescriptions().entrySet()){
-						// creer un for avec la liste des langues du projets pour créer le labelMap et le ScreenTipMap
-						String langue = langKey.getKey();
-						if (labelMap.get(langue)==null) {
-							Map<String, String> lm = new HashMap<String, String>();
-							labelMap.put(langue, lm);
-							Map<String, String> vlm = new HashMap<String, String>();
-							viewsLabelMap.put(langue, vlm);
-							Map<String, String> qsSTM = new HashMap<String, String>();
-							qsScreenTipMap.put(langue, qsSTM);
-							Map<String, String> qiSTM = new HashMap<String, String>();
-							qiScreenTipMap.put(langue, qiSTM);
-							Map<String, String> qifSTM = new HashMap<String, String>();
-							qifScreenTipMap.put(langue, qifSTM);
-						}		
-					}
-					//end init
-					//map tooltip
-					for(Entry<String, String> langDesc: query_subject.getValue().getDescriptions().entrySet()){
-						if(langDesc.getValue() == null || langDesc.getValue().equals("")) {
-							qsScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_name());
-							} else {
-								System.out.println("QS langDesc : " + langDesc.getValue());
-								qsScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_name() + ": " + langDesc.getValue());
-							}
-					}
-					//end map tooltip
-					//end tooltip
-					
-					//lancement f1 ref
-					for(QuerySubject qs: qsList){
-			        	recurseCount.put(qs.getTable_alias(), 0);
-			        }
-					
-					f1(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias(), "", "[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_alias(), recurseCount, "Final", filterNameSpaceSource);
-					//end f1
-											
-					for(Relation rel: query_subject.getValue().getRelations()){
-						if(rel.isFin()){
-							
-							RelationShip RS = new RelationShip("[FINAL].[" + query_subject.getValue().getTable_alias() + "]" , "[FINAL].[" + rel.getPktable_alias() + "]");
-							// changer en qs + refobj
-							RS.setExpression(rel.getRelationship());
-							if (rel.isRightJoin())
-							{
-								RS.setCard_left_min("zero");
-							} else {
-								RS.setCard_left_min("one");
-							}
-							RS.setCard_left_max("many");
+		}
 		
-							if (rel.isLeftJoin())
-							{
-								RS.setCard_right_min("zero");
-							} else {
-								RS.setCard_right_min("one");
-							}
-							RS.setCard_right_max("one");
-							RS.setParentNamespace("FINAL");
-							rsList.add(RS);					
+		// On est bien Tintin...
+		
+//        TaskerSVC.start();
+		
+		String cognosDataSource = "CDA4";
+		String cognosCatalog = "";
+		String cognosSchema = "MAXIMO";
+		String cognosDefaultLocale = "en-gb";
+		String cognosLocales = "";
+		
+		String cognosDispatcher = "http://172.16.186.246:9300/p2pd/servlet/dispatch";
+		String pathToXML = "/opt/wks/v1/dmaNC/WebContent/res/templates";
+		String cognosLogin = "admin";
+		String cognosPassword = "Freestyle05$";
+		String cognosNamespace = "CognosEx";
+		String projectName = "BDXMET_Physical_V2.1_test7";
+		String cognosFolder = "C:/models/user0";
+		String cognosModelsPath = "/mnt/models/user0";
+		String dBEngine = "ORA";
+		boolean isXML = true;
+		
+		Path projectPath = Paths.get(cognosModelsPath + "/" + projectName);
+		
+		
+		csvc = new CognosSVC(cognosDispatcher);
+		csvc.setPathToXML(pathToXML);
+		fsvc = new FactorySVC(csvc);
+		try {
+			csvc.logon(cognosLogin, cognosPassword, cognosNamespace);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String modelName = projectName;
+		try {
+			csvc.openModel(modelName, cognosFolder);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		fsvc.setLocale(cognosDefaultLocale);
+		
+
+// end start		
+
+		if (!isXML) {
+			fsvc.createNamespace("PHYSICAL", "Model");
+		}
+		fsvc.createNamespace("PHYSICALUSED", "Model");
+		fsvc.createNamespace("AUTOGENERATION", "Model");
+		fsvc.createNamespace("FINAL", "AUTOGENERATION");
+		fsvc.createNamespace("REF", "AUTOGENERATION");
+		fsvc.createNamespace("SEC", "AUTOGENERATION");
+		fsvc.createNamespace("TRA", "AUTOGENERATION");
+		fsvc.createNamespace("FILTER_FINAL", "AUTOGENERATION");
+		fsvc.createNamespace("FILTER_REF", "AUTOGENERATION");
+		fsvc.createNamespace("DATA", "Model");
+		fsvc.createNamespace("DIMENSIONAL", "Model");
+		fsvc.createNamespace("VIEWS", "Model");
+
+		if (!isXML) {
+			fsvc.DBImport("PHYSICAL", cognosDataSource, cognosCatalog ,cognosSchema, dBEngine);
+		}
+		
+		gRefMap = new HashMap<String, Integer>();
+		
+		rsList = new ArrayList<RelationShip>();
+
+		labelMap = new HashMap<String, Map<String, String>>();
+		labelMapRefAliasLabel = new HashMap<String, Map<String, String>>();
+		qsScreenTipMap = new HashMap<String, Map<String, String>>();
+		qiScreenTipMap = new HashMap<String, Map<String, String>>();
+		qifScreenTipMap = new HashMap<String, Map<String, String>>();
+		viewsLabelMap = new HashMap<String, Map<String, String>>();
+		filterMap = new HashMap<String, String>();
+		folderMap = new HashMap<String, Boolean>();
+		filterMapApply = new HashMap<String, String>();
+		viewsFolders = new HashMap<String, String>();
+		
+
+		//to get traductions from AliasRef to name Dimensions
+		for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
+			if (query_subject.getValue().getType().equalsIgnoreCase("Ref")){
+				//init language project one time
+				for(Entry<String, String> langKey: query_subject.getValue().getDescriptions().entrySet()){
+					// creer un for avec la liste des langues du projets pour créer le labelMap et le ScreenTipMap
+					String langue = langKey.getKey();
+					if (labelMapRefAliasLabel.get(langue)==null) {
+						Map<String, String> lm = new HashMap<String, String>();
+						labelMapRefAliasLabel.put(langue, lm);
+					}
+				}
+				for(Entry<String, String> langLabel: query_subject.getValue().getLabels().entrySet()){
+					if(langLabel.getValue() == null || langLabel.getValue().equals("")) {
+						labelMapRefAliasLabel.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_name());
+						} else {
+							labelMapRefAliasLabel.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), langLabel.getValue());
+						}
+				}
+			}
+		}
+		// end to get traductions from AliasRef to name Dimensions
+				
+		for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
+			
+			if (query_subject.getValue().getType().equalsIgnoreCase("Final")){
+				
+				fsvc.copyQuerySubject("[PHYSICALUSED]", "[PHYSICAL].[" + query_subject.getValue().getTable_name() + "]");
+				fsvc.renameQuerySubject("[PHYSICALUSED].[" + query_subject.getValue().getTable_name() + "]", "FINAL_" + query_subject.getValue().getTable_alias());
+				
+				fsvc.createQuerySubject("PHYSICALUSED", "FINAL", "FINAL_" + query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias());
+				//ajout filter
+				String filterNameSpaceSource = "[FINAL]";
+				if (query_subject.getValue().getFilters()!=null && !query_subject.getValue().getFilters().isEmpty())
+				{
+					fsvc.createQuerySubject("FINAL", "FILTER_FINAL", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
 					
+					Map<String, Filter> qsFilters = query_subject.getValue().getFilters();
+					int y = 0;
+					for(Entry<String, Filter> f: qsFilters.entrySet()){
+						
+						String option = "always";
+						if (f.getValue().getOption().equals("Facultative")) {
+							option = "asNeeded";
 						}
-					}				
-					//add label map qs
-					for(Entry<String, String> langLabel: query_subject.getValue().getLabels().entrySet()){
-						if(langLabel.getValue() == null || langLabel.getValue().equals("")) {
-							labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_name());
+						fsvc.createQuerySubjectFilter("[FILTER_FINAL].[" + query_subject.getValue().getTable_alias() + "]" , f.getValue().getExpression(), f.getValue().getName(), option, y);
+						y++;
+					}
+
+					fsvc.createQuerySubject("FILTER_FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
+					filterNameSpaceSource = "[FILTER_FINAL]";
+				} else {
+					fsvc.createQuerySubject("FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
+				}
+				//end filter
+				//folder pour les qs Finaux
+				if(query_subject.getValue().getFolder()!=null && !query_subject.getValue().getFolder().equals("")) {
+					
+					if(folderMap.get(query_subject.getValue().getFolder())==null) {
+						fsvc.createFolder("[DATA]", query_subject.getValue().getFolder());
+						folderMap.put(query_subject.getValue().getFolder(), true);
+					}
+					fsvc.moveQuerySubjectInFolder("[DATA].[" + query_subject.getValue().getTable_alias() + "]", "[DATA].[" + query_subject.getValue().getFolder() + "]");
+				}
+				//end folder
+
+				//init language project one time
+				for(Entry<String, String> langKey: query_subject.getValue().getDescriptions().entrySet()){
+					// creer un for avec la liste des langues du projets pour créer le labelMap et le ScreenTipMap
+					String langue = langKey.getKey();
+					if (labelMap.get(langue)==null) {
+						Map<String, String> lm = new HashMap<String, String>();
+						labelMap.put(langue, lm);
+						Map<String, String> vlm = new HashMap<String, String>();
+						viewsLabelMap.put(langue, vlm);
+						Map<String, String> qsSTM = new HashMap<String, String>();
+						qsScreenTipMap.put(langue, qsSTM);
+						Map<String, String> qiSTM = new HashMap<String, String>();
+						qiScreenTipMap.put(langue, qiSTM);
+						Map<String, String> qifSTM = new HashMap<String, String>();
+						qifScreenTipMap.put(langue, qifSTM);
+					}		
+				}
+				//end init
+				//map tooltip
+				for(Entry<String, String> langDesc: query_subject.getValue().getDescriptions().entrySet()){
+					if(langDesc.getValue() == null || langDesc.getValue().equals("")) {
+						qsScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_name());
+						} else {
+//							System.out.println("QS langDesc : " + langDesc.getValue());
+							qsScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_name() + ": " + langDesc.getValue());
+						}
+				}
+				//end map tooltip
+				//end tooltip
+				
+				//lancement f1 ref
+				for(QuerySubject qs: qsList){
+		        	recurseCount.put(qs.getTable_alias(), 0);
+		        }
+				
+				f1(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias(), "", "[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_alias(), recurseCount, "Final", filterNameSpaceSource);
+				//end f1
+										
+				for(Relation rel: query_subject.getValue().getRelations()){
+					if(rel.isFin()){
+						
+						RelationShip RS = new RelationShip("[FINAL].[" + query_subject.getValue().getTable_alias() + "]" , "[FINAL].[" + rel.getPktable_alias() + "]");
+						// changer en qs + refobj
+						RS.setExpression(rel.getRelationship());
+						if (rel.isRightJoin())
+						{
+							RS.setCard_left_min("zero");
+						} else {
+							RS.setCard_left_min("one");
+						}
+						RS.setCard_left_max("many");
+	
+						if (rel.isLeftJoin())
+						{
+							RS.setCard_right_min("zero");
+						} else {
+							RS.setCard_right_min("one");
+						}
+						RS.setCard_right_max("one");
+						RS.setParentNamespace("FINAL");
+						rsList.add(RS);					
+				
+					}
+				}				
+				//add label map qs
+				for(Entry<String, String> langLabel: query_subject.getValue().getLabels().entrySet()){
+					if(langLabel.getValue() == null || langLabel.getValue().equals("")) {
+						labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_name());
+						} else {
+							labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), langLabel.getValue());
+						}
+				}
+				//add label map fields
+				for(Field field: query_subject.getValue().getFields()) {
+					
+					if (field.isCustom()) {
+						
+					fsvc.createQueryItem("[DATA].[" + query_subject.getValue().getTable_alias() + "]", field.getField_name(), field.getExpression(), cognosDefaultLocale);
+						//end regular agg
+					}
+					
+					//test cas ou la langue n'existe pas dans le map
+					for(Entry<String, Map<String, String>> langLabel: labelMap.entrySet()){
+						String label = field.getLabels().get(langLabel.getKey());
+						if (label == null || label.equals("")) {
+							labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias() + "." + field.getField_name(), field.getField_name());
+						} else {
+							labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias() + "." + field.getField_name(), label);
+						}
+					}
+					//end test
+					
+					
+					//add tooltip
+
+					//maptooltip
+					for(Entry<String, String> langDesc: field.getDescriptions().entrySet()){
+						if(langDesc.getValue() == null || langDesc.getValue().equals("")) {
+							qiScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", query_subject.getValue().getTable_name() + "." + field.getField_name());
 							} else {
-								labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias(), langLabel.getValue());
+						//		System.out.println("QI langDesc : " + langDesc.getValue());
+								qiScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", query_subject.getValue().getTable_name() + "." + field.getField_name() + ": " + langDesc.getValue());
 							}
 					}
-					//add label map fields
-					for(Field field: query_subject.getValue().getFields()) {
-						
-						if (field.isCustom()) {
-							
-						fsvc.createQueryItem("[DATA].[" + query_subject.getValue().getTable_alias() + "]", field.getField_name(), field.getExpression(), cognosDefaultLocale);
-							//end regular agg
-						}
-						
-						//test cas ou la langue n'existe pas dans le map
-						for(Entry<String, Map<String, String>> langLabel: labelMap.entrySet()){
-							String label = field.getLabels().get(langLabel.getKey());
-							if (label == null || label.equals("")) {
-								labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias() + "." + field.getField_name(), field.getField_name());
-							} else {
-								labelMap.get(langLabel.getKey()).put(query_subject.getValue().getTable_alias() + "." + field.getField_name(), label);
-							}
-						}
-						//end test
-						
-						
-						//add tooltip
-
-						//maptooltip
-						for(Entry<String, String> langDesc: field.getDescriptions().entrySet()){
-							if(langDesc.getValue() == null || langDesc.getValue().equals("")) {
-								qiScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", query_subject.getValue().getTable_name() + "." + field.getField_name());
-								} else {
-							//		System.out.println("QI langDesc : " + langDesc.getValue());
-									qiScreenTipMap.get(langDesc.getKey()).put("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", query_subject.getValue().getTable_name() + "." + field.getField_name() + ": " + langDesc.getValue());
-								}
-						}
-						//end map tool tip
-						
-						//end tooltip
-						//change property query item
-						fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "usage", field.getIcon().toLowerCase());
-						if (!field.getDisplayType().toLowerCase().equals("value"))
-						{
-							fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "displayType", field.getDisplayType().toLowerCase());
-						}
-						if (field.isHidden())
-						{
-							fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "hidden", "true");
-							
-						}
-						//regular agg a préciser avec une liste des types qui entrainent une somme pour chaque type de base.
-//							System.out.println("regularAgg : fieldType : " + field.getField_type().toLowerCase());
-						if (field.isCustom() && field.getField_type().toLowerCase().equals("decimal")) {
-//								System.out.println("regularAgg : fieldType dans le if : " + field.getField_type().toLowerCase());
-							fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "regularAggregate", "sum");
-						}
-					//end change
+					//end map tool tip
+					
+					//end tooltip
+					//change property query item
+					fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "usage", field.getIcon().toLowerCase());
+					if (!field.getDisplayType().toLowerCase().equals("value"))
+					{
+						fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "displayType", field.getDisplayType().toLowerCase());
 					}
-					// end label
+					if (field.isHidden())
+					{
+						fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "hidden", "true");
+						
+					}
+					//regular agg a préciser avec une liste des types qui entrainent une somme pour chaque type de base.
+//						System.out.println("regularAgg : fieldType : " + field.getField_type().toLowerCase());
+					if (field.isCustom() && field.getField_type().toLowerCase().equals("decimal")) {
+//							System.out.println("regularAgg : fieldType dans le if : " + field.getField_type().toLowerCase());
+						fsvc.changeQueryItemProperty("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", "regularAggregate", "sum");
+					}
+				//end change
 				}
-				
-			}
-			//IICCreateRelation(rsList);
-			for(RelationShip rs: rsList){
-				fsvc.createRelationship(rs);
+				// end label
 			}
 			
+		}
+		//IICCreateRelation(rsList);
+		for(RelationShip rs: rsList){
+			fsvc.createRelationship(rs);
+		}
+		
+		
+		// multidimensional
+		
+		Map<String, Map<String, String>> measures = new HashMap<String, Map<String, String>>();
+		
+		String qSIDStart = "";
+		for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
 			
-			// multidimensional
-
-			Map<String, Map<String, String>> measures = new HashMap<String, Map<String, String>>();
-			
-			String qSIDStart = "";
-			for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
-				
-				if(query_subject.getValue().isRoot()) {
-					qSIDStart = query_subject.getValue().get_id();
-					System.out.println(query_subject.getValue().get_id() + " ids : Root");
-					createMeasures("", qSIDStart, true, measures);
-				}
-//				Set<String> set = query_subject.getValue().getLinker_ids();
-//				for (String s : set) {
-//					if (s.equals("Root")) {
-//						qSIDStart = query_subject.getValue().get_id();
-//						System.out.println(query_subject.getValue().get_id() + " ids : " + s);
-//						createMeasures("", qSIDStart, true, measures);
-//							System.out.println("MeasureMap : " + measures.toString());
-//					}
+			if(query_subject.getValue().isRoot()) {
+				qSIDStart = query_subject.getValue().get_id();
+				System.out.println(query_subject.getValue().get_id() + " ids : Root");
+				createMeasures("", qSIDStart, true, measures);
+			}
+//			Set<String> set = query_subject.getValue().getLinker_ids();
+//			for (String s : set) {
+//				if (s.equals("Root")) {
+//					qSIDStart = query_subject.getValue().get_id();
+//					System.out.println(query_subject.getValue().get_id() + " ids : " + s);
+//					createMeasures("", qSIDStart, true, measures);
+//						System.out.println("MeasureMap : " + measures.toString());
 //				}
-			}
+//			}
+		}
 
-			Map<String, Map<String, String>> dimensions = new HashMap<String, Map<String, String>>();
-			Map<String, Map<String, String>> dimensionsBK = new HashMap<String, Map<String, String>>();
-			Map<String, Map<String, String>> dimensionsHN = new HashMap<String, Map<String, String>>();
-			Map<String, Map<String, String>> dimensionsAT = new HashMap<String, Map<String, String>>();
-			scanDimensions(dimensions, dimensionsBK, dimensionsHN, dimensionsAT);
-			scanFinalFieldsDimensions(dimensions, dimensionsBK, dimensionsHN, dimensionsAT);
-			System.out.println("Map Dimension : " + dimensions.toString());
-			createHierarchiesNb(dimensions);				
-			renameHierarchies(dimensions, dimensionsHN);
-			buildDimensions(dimensions, dimensionsBK, dimensionsAT, measures, dBEngine);
+		Map<String, Map<String, String>> dimensions = new HashMap<String, Map<String, String>>();
+		Map<String, Map<String, String>> dimensionsBK = new HashMap<String, Map<String, String>>();
+		Map<String, Map<String, String>> dimensionsHN = new HashMap<String, Map<String, String>>();
+		Map<String, Map<String, String>> dimensionsAT = new HashMap<String, Map<String, String>>();
+		scanDimensions(dimensions, dimensionsBK, dimensionsHN, dimensionsAT);
+		scanFinalFieldsDimensions(dimensions, dimensionsBK, dimensionsHN, dimensionsAT);
+		System.out.println("Map Dimension : " + dimensions.toString());
+		createHierarchiesNb(dimensions);				
+		renameHierarchies(dimensions, dimensionsHN);
+		buildDimensions(dimensions, dimensionsBK, dimensionsAT, measures, dBEngine);
 
-			// end multidimensional
-			
-			//views
-			createViews(cognosDefaultLocale);
-			//end viewses
-			
-			//add locales
-					int intLang = 1;
-					for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
-						fsvc.addLocale(langueKey.getKey().toLowerCase(), cognosDefaultLocale);
-						
-						//on ecrit les tooltip dans chaque langue pour les QS, QI, QI folder
-						for(Entry<String, String> screenTipMap: qsScreenTipMap.get(langueKey.getKey().toLowerCase()).entrySet()){
-							fsvc.createScreenTip("querySubject", screenTipMap.getKey() , screenTipMap.getValue(), intLang );
-						}
-						
-						for(Entry<String, String> screenTipMap: qiScreenTipMap.get(langueKey.getKey().toLowerCase()).entrySet()){
-							fsvc.createScreenTip("queryItem", screenTipMap.getKey() , screenTipMap.getValue(), intLang );
-						}
+		// end multidimensional
+		
+		//views
+		createViews(cognosDefaultLocale);
+		//end viewses
+		
+		//add locales
+				int intLang = 1;
+				for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+					fsvc.addLocale(langueKey.getKey().toLowerCase(), cognosDefaultLocale);
 					
-						for(Entry<String, String> screenTipMap: qifScreenTipMap.get(langueKey.getKey().toLowerCase()).entrySet()){
-							fsvc.createScreenTip("queryItemFolder", screenTipMap.getKey() , screenTipMap.getValue(), intLang );
-						}
-						intLang ++;
-						
+					//on ecrit les tooltip dans chaque langue pour les QS, QI, QI folder
+					for(Entry<String, String> screenTipMap: qsScreenTipMap.get(langueKey.getKey().toLowerCase()).entrySet()){
+						fsvc.createScreenTip("querySubject", screenTipMap.getKey() , screenTipMap.getValue(), intLang );
 					}
-					//end add locales
-			
-			// add value to labelMap in order to translate Time Dimension Level
-			//English
-			if (labelMap.get("en")!=null) {
-				Map<String, String> m = labelMap.get("en");
-				m.put("YEAR", "Year"); m.put("YEAR_KEY", "Year key");
-				m.put("QUARTER", "Quarter"); m.put("QUARTER_KEY", "Quarter key"); 
-				m.put("MONTH", "Month"); m.put("MONTH_KEY", "Month key");
-				m.put("WEEK", "Week"); m.put("WEEK_KEY", "Week key");
-				m.put("DAY", "Day"); m.put("DAY_KEY", "Day key");
-				m.put("DAY_OF_WEEK", "Day of week"); 	m.put("DAY_OF_WEEK_KEY", "Day of week key");
-				m.put("AM/PM","Am/pm"); m.put("AM/PM_KEY","Am/pm key");
-				m.put("HOUR","Hour"); m.put("HOUR_KEY","Hour key");
-				m.put("MIN","Minute"); m.put("MIN_KEY","Minute key");
-				m.put("DATE", "Date"); m.put("DATE_KEY", "Date key");
-				m.put("Fact", "(Measures)");
-			}
-			//French
-			if (labelMap.get("fr")!=null) {
-				Map<String, String> m = labelMap.get("fr");
-				m.put("YEAR", "Année"); m.put("YEAR_KEY", "Année clef");
-				m.put("QUARTER", "Trimestre"); m.put("QUARTER_KEY", "Trimestre clef");
-				m.put("MONTH", "Mois"); m.put("MONTH_KEY", "Mois clef");
-				m.put("WEEK", "Semaine"); m.put("WEEK_KEY", "Semaine clef");
-				m.put("DAY", "Jour"); m.put("DAY_KEY", "Jour clef");
-				m.put("DAY_OF_WEEK", "Jour de la semaine"); m.put("DAY_OF_WEEK_KEY", "Jour de la semaine clef");
-				m.put("AM/PM","Am/pm"); m.put("AM/PM_KEY","Am/pm clef");
-				m.put("HOUR","Heure"); m.put("HOUR_KEY","Heure clef");
-				m.put("MIN","Minute"); m.put("MIN_KEY","Minute clef");
-				m.put("DATE", "Date"); m.put("DATE_KEY", "Date clef");
-				m.put("(By month)", "(Par mois)");
-				m.put("(By week)", "(Par semaine)");
-				m.put("(Rolling month)", "(Mois glissant)");
-				m.put("Fact", "(Mesures)");
-			}
-			// end static value to Map
-			
-			//Reference language for report based on en-uk
-			fsvc.changePropertyFixIDDefaultLocale();
-			
-			// tests
+					
+					for(Entry<String, String> screenTipMap: qiScreenTipMap.get(langueKey.getKey().toLowerCase()).entrySet()){
+						fsvc.createScreenTip("queryItem", screenTipMap.getKey() , screenTipMap.getValue(), intLang );
+					}
+				
+					for(Entry<String, String> screenTipMap: qifScreenTipMap.get(langueKey.getKey().toLowerCase()).entrySet()){
+						fsvc.createScreenTip("queryItemFolder", screenTipMap.getKey() , screenTipMap.getValue(), intLang );
+					}
+					intLang ++;
+					
+				}
+				//end add locales
+		
+		// add value to labelMap in order to translate Time Dimension Level
+		//English
+		if (labelMap.get("en")!=null) {
+			Map<String, String> m = labelMap.get("en");
+			m.put("YEAR", "Year"); m.put("YEAR_KEY", "Year key");
+			m.put("QUARTER", "Quarter"); m.put("QUARTER_KEY", "Quarter key"); 
+			m.put("MONTH", "Month"); m.put("MONTH_KEY", "Month key");
+			m.put("WEEK", "Week"); m.put("WEEK_KEY", "Week key");
+			m.put("DAY", "Day"); m.put("DAY_KEY", "Day key");
+			m.put("DAY_OF_WEEK", "Day of week"); 	m.put("DAY_OF_WEEK_KEY", "Day of week key");
+			m.put("AM/PM","Am/pm"); m.put("AM/PM_KEY","Am/pm key");
+			m.put("HOUR","Hour"); m.put("HOUR_KEY","Hour key");
+			m.put("MIN","Minute"); m.put("MIN_KEY","Minute key");
+			m.put("DATE", "Date"); m.put("DATE_KEY", "Date key");
+			m.put("Fact", "(Measures)");
+		}
+		//French
+		if (labelMap.get("fr")!=null) {
+			Map<String, String> m = labelMap.get("fr");
+			m.put("YEAR", "Année"); m.put("YEAR_KEY", "Année clef");
+			m.put("QUARTER", "Trimestre"); m.put("QUARTER_KEY", "Trimestre clef");
+			m.put("MONTH", "Mois"); m.put("MONTH_KEY", "Mois clef");
+			m.put("WEEK", "Semaine"); m.put("WEEK_KEY", "Semaine clef");
+			m.put("DAY", "Jour"); m.put("DAY_KEY", "Jour clef");
+			m.put("DAY_OF_WEEK", "Jour de la semaine"); m.put("DAY_OF_WEEK_KEY", "Jour de la semaine clef");
+			m.put("AM/PM","Am/pm"); m.put("AM/PM_KEY","Am/pm clef");
+			m.put("HOUR","Heure"); m.put("HOUR_KEY","Heure clef");
+			m.put("MIN","Minute"); m.put("MIN_KEY","Minute clef");
+			m.put("DATE", "Date"); m.put("DATE_KEY", "Date clef");
+			m.put("(By month)", "(Par mois)");
+			m.put("(By week)", "(Par semaine)");
+			m.put("(Rolling month)", "(Mois glissant)");
+			m.put("Fact", "(Mesures)");
+		}
+		// end static value to Map
+		
+		// tests
+		
+//		System.out.println(viewsFolders.toString());
+
+	for(Entry<String, Map<String, String>> langueKey: viewsLabelMap.entrySet()){
+		for(Entry<String, String> viewLabelm: viewsLabelMap.get(langueKey.getKey().toLowerCase()).entrySet()){
+//			System.out.println("label: " + viewLabelm.getKey() + " * * " + viewLabelm.getValue() );
+		}
+	}
+System.out.println("labelMapRefAliasLabel: " + labelMapRefAliasLabel.toString());
+		
+//		try {
 			try {
 				csvc.executeAllActions();
+			} catch (RemoteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (DocumentException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			catch(Exception e) {
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Cognos executeAllActions() failed.");
-				throw e;
-			}
-			
-			// fin tests
+//		}
+/*		catch(Exception e) {
+			result.put("STATUS", "KO");
+			result.put("ERROR", "Cognos executeAllActions() failed.");
+			throw e;
+		}
+*/		
+		// fin tests
+	
+		//stop();
+		csvc.saveModel();
+		csvc.closeModel();
+		csvc.logoff();
+		System.out.println("END COGNOS API");
 		
-			//stop();
-			csvc.saveModel();
-			csvc.closeModel();
-			csvc.logoff();
-			System.out.println("END COGNOS API");
-			
-			// code parser xml for labels
-			
-			System.out.println("START XML MODIFICATION");
+		// code parser xml for labels
+
+		System.out.println("START XML MODIFICATION");
 			try {
-				
-				String modelSharedPath = projectPath + "/model.xml";
 							
+				String modelSharedPath = projectPath + "/model.xml";
+				
 				Path input = Paths.get(modelSharedPath);
 				Path output = Paths.get(modelSharedPath);
+				
 				String datas = null;
 				String inputSearch = "xmlns=\"http://www.developer.cognos.com/schemas/bmt/60/12\"";
 				String outputSearch = "queryMode=\"dynamic\"";
 				String outputReplace = outputSearch + " " + inputSearch;  
 				
-				Charset charset = StandardCharsets.UTF_8;
+				charset = StandardCharsets.UTF_8;
 				if(Files.exists(input)){
 					datas = new String(Files.readAllBytes(input), charset);
 				}
@@ -725,9 +548,10 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				
 				// modifs
 				
+//				File xmlFile = new File(ConfigProperties.modelXML);
 				SAXReader reader = new SAXReader();
 				Document document = reader.read(new ByteArrayInputStream(datas.getBytes(StandardCharsets.UTF_8)));
-				
+
 				String namespaceName = "DATA";
 				String spath = "/project/namespace/namespace";
 				int k=1;
@@ -778,6 +602,8 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 					fsvc.recursiveParserDimension(document, spath, langLabelMap.getKey().toLowerCase(), langLabelMap.getValue(), labelMapRefAliasLabel.get(langLabelMap.getKey()));
 				}
 				
+
+				
 				try {
 	
 					datas = document.asXML();
@@ -792,98 +618,57 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				
 				// fin test writer
 				
-			} catch (DocumentException e) {
+			} catch (DocumentException | IOException e ) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("END XML MODIFICATION");
-			
+		System.out.println("END XML MODIFICATION");		
 			//publication
-//				System.out.println("Create and Publish Package");	
+//			System.out.println("Create and Publish Package");	
 			
 			//start
 			csvc = new CognosSVC(cognosDispatcher);
 			csvc.setPathToXML(pathToXML);
 			fsvc = new FactorySVC(csvc);
-			csvc.logon(cognosLogin, cognosPassword, cognosNamespace);
-			csvc.openModel(modelName, cognosFolder);
+			try {
+				csvc.logon(cognosLogin, cognosPassword, cognosNamespace);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				csvc.openModel(modelName, cognosFolder);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			fsvc.setLocale(cognosDefaultLocale);
 			
 			@SuppressWarnings("unused")
 			String[] locales = {cognosLocales};
 			fsvc.changePropertyFixIDDefaultLocale();
-//				fsvc.createPackage(modelName, modelName, modelName, locales);
-//				fsvc.publishPackage(modelName,"/content");
-			
-//			String actLog = null;
+//			fsvc.createPackage(modelName, modelName, modelName, locales);
+//			fsvc.publishPackage(modelName,"/content");
 			
 			try {
-//				actLog = csvc.executeAllActions();
 				csvc.executeAllActions();
-			}
-			catch(Exception e) {
-				result.put("STATUS", "KO");
-				result.put("ERROR", "Cognos executeAllActions() failed.");
-				throw e;
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (DocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			
 			csvc.saveModel();
 			csvc.closeModel();
-			csvc.logoff();		
+			csvc.logoff();
+			
 			
 			System.out.println("Model Generation Finished");
-
-			result.put("STATUS", "OK");
-			result.put("MESSAGE", projectName + " published sucessfully.");
-            // START Write action log file to server  
-//			prj = Paths.get((String) request.getSession().getAttribute("projectPath"));
-//			Path dlDir = Paths.get(prj + "/downloads");
-//			Path actLogFile = Paths.get(dlDir + "/actLog.xml");
-//			Files.write(actLogFile, actLog.getBytes());
-//			actLogFile.toFile().setReadable(true, false);
-            // END Write action log file to server  
-			
-		}
-		catch(Exception e){
-			result.put("STATUS", "KO");
-            result.put("EXCEPTION", e.getClass().getName());
-            result.put("MESSAGE", e.getMessage());
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            result.put("STACKTRACE", sw.toString());
-            String[] axisFault = StringUtils.substringsBetween(sw.toString(), "<ns1:messageString>", "</ns1:messageString>");
-            if(axisFault != null && axisFault.length > 0) {
-            	result.put("AXISFAULT", axisFault);
-            }
-            e.printStackTrace(System.err);
-            // START Write error file to server  
-			Path prj = Paths.get((String) request.getSession().getAttribute("projectPath"));
-			Path dlDir = Paths.get(prj + "/downloads");
-			Path errorFile = Paths.get(dlDir + "/error.json");
-			Files.write(errorFile, Tools.toJSON(result).getBytes());
-			errorFile.toFile().setReadable(true, false);
-            // END Write error file to server  
-            
-        }
-		
-		finally {
-			//response to the browser
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			response.getWriter().write(Tools.toJSON(result));
-		}
-		
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
-
-	protected void createViews(String cognosDefaultLocale) {
+	
+	protected static void createViews(String cognosDefaultLocale) {
 		for(Entry<String, QuerySubject> query_subject: query_subjects_views.entrySet()){
 			if (query_subject.getValue().getType().equalsIgnoreCase("Final")){
 
@@ -987,7 +772,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 	
-	protected void createViewsf1(String cognosDefaultLocale, String racineFolderPath, Field f, String qsFinal, String gDirName, String qsFinalName) {
+	protected static void createViewsf1(String cognosDefaultLocale, String racineFolderPath, Field f, String qsFinal, String gDirName, String qsFinalName) {
 		String repName = "";
 		String repNameTab[] = StringUtils.splitByWholeSeparator(f.getField_name(), ") ");
 
@@ -1080,7 +865,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 	
-	protected void f1(String qsAlias, String qsAliasInc, String gDirName, String qsFinal, String qsFinalName, Map<String, Integer> recurseCount, String qSleftType, String leftFilterNameSpace) {
+	protected static void f1(String qsAlias, String qsAliasInc, String gDirName, String qsFinal, String qsFinalName, Map<String, Integer> recurseCount, String qSleftType, String leftFilterNameSpace) {
 		
 		Map<String, Integer> copyRecurseCount = new HashMap<String, Integer>();
 		copyRecurseCount.putAll(recurseCount);
@@ -1182,6 +967,9 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 					if (query_subjects.get(pkAlias + namespaceID).getFilters()!=null && !query_subjects.get(pkAlias + namespaceID).getFilters().isEmpty())
 					{
 						
+//						fsvc.createQuerySubject(namespaceName, "FILTER_" + namespaceName, qsFinalName + gDirNameCurrent, qsFinalName + gDirNameCurrent);
+						System.out.println("Filters: (pkAlias + namespaceID): " + pkAlias + namespaceID);
+						
 						Map<String, Filter> qsFilters = query_subjects.get(pkAlias + namespaceID).getFilters();
 							
 						int z = 0;
@@ -1193,6 +981,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 								if (!isFilterRefCreated) {
 									fsvc.createQuerySubject(namespaceName, "FILTER_" + namespaceName, qsFinalName + gDirNameCurrent, qsFinalName + gDirNameCurrent);
 									filterNameSpaceSource = "[FILTER_" + namespaceName + "]";
+									System.out.println("Filters created for: " + qsFinalName + gDirNameCurrent);
 									isFilterRefCreated = true;
 								}
 								
@@ -1209,14 +998,16 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 									}
 									name = name + z;
 								}
-								
+							
 								fsvc.createQuerySubjectFilter(pathRefQs , exp, name, option, z);
 								z++;
 							}
 						}
+
+//						filterNameSpaceSource = "[FILTER_" + namespaceName + "]";
 					}
 					//end filtre
-
+					
 					String gFieldNameReorder;
 					if(qSleftType.equals("Final")) {
 						gFieldNameReorder = rel.getAbove();
@@ -1241,7 +1032,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							if(langDesc.getValue() == null || langDesc.getValue().equals("")) {
 								qifScreenTipMap.get(langDesc.getKey()).put(qsFinal + ".[" + gDirNameCurrent + "]", query_subjects.get(pkAlias + namespaceID).getTable_name());
 								} else {
-									System.out.println("QSF langDesc : " + langDesc.getValue());
+//									System.out.println("QSF langDesc : " + langDesc.getValue());
 									qifScreenTipMap.get(langDesc.getKey()).put(qsFinal + ".[" + gDirNameCurrent + "]", query_subjects.get(pkAlias + namespaceID).getTable_name() + ": " + langDesc.getValue());
 								}
 						}
@@ -1258,10 +1049,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 						if (rel.isRef()) {
 							if (field.isCustom()) {
 								
-								String exp = field.getExpression();
-//								exp = StringUtils.replace(exp, "*", filterNameSpaceSource + ".[" + qsFinalName + gDirNameCurrent +"]");
-								exp = StringUtils.replace(exp, "**", "[DATA].[" + qsFinalName + "].[" + gDirNameCurrent.substring(1));
-								fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gFieldName + "." + field.getField_name(), exp);
+								fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gFieldName + "." + field.getField_name(), field.getExpression());
 						
 							} else {
 							fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gFieldName + "." + field.getField_name(), filterNameSpaceSource + ".[" + qsFinalName + gDirNameCurrent +"].[" + field.getField_name() + "]");
@@ -1356,8 +1144,10 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 						
 						fixedExp = StringUtils.replace(fixedExp, "LEFT[" + leftQsType + "].[" + qsAlias + "]", "[" + leftQsType + "].[" + qsAliasInc + "]");
 						fixedExp = StringUtils.replace(fixedExp, "RIGHT[", "[");
-
-					//end for recursive QS
+						System.out.println("Recursive fixedExp: " + fixedExp);
+						System.out.println("Recursive fixedExp: " + fixedExp);
+					//end for recursive QS			
+						
 					} else {
 						//original line
 						fixedExp = StringUtils.replace(fixedExp, "[" + leftQsType + "].[" + qsAlias + "]", "[" + leftQsType + "].[" + qsAliasInc + "]");
@@ -1365,7 +1155,8 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 					//end fix recursive tables
 				}
 				fixedExp = StringUtils.replace(fixedExp, "[" + namespaceName + "].[" + pkAlias + "]", "[" + namespaceName + "].[" + qsFinalName + gDirNameCurrent + "]");
-				System.out.println("tra : " + fixedExp);
+
+				//				System.out.println("tra : " + fixedExp);
 				
 				RS.setExpression(fixedExp);
 				if (rel.isRightJoin())
@@ -1393,7 +1184,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 	
-	protected void createMeasures(String PreviousQSID, String qsID, Boolean first, Map<String, Map<String, String>> mm) {
+	protected static void createMeasures(String PreviousQSID, String qsID, Boolean first, Map<String, Map<String, String>> mm) {
 
 		QuerySubject query_subject = query_subjects.get(qsID);
 		QuerySubject query_subject_prev = query_subjects.get(PreviousQSID);
@@ -1432,7 +1223,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 	
-	protected void scanDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsHN, Map<String, Map<String, String>> dimensionsAT) {
+	protected static void scanDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsHN, Map<String, Map<String, String>> dimensionsAT) {
 		//On parcours tous les QS Final + Ref pour trouver les différentes dimensions, sans alimenter les hierachies, ni les levels, ni les champs
 		
 		for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
@@ -1552,7 +1343,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 	
-	protected void scanFinalFieldsDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsHN, Map<String, Map<String, String>> dimensionsAT) {
+	protected static void scanFinalFieldsDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsHN, Map<String, Map<String, String>> dimensionsAT) {
 		
 		for (Entry<String, Map<String, String>> dimension: dimensions.entrySet()) {
 			System.out.println("dimension.getKey() : " + dimension.getKey());
@@ -1607,7 +1398,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 			
-	protected void scanRefFieldsDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsHN, Map<String, Map<String, String>> dimensionsAT, String dimension, String qsAlias, String qsAliasInc, String gDirName, String qsFinal, String qsFinalName, Map<String, Integer> recurseCount, Boolean qSleftIsFinal) {
+	protected static void scanRefFieldsDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsHN, Map<String, Map<String, String>> dimensionsAT, String dimension, String qsAlias, String qsAliasInc, String gDirName, String qsFinal, String qsFinalName, Map<String, Integer> recurseCount, Boolean qSleftIsFinal) {
 		//On va parcourir chaque arbre ref en partant de la table final, afin de pouvoir utiliser le gDirName pour modifier la référence de la clef du map. Ex SYSUSERRef devient pour cognos [DATA].[S_SAMPLE].[SECURITYUSER.SYSUSERDESC]
 		
 		Map<String, String> hierarchiesFields = dimensions.get(dimension);
@@ -1682,7 +1473,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 			
-	protected void createHierarchiesNb(Map<String, Map<String, String>> dimensions) {
+	protected static void createHierarchiesNb(Map<String, Map<String, String>> dimensions) {
 		
 		for(Entry<String, Map<String, String>> dimension: dimensions.entrySet()){
 			if(!dimension.getKey().startsWith("Time Dimension")) {
@@ -1705,7 +1496,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 	
-	protected int createHierarchiesNbRecurs (Map<String, String> dimensionFields, String previousField, Map<String, String> hierarchies, int i) {
+	protected static int createHierarchiesNbRecurs (Map<String, String> dimensionFields, String previousField, Map<String, String> hierarchies, int i) {
 
 		String hierarchyBase = hierarchies.get(Integer.toString(i));
 		Boolean addHierarchy = false;
@@ -1722,7 +1513,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		return i;
 	}
 
-	protected void renameHierarchies(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsHN){
+	protected static void renameHierarchies(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsHN){
 		for(Entry<String, Map<String, String>> dimension: dimensions.entrySet()){
 			if(!dimension.getKey().startsWith("Time Dimension")) {
 				Map<String, String> hierarchies = new HashMap<String, String>();
@@ -1769,7 +1560,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		}
 	}
 	
-	protected void buildDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsAT, Map<String, Map<String, String>> measures, String dbEngine){
+	protected static void buildDimensions(Map<String, Map<String, String>> dimensions, Map<String, Map<String, String>> dimensionsBK, Map<String, Map<String, String>> dimensionsAT, Map<String, Map<String, String>> measures, String dbEngine){
 		
 		Map<String, String> dimensionScreenTip = new HashMap<String, String> ();
 		Map<String, String> hierarchyScreenTip = new HashMap<String, String> ();
@@ -2041,7 +1832,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				}
 	}
 	
-	protected Boolean isQsHigherThanMeasure(String qsIDMeasure, String searchQsID) {
+	protected static Boolean isQsHigherThanMeasure(String qsIDMeasure, String searchQsID) {
 		QuerySubject qS = query_subjects.get(qsIDMeasure);
 		
 		if (qsIDMeasure.equals(searchQsID)) {
@@ -2059,7 +1850,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 		return false;
 	}
 	
-	protected void moveDimensions(String qsID, Map <String, Map<String, String>> dimensions) {
+	protected static void moveDimensions(String qsID, Map <String, Map<String, String>> dimensions) {
 
 		QuerySubject query_subject = query_subjects.get(qsID);
 		

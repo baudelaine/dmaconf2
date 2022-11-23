@@ -211,7 +211,7 @@ public class CognosSVC {
 					
 					if (actionsMap.get(String.valueOf(j)) != null) {
 						
-						System.out.println(j + " < " + m);
+//						System.out.println(j + " < " + m);
 						Element e = actionsMap.get(String.valueOf(j));
 						e.addAttribute("seq", String.valueOf(j));
 						lst.add(e);

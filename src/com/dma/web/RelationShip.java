@@ -6,7 +6,7 @@
 package com.dma.web;
 
 import java.util.UUID;
-
+import org.apache.commons.lang3.StringUtils;
 /**
  *
  * @author Iqbal
@@ -26,7 +26,11 @@ public class RelationShip {
 	public RelationShip(String querySubject_left, String querySubject_right) {
 		this.querySubject_left = querySubject_left;
 		this.querySubject_right = querySubject_right;
-		this.Name = UUID.randomUUID().toString();
+//		this.Name = UUID.randomUUID().toString();
+		String ExpName = querySubject_left + "-" + querySubject_right;
+		ExpName = StringUtils.replace(ExpName, "[", "");
+		ExpName = StringUtils.replace(ExpName, "]", "");
+		this.Name = ExpName;
 		// this.Name = "NNN";
 
 	}

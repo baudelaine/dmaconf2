@@ -509,6 +509,8 @@ public class FactorySVC {
 		    cdata.setText("");
 			cdata.addCDATA(root_cdata.asXML());
 
+			Exp = StringUtils.replace(Exp, "<", "&lt;");
+			Exp = StringUtils.replace(Exp, ">", "&gt;");
 			
 			//gestion des refobj
 			String str = elemExp.getStringValue();
@@ -571,6 +573,7 @@ public class FactorySVC {
 			qiName.addAttribute("value", name);
 			qiName.addAttribute("locale", locale);
 			
+			
 			//gestion des refobj
 			//String str = xp.getStringValue();
 			//String refobjMaker[] = StringUtils.splitByWholeSeparator(str, "expToReplace");
@@ -626,6 +629,9 @@ public class FactorySVC {
 			qiName.setText(name);
 			qiPathNewItem.setText("/O/name[0]/O/" + querySubject + ".[New Query Item]");
 			qiPath.setText("/O/expression[0]/O/" + querySubject + ".[" + name + "]");
+			
+			exp = StringUtils.replace(exp, "<", "&lt;");
+			exp = StringUtils.replace(exp, ">", "&gt;");
 			
 			//gestion des refobj
 			String str = xp.getStringValue();
@@ -700,6 +706,9 @@ public class FactorySVC {
 			n2.setText("/O/expression[0]/O/" + QS + ".[" + Name + "]");
 			folder.setText(QS + ".[" + Folder + "]");
 			nm.setText(Name);
+			
+			Exp = StringUtils.replace(Exp, "<", "&lt;");
+			Exp = StringUtils.replace(Exp, ">", "&gt;");
 			
 			//gestion des refobj
 			String str = xp.getStringValue();
@@ -807,7 +816,12 @@ public class FactorySVC {
 
 			String lRefobj = refobjMaker[0];
 			String rRefobj = refobjMaker[1];
-			String splitExp[] = StringUtils.splitByWholeSeparator(rs.getExpression(), "].[");
+			
+			String rsExp = rs.getExpression();
+			rsExp = StringUtils.replace(rsExp, "<", "&lt;");
+			rsExp = StringUtils.replace(rsExp, ">", "&gt;");
+			
+			String splitExp[] = StringUtils.splitByWholeSeparator(rsExp, "].[");
 			str = "";
 			for (int i = 0 ; i < splitExp.length ; i++) {
 				String strAdd = "";
