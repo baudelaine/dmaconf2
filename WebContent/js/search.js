@@ -49,7 +49,7 @@ $(document)
 .ready(function() {
   buildTable($('#searchTable'), searchCols);
   checkDBMD();
-  // ChooseTable($('#searchSelect'));
+  ChooseTable($('#searchSelect'));
   ChooseColumn($('#searchColumnSelect'));
   // GetDBMD($('#searchTable'));
 })
