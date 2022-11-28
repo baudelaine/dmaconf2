@@ -1660,14 +1660,31 @@ function ChooseTable(table, sort) {
       url: "GetTables",
       dataType: 'json',
       async: true,
-      success: function(tables) {
-        console.log(tables);
-        $.each(tables, function(i, obj){
-          var option = '<option class="fontsize" value="' + obj.name + '">' + obj.name + '</option>';
+      // success: function(tables) {
+      //   console.log(tables);
+      //   $.each(tables, function(i, obj){
+      //     var option = '<option class="fontsize" value="' + obj.name + '">' + obj.name + '</option>';
+      //     table.append(option);
+      //   });
+      //   table.selectpicker('refresh');
+      // }
+      success: function(data) {
+        console.log(data);
+        $.each(data.TABLES, function(tableName, tableType){
+          if(tableType == "VIEW"){
+            var option = '<option class="fontsize" value="' + tableName + '" data-subtext="(' + tableType + ')">' + tableName + '</option>';
+          }
+          if(tableType == "TABLE"){
+            var option = '<option class="fontsize" value="' + tableName + '">' + tableName + '</option>';
+          }
           table.append(option);
         });
         table.selectpicker('refresh');
+      },
+      error: function(data) {
+          console.log(data);
       }
+
       });
     }
 
