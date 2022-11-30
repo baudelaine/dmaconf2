@@ -124,6 +124,21 @@ $('#dynamicModal').on('shown.bs.modal', function(){
 
 });
 
+$("#watchContent").click(function(){
+  var table_name = $('#searchSelect').find("option:selected").val();
+  if(!table_name == ""){
+  var query = "select * from " + table_name;
+  console.log(query);
+  var parms = {query: query};
+  localStorage.setItem('SQLQuery', JSON.stringify(parms));
+  window.open("watchContent.html");
+  }
+  else{
+    showalert("No Table selected.", "Select a table first.", "alert-warning", "bottom");
+    $("#tables").selectpicker("toggle");
+  }
+})
+
 $('#modQueriesList').on('hidden.bs.modal', function() {
 });
 
