@@ -85,10 +85,10 @@ public class UpdateModelServlet extends HttpServlet {
 				
 				Map<String, Map<String, Field>> modelMap = new HashMap<String, Map<String, Field>>();
 				Map<String, Map<String, Field>> dbMap = new HashMap<String, Map<String, Field>>();
-				Map<String, Integer> colCountMap = new HashMap<String, Integer>();
 				
 				// Start build modelMap and put custom fields in customFields
 				for(QuerySubject qs: qss) {
+					String _id = qs.get_id();
 					String table = qs.getTable_name();
 					List<Field> fields = qs.getFields();
 					Map<String, Field> fMap = new HashMap<String, Field>();
@@ -103,7 +103,7 @@ public class UpdateModelServlet extends HttpServlet {
 						}
 					}
 					modelMap.put(table, fMap);
-					customFields.put(table, customFList);
+					customFields.put(_id, customFList);
 				}
 				// End build modelMap and put custom fields in customFields
 
@@ -186,8 +186,6 @@ public class UpdateModelServlet extends HttpServlet {
 				    	if(modelMap.containsKey(table)) {
 					    	System.out.println(table);
 							ResultSet rstFields = metaData.getColumns(conn.getCatalog(), schema, table, "%");
-							ResultSetMetaData rsmd = rstTables.getMetaData();
-							colCountMap.put(table, rsmd.getColumnCount());
 							Map<String, Field> fMap = new HashMap<String, Field>();
 							while(rstFields.next()){
 								Field field = new Field();
@@ -215,8 +213,8 @@ public class UpdateModelServlet extends HttpServlet {
 				    rstTables.close();
 					// End build dbMap and colCountMap
 				    
-				    System.out.println(modelMap);
-				    System.out.println(dbMap);
+//				    System.out.println(modelMap);
+//				    System.out.println(dbMap);
 				    
 				    // Start Update ORDINAL_POSITION (fieldPos) of existing field in model and put fields that does not exists in db in fieldsToRemove 
 				    for(Entry<String, Map<String, Field>> model: modelMap.entrySet()) {
@@ -283,12 +281,14 @@ public class UpdateModelServlet extends HttpServlet {
 						if(fieldsToAdd.get(qs.getTable_name()) != null) {
 							fields.addAll(fieldsToAdd.get(qs.getTable_name()));
 						}
-						int fieldPos = colCountMap.get(qs.getTable_name());
-//						System.out.println(qs.getTable_name());
-//						System.out.println(fieldPos);
-						if(customFields.get(qs.getTable_name()) != null) {
-							for(Field customField: customFields.get(qs.getTable_name())) {
-								customField.setFieldPos(fieldPos++);
+						int fieldPos = fields.size();
+						System.out.println("qs.getTable_name()=" + qs.getTable_name());
+						System.out.println("fieldPos=" + fieldPos);
+						if(customFields.get(qs.get_id()) != null) {
+							for(Field customField: customFields.get(qs.get_id())) {
+								System.out.println("customFields.get(qs.get_id())=" + customFields.get(qs.get_id()));
+								System.out.println("fieldPos=" + fieldPos);
+								customField.setFieldPos(++fieldPos);
 								fields.add(customField);
 							}
 						}
