@@ -70,9 +70,9 @@ public class GetDatabaseMetaDatasFromCache extends HttpServlet {
 				result.put("DATAS", dbmd);
 			}
 			else {
-				throw new Exception(path.toString() + " not found.");
+				result.put("STATUS", "KO");
+				result.put("RESPONSE", path.toString() + " not found.");
 			}
-				
 			
 		}
 		catch (Exception e) {

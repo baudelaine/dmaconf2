@@ -1479,6 +1479,7 @@ function RemoveDBMD(){
                 $('#searchTable').bootstrapTable("removeAll");
                 $('#searchSelect').empty();
                 $('#searchSelect').selectpicker('refresh');
+                ChooseTable($('#searchSelect'));
                 checkDBMD();
               }
               else{
