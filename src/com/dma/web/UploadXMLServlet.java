@@ -130,11 +130,13 @@ public class UploadXMLServlet extends HttpServlet {
 						querySubject.setType("TABLE");
 						NodeList qs = qss.getChildNodes();
 						List<Field> fields = new ArrayList<Field>();
+						int fieldPos = 1;
 						for(int i = 0; i < qs.getLength(); i++){
 							if(qs.item(i).getNodeName().equalsIgnoreCase("queryItem")) {
 								Node qis = qs.item(i);
 								NodeList qi = qis.getChildNodes();
 								Field field = new Field();
+								field.setFieldPos(fieldPos++);
 								for(int j = 0; j < qi.getLength(); j++) {
 									System.out.println("\t" + qi.item(j).getNodeName() + "\t" + qi.item(j).getTextContent());
 									switch(qi.item(j).getNodeName()) {
