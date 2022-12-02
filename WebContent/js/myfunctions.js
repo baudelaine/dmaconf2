@@ -3153,6 +3153,16 @@ function buildRelationTable($el, cols, data, qs){
             updateCell($el, row.index, field, newValue);
             break;
 
+          case "relationship":
+            console.log("on a clické sur relationship");
+            console.log(value);
+            console.log(row);
+            console.log(field);
+            $newRowModal.modal('toggle');
+            $('#modQuerySubject').text(qs);
+            ChooseField($('#modColumn'), row.table_name);            
+            break;
+
           case "nommageRep":
             var allowNommageRep = true;
 

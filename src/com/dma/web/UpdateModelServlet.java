@@ -174,7 +174,7 @@ public class UpdateModelServlet extends HttpServlet {
 				    ResultSet rstTables = metaData.getTables(conn.getCatalog(), schema, "%", types);					    
 				    while (rstTables.next()) {
 				    	String table = rstTables.getString("TABLE_NAME");
-				    	if(modelFields.containsKey(table)) {
+				    	if(tablesInModel.contains(table)) {
 							ResultSet rstFields = metaData.getColumns(conn.getCatalog(), schema, table, "%");
 							Map<String, Field> fMap = new HashMap<String, Field>();
 							while(rstFields.next()){
