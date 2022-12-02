@@ -3158,9 +3158,9 @@ function buildRelationTable($el, cols, data, qs){
             console.log(value);
             console.log(row);
             console.log(field);
-            $newRowModal.modal('toggle');
-            $('#modQuerySubject').text(qs);
-            ChooseField($('#modColumn'), row.table_name);            
+            // $newRowModal.modal('toggle');
+            // $('#modQuerySubject').text(qs);
+            // ChooseField($('#modColumn'), row.table_name);            
             break;
 
           case "nommageRep":
