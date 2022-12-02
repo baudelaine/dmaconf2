@@ -6348,7 +6348,7 @@ $("#updateModel").click(function(){
     success: function(data) {
         console.log(data);
 
-        if(jQuery.isEmptyObject(data.ADDED) && jQuery.isEmptyObject(data.REMOVED)){
+        if(jQuery.isEmptyObject(data.ADDED) && jQuery.isEmptyObject(data.REMOVED)  && jQuery.isEmptyObject(data.UPDATED)){
           bootbox.alert({
             message: "Model is already up to date.",
             size: "small",

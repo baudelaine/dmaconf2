@@ -79,38 +79,40 @@ public class UpdateModelServlet extends HttpServlet {
 				List<QuerySubject> qss = (List<QuerySubject>) Tools.fromJSON((String) parms.get("model"), new TypeReference<List<QuerySubject>>(){});
 
 				Map<String, List<Field>> fieldsToRemove = new HashMap<String, List<Field>>();
-				Map<String, List<Field>> fieldsToAdd = new HashMap<String, List<Field>>();
+				Map<String, Set<Field>> fieldsToAdd = new HashMap<String, Set<Field>>();
 				Map<String, List<Field>> fieldsToUpdate = new HashMap<String, List<Field>>();
-				Map<String, List<Field>> customFields = new HashMap<String, List<Field>>();
 
-				Map<String, List<Field>> newFields = new HashMap<String, List<Field>>();
-				
-				
-				Map<String, Map<String, Field>> modelMap = new HashMap<String, Map<String, Field>>();
+				Map<String, List<Field>> customFields = new HashMap<String, List<Field>>();
+				Map<String, Map<String, Field>> modelFields = new HashMap<String, Map<String, Field>>();
+
 				Map<String, Map<String, Field>> dbMap = new HashMap<String, Map<String, Field>>();
 				Map<String, Map<String, Field>> xmlMap = new HashMap<String, Map<String, Field>>();
 				Map<String, Map<String, Field>> currentMap = new HashMap<String, Map<String, Field>>();
 				
-				// Start build modelMap and put custom fields in customFields
+				Map<String, Map<String, Map<String, Field>>> ids = new HashMap<String, Map<String, Map<String, Field>>>();
+				Set<String> tablesInModel = new HashSet<String>();
+
+				// Start build ids and put custom fields in customFields
 				for(QuerySubject qs: qss) {
-					String _id = qs.get_id();
+					String id = qs.get_id();
 					String table = qs.getTable_name();
-					List<Field> fields = qs.getFields();
-					Map<String, Field> fMap = new HashMap<String, Field>();
+					tablesInModel.add(table);
+					Map<String, Map<String, Field>> tables = new HashMap<String, Map<String, Field>>();
+					Map<String, Field> columns = new HashMap<String, Field>();
 					List<Field> customFList = new ArrayList<Field>();
-					for(Field field: fields) {
-						String fieldName = field.getField_name();
+					for(Field field: qs.getFields()) {
 						if(!field.isCustom()) {
-							fMap.put(fieldName, field);
+							columns.put(field.getField_name(), field);
 						}
 						else {
 							customFList.add(field);					
-						}
+						}						
 					}
-					modelMap.put(table, fMap);
-					customFields.put(_id, customFList);
+					tables.put(table, columns);
+					ids.put(id, tables);
+					customFields.put(id, customFList);
 				}
-				// End build modelMap and put custom fields in customFields
+				// End build ids and put custom fields in customFields
 
 				boolean isXML = false;
 				Project project = (Project) request.getSession().getAttribute("currentProject");
@@ -120,7 +122,6 @@ public class UpdateModelServlet extends HttpServlet {
 						isXML = true;
 					}
 				}
-
 				
 				if(isXML) {
 					@SuppressWarnings("unchecked")
@@ -128,30 +129,12 @@ public class UpdateModelServlet extends HttpServlet {
 					
 					for(Entry<String, QuerySubject> qs: qssXML.entrySet()) {
 						String table = qs.getKey();
-						if(modelMap.containsKey(table)){
+						if(tablesInModel.contains(table)){
 					    	System.out.println("XML " + table);
 					    	Map<String, Field> fMap = new HashMap<String, Field>();
 							List<Field> fields = qs.getValue().getFields();
 							for(Field field: fields) {
 								String column = field.getField_name();
-//								if(!modelMap.get(table).containsKey(field.getField_name())) {
-//									if(!newFields.containsKey(table)) {
-//										newFields.put(table, new ArrayList<Field>());
-//									}
-//									
-//									Field newField = new Field();
-//									newField.set_id(field.getField_name());
-//									newField.setField_name(field.getField_name());
-//									newField.setField_type(field.getField_type());
-//									Map<String, String> langsMap = new HashMap<String, String>();
-//									for(String lang: langs) {
-//										langsMap.put(lang, "");
-//									}
-//									newField.setLabels(langsMap);
-//									newField.setDescriptions(langsMap);
-//									
-//									newFields.get(table).add(newField);
-//								}
 								fMap.put(column, field);
 							}
 							xmlMap.put(table, fMap);
@@ -191,14 +174,12 @@ public class UpdateModelServlet extends HttpServlet {
 				    ResultSet rstTables = metaData.getTables(conn.getCatalog(), schema, "%", types);					    
 				    while (rstTables.next()) {
 				    	String table = rstTables.getString("TABLE_NAME");
-				    	if(modelMap.containsKey(table)) {
-					    	System.out.println(table);
+				    	if(modelFields.containsKey(table)) {
 							ResultSet rstFields = metaData.getColumns(conn.getCatalog(), schema, table, "%");
 							Map<String, Field> fMap = new HashMap<String, Field>();
 							while(rstFields.next()){
 								Field field = new Field();
 								String column = rstFields.getString("COLUMN_NAME");
-								System.out.println(column);
 								field.set_id(rstFields.getString("COLUMN_NAME"));
 								field.setField_name(rstFields.getString("COLUMN_NAME"));
 								field.setField_type(rstFields.getString("TYPE_NAME"));
@@ -223,81 +204,74 @@ public class UpdateModelServlet extends HttpServlet {
 				    currentMap = dbMap;
 				}
 				    
-//				    System.out.println(modelMap);
-//				    System.out.println(dbMap);
-			    
 			    // Start Update ORDINAL_POSITION (fieldPos) of existing field in model and put fields that does not exists in db in fieldsToRemove 
-			    for(Entry<String, Map<String, Field>> model: modelMap.entrySet()) {
-			    	String modelTable = model.getKey();
-			    	Map<String, Field> modelFieldsMap = model.getValue();
+			    for(Entry<String, Map<String, Map<String, Field>>> id: ids.entrySet()) {
+			    	String qs_id = id.getKey();
+			    	String qs_table = id.getValue().entrySet().iterator().next().getKey();
+			    	Map<String, Field> qs_columns = id.getValue().entrySet().iterator().next().getValue();
+			    	
 		    		List<Field> fieldsToRemoveList = new ArrayList<Field>();
 		    		List<Field> fieldsToUpdateList = new ArrayList<Field>();
-			    	for(Entry<String, Field> field: modelFieldsMap.entrySet()) {
-			    		String modelColumn = field.getKey();
-			    		Field modelField = field.getValue();
-				    	if(currentMap.get(modelTable).get(modelColumn) != null) {
-				    		int dbFieldPos = currentMap.get(modelTable).get(modelColumn).getFieldPos();
-				    		modelField.setFieldPos(dbFieldPos);
-				    		fieldsToUpdateList.add(modelField);
-//					    		System.out.println(modelColumn + " exists in DB (" + modelField.getFieldPos() + ")");
+
+		    		for(Entry<String, Field> column: qs_columns.entrySet()) {
+			    		String qs_column = column.getKey();
+			    		Field qs_field = column.getValue();
+				    	if(currentMap.get(qs_table).get(qs_column) != null) {
+				    		int dbFieldPos = currentMap.get(qs_table).get(qs_column).getFieldPos();
+				    		qs_field.setFieldPos(dbFieldPos);
+				    		fieldsToUpdateList.add(qs_field);
 				    	}
 				    	else {
-//					    		System.out.println(modelColumn + " DOES NOT exists in DB");
-				    		fieldsToRemoveList.add(modelField);
+				    		fieldsToRemoveList.add(qs_field);
 				    	}
 			    	}
 			    	if(!fieldsToRemoveList.isEmpty()) {
-			    		fieldsToRemove.put(modelTable, fieldsToRemoveList);
+			    		fieldsToRemove.put(qs_id, fieldsToRemoveList);
 			    	}
 			    	if(!fieldsToUpdateList.isEmpty()) {
-			    		fieldsToUpdate.put(modelTable, fieldsToUpdateList);
+			    		fieldsToUpdate.put(qs_id, fieldsToUpdateList);
 			    	}
 			    }
 			    // End Update ORDINAL_POSITION (fieldPos) of existing field in model and put fields that does not exists in db in fieldsToRemove 
 			    
-			    // Start Adding field in db that does not exists in model in fieldsToAdd
+			    // Start Adding field from db/xml that does not exists in model in fieldsToAdd
 			    for(Entry<String, Map<String, Field>> db: currentMap.entrySet()) {
 			    	String dbTable = db.getKey();
 			    	Map<String, Field> dbFieldsMap = db.getValue();
-			    	List<Field> fieldsToAddList = new ArrayList<Field>();
+			    	Set<Field> fieldsToAddList = new HashSet<Field>();
 			    	for(Entry<String, Field> field: dbFieldsMap.entrySet()) {
 			    		String dbColumn = field.getKey();
 			    		Field dbField = field.getValue();
-			    		if(modelMap.get(dbTable).get(dbColumn) == null) {
-			    			fieldsToAddList.add(dbField);
-//					    		System.out.println(dbColumn + " DOES NOT exists in model (" + dbField.getFieldPos() + ")");
+			    		for(QuerySubject qs: qss) {
+				    		if(ids.get(qs.get_id()).containsKey(dbTable)) {
+				    			if(! ids.get(qs.get_id()).get(dbTable).containsKey(dbColumn)) {
+				    				fieldsToAddList.add(dbField);
+				    			}
+				    		}
 			    		}
 			    	}
 			    	if(!fieldsToAddList.isEmpty()) {
 			    		fieldsToAdd.put(dbTable, fieldsToAddList);
 			    	}
 			    }
-			    // End Adding field in db that does not exists in model in fieldsToAdd
-			    
-			    
-			    
-//				    System.out.println(modelMap);
-//				    System.out.println(dbMap);
-//				    System.out.println(fieldsToRemove);
-//				    System.out.println(fieldsToAdd);
-//				    System.out.println(fieldsToUpdate);
-//				    System.out.println(customFields);
+			    // End Adding field from db/xml that does not exists in model in fieldsToAdd
 			    
 				for(QuerySubject qs: qss) {
 					List<Field> fields = new ArrayList<Field>();
-					if(fieldsToUpdate.get(qs.getTable_name()) != null) {
-						fields.addAll(fieldsToUpdate.get(qs.getTable_name()));
+					if(fieldsToUpdate.get(qs.get_id()) != null) {
+						fields.addAll(fieldsToUpdate.get(qs.get_id()));
 					}
 					if(fieldsToAdd.get(qs.getTable_name()) != null) {
 						fields.addAll(fieldsToAdd.get(qs.getTable_name()));
 					}
+					
+					if(fieldsToRemove.get(qs.get_id()) != null) {
+						fields.removeAll(fieldsToRemove.get(qs.get_id()));
+					}
+					
 					int fieldPos = fields.size();
-					System.out.println("qs.getTable_name()=" + qs.getTable_name());
-					System.out.println("fieldPos=" + fieldPos);
 					if(customFields.get(qs.get_id()) != null) {
 						for(Field customField: customFields.get(qs.get_id())) {
-							System.out.println("customFields.get(qs.get_id())=" + customFields.get(qs.get_id()));
-							System.out.println("fieldPos=" + fieldPos);
 							customField.setFieldPos(++fieldPos);
 							fields.add(customField);
 						}
@@ -308,7 +282,7 @@ public class UpdateModelServlet extends HttpServlet {
 				result.put("MODEL", qss);
 				result.put("REMOVED", fieldsToRemove);
 				result.put("ADDED", fieldsToAdd);
-				result.put("NEWFIELDS", newFields);
+				result.put("UPDATED", fieldsToUpdate);
 				result.put("CUSTOMFIELDS", customFields);
 				result.put("STATUS", "OK");
 			}
