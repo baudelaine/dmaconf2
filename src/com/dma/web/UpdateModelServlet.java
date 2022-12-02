@@ -80,7 +80,7 @@ public class UpdateModelServlet extends HttpServlet {
 
 				Map<String, List<Field>> fieldsToRemove = new HashMap<String, List<Field>>();
 				Map<String, Set<Field>> fieldsToAdd = new HashMap<String, Set<Field>>();
-				Map<String, List<Field>> fieldsToUpdate = new HashMap<String, List<Field>>();
+				Map<String, Set<Field>> fieldsToUpdate = new HashMap<String, Set<Field>>();
 
 				Map<String, List<Field>> customFields = new HashMap<String, List<Field>>();
 				Map<String, Map<String, Field>> modelFields = new HashMap<String, Map<String, Field>>();
@@ -211,7 +211,7 @@ public class UpdateModelServlet extends HttpServlet {
 			    	Map<String, Field> qs_columns = id.getValue().entrySet().iterator().next().getValue();
 			    	
 		    		List<Field> fieldsToRemoveList = new ArrayList<Field>();
-		    		List<Field> fieldsToUpdateList = new ArrayList<Field>();
+		    		Set<Field> fieldsToUpdateList = new HashSet<Field>();
 
 		    		for(Entry<String, Field> column: qs_columns.entrySet()) {
 			    		String qs_column = column.getKey();
@@ -242,31 +242,36 @@ public class UpdateModelServlet extends HttpServlet {
 			    	for(Entry<String, Field> field: dbFieldsMap.entrySet()) {
 			    		String dbColumn = field.getKey();
 			    		Field dbField = field.getValue();
+			    		String qs_id = null;
 			    		for(QuerySubject qs: qss) {
 				    		if(ids.get(qs.get_id()).containsKey(dbTable)) {
 				    			if(! ids.get(qs.get_id()).get(dbTable).containsKey(dbColumn)) {
+				    				qs_id = qs.get_id();
 				    				fieldsToAddList.add(dbField);
 				    			}
 				    		}
 			    		}
-			    	}
-			    	if(!fieldsToAddList.isEmpty()) {
-			    		fieldsToAdd.put(dbTable, fieldsToAddList);
+				    	if(!fieldsToAddList.isEmpty() && qs_id != null) {
+				    		fieldsToAdd.put(qs_id, fieldsToAddList);
+				    	}
+
 			    	}
 			    }
 			    // End Adding field from db/xml that does not exists in model in fieldsToAdd
 			    
 				for(QuerySubject qs: qss) {
-					List<Field> fields = new ArrayList<Field>();
-					if(fieldsToUpdate.get(qs.get_id()) != null) {
-						fields.addAll(fieldsToUpdate.get(qs.get_id()));
-					}
-					if(fieldsToAdd.get(qs.getTable_name()) != null) {
-						fields.addAll(fieldsToAdd.get(qs.getTable_name()));
-					}
-					
+					Set<Field> fields = new HashSet<Field>();
+
 					if(fieldsToRemove.get(qs.get_id()) != null) {
 						fields.removeAll(fieldsToRemove.get(qs.get_id()));
+					}
+
+					if(fieldsToAdd.get(qs.get_id()) != null) {
+						fields.addAll(fieldsToAdd.get(qs.get_id()));
+					}
+					
+					if(fieldsToUpdate.get(qs.get_id()) != null) {
+						fields.addAll(fieldsToUpdate.get(qs.get_id()));
 					}
 					
 					int fieldPos = fields.size();
@@ -276,7 +281,7 @@ public class UpdateModelServlet extends HttpServlet {
 							fields.add(customField);
 						}
 					}
-					qs.setFields(fields);
+					qs.setFields(new ArrayList<>(fields));
 				}
 				
 				result.put("MODEL", qss);

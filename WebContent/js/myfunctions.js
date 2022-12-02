@@ -3158,6 +3158,11 @@ function buildRelationTable($el, cols, data, qs){
             console.log(value);
             console.log(row);
             console.log(field);
+
+            // var alias = $('#modQuerySubject').text().split(" - ")[0];
+            // var type = $('#modQuerySubject').text().split(" - ")[1].toUpperCase();
+            // var table = $('#modQuerySubject').text().split(" - ")[2];
+          
             // $newRowModal.modal('toggle');
             // $('#modQuerySubject').text(qs);
             // ChooseField($('#modColumn'), row.table_name);            

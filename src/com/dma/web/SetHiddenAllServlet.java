@@ -91,7 +91,7 @@ public class SetHiddenAllServlet extends HttpServlet {
 				            rst1 = stmt.executeQuery(query1);
 //			            	System.out.println(query1); 
 				            if (!rst1.next()) {    
-				                System.out.println("No data"); 
+//				                System.out.println("No data"); 
 				                rst0Result.add(colName);
 				            } 		            
 			            }
