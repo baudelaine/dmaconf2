@@ -78,16 +78,20 @@ public class UpdateModelServlet extends HttpServlet {
 				@SuppressWarnings("unchecked")
 				List<QuerySubject> qss = (List<QuerySubject>) Tools.fromJSON((String) parms.get("model"), new TypeReference<List<QuerySubject>>(){});
 
-				Map<String, List<Field>> fieldsToRemove = new HashMap<String, List<Field>>();
-				Map<String, Set<Field>> fieldsToAdd = new HashMap<String, Set<Field>>();
-				Map<String, Set<Field>> fieldsToUpdate = new HashMap<String, Set<Field>>();
+				Map<String, Set<String>> fieldsToRemove = new HashMap<String, Set<String>>();
+				Map<String, Set<String>> fieldsToAdd = new HashMap<String, Set<String>>();
+				Map<String, Set<String>> fieldsToUpdate = new HashMap<String, Set<String>>();
 
 				Map<String, List<Field>> customFields = new HashMap<String, List<Field>>();
 				Map<String, Map<String, Field>> modelFields = new HashMap<String, Map<String, Field>>();
 
 				Map<String, Map<String, Field>> dbMap = new HashMap<String, Map<String, Field>>();
 				Map<String, Map<String, Field>> xmlMap = new HashMap<String, Map<String, Field>>();
-				Map<String, Map<String, Field>> currentMap = new HashMap<String, Map<String, Field>>();
+				Map<String, Map<String, Field>> currents = new HashMap<String, Map<String, Field>>();
+
+				Map<String, Map<String, Set<String>>> updates = new HashMap<String, Map<String, Set<String>>>();
+				List<QuerySubject> newQss = new ArrayList<QuerySubject>();
+				
 				
 				Map<String, Map<String, Map<String, Field>>> ids = new HashMap<String, Map<String, Map<String, Field>>>();
 				Set<String> tablesInModel = new HashSet<String>();
@@ -140,7 +144,7 @@ public class UpdateModelServlet extends HttpServlet {
 							xmlMap.put(table, fMap);
 						}
 					}
-					currentMap = xmlMap;
+					currents = xmlMap;
 				}
 				else {
 
@@ -201,93 +205,99 @@ public class UpdateModelServlet extends HttpServlet {
 				    }
 				    rstTables.close();
 					// End build dbMap
-				    currentMap = dbMap;
+				    currents = dbMap;
 				}
-				    
-			    // Start Update ORDINAL_POSITION (fieldPos) of existing field in model and put fields that does not exists in db in fieldsToRemove 
-			    for(Entry<String, Map<String, Map<String, Field>>> id: ids.entrySet()) {
+
+				
+				for(Entry<String, Map<String, Map<String, Field>>> id: ids.entrySet()) {
 			    	String qs_id = id.getKey();
 			    	String qs_table = id.getValue().entrySet().iterator().next().getKey();
 			    	Map<String, Field> qs_columns = id.getValue().entrySet().iterator().next().getValue();
-			    	
-		    		List<Field> fieldsToRemoveList = new ArrayList<Field>();
-		    		Set<Field> fieldsToUpdateList = new HashSet<Field>();
-
-		    		for(Entry<String, Field> column: qs_columns.entrySet()) {
-			    		String qs_column = column.getKey();
-			    		Field qs_field = column.getValue();
-				    	if(currentMap.get(qs_table).get(qs_column) != null) {
-				    		int dbFieldPos = currentMap.get(qs_table).get(qs_column).getFieldPos();
-				    		qs_field.setFieldPos(dbFieldPos);
-				    		fieldsToUpdateList.add(qs_field);
-				    	}
-				    	else {
-				    		fieldsToRemoveList.add(qs_field);
-				    	}
-			    	}
-			    	if(!fieldsToRemoveList.isEmpty()) {
-			    		fieldsToRemove.put(qs_id, fieldsToRemoveList);
-			    	}
-			    	if(!fieldsToUpdateList.isEmpty()) {
-			    		fieldsToUpdate.put(qs_id, fieldsToUpdateList);
-			    	}
-			    }
-			    // End Update ORDINAL_POSITION (fieldPos) of existing field in model and put fields that does not exists in db in fieldsToRemove 
-			    
-			    // Start Adding field from db/xml that does not exists in model in fieldsToAdd
-			    for(Entry<String, Map<String, Field>> db: currentMap.entrySet()) {
-			    	String dbTable = db.getKey();
-			    	Map<String, Field> dbFieldsMap = db.getValue();
-			    	Set<Field> fieldsToAddList = new HashSet<Field>();
-			    	for(Entry<String, Field> field: dbFieldsMap.entrySet()) {
-			    		String dbColumn = field.getKey();
-			    		Field dbField = field.getValue();
-			    		String qs_id = null;
-			    		for(QuerySubject qs: qss) {
-				    		if(ids.get(qs.get_id()).containsKey(dbTable)) {
-				    			if(! ids.get(qs.get_id()).get(dbTable).containsKey(dbColumn)) {
-				    				qs_id = qs.get_id();
-				    				fieldsToAddList.add(dbField);
-				    			}
-				    		}
-			    		}
-				    	if(!fieldsToAddList.isEmpty() && qs_id != null) {
-				    		fieldsToAdd.put(qs_id, fieldsToAddList);
-				    	}
-
-			    	}
-			    }
-			    // End Adding field from db/xml that does not exists in model in fieldsToAdd
-			    
+			    	Set<String> qs_columnsKeys = new HashSet<String>(qs_columns.keySet());
+			    	System.out.println(qs_id + " -> " + qs_table + " -> " + qs_columnsKeys.size() + " - " + qs_columnsKeys);
+			    	Map<String, Field> current_columns = currents.get(qs_table);
+			    	Set<String> current_columnsKeys = new HashSet<String>(current_columns.keySet());
+			    	Set<String> addedColumnsKeys = new HashSet<String>(current_columnsKeys);
+			    	addedColumnsKeys.removeAll(qs_columnsKeys);
+			    	System.out.println("addedColumnsKeys -> " + addedColumnsKeys.size() + " - " + addedColumnsKeys);
+			    	Set<String> removedColumnsKeys = new HashSet<String>(qs_columnsKeys);
+			    	removedColumnsKeys.removeAll(current_columnsKeys);
+			    	System.out.println("removedColumnsKeys -> " + removedColumnsKeys.size() + " - " + removedColumnsKeys);
+			    	Set<String> retainedColumnsKeys = new HashSet<String>(qs_columnsKeys);
+			    	retainedColumnsKeys.retainAll(current_columnsKeys);
+			    	System.out.println("retainedColumnsKeys -> " + retainedColumnsKeys.size() + " - " + retainedColumnsKeys);
+			    	Map<String, Set<String>> update = new HashMap<String, Set<String>>();
+			    	update.put("added", addedColumnsKeys);
+			    	update.put("removed", removedColumnsKeys);
+			    	update.put("retained", retainedColumnsKeys);
+			    	updates.put(qs_id, update);
+//			    	System.out.println(Tools.toJSON(updates));
+				}
+				
 				for(QuerySubject qs: qss) {
-					Set<Field> fields = new HashSet<Field>();
-
-					if(fieldsToRemove.get(qs.get_id()) != null) {
-						fields.removeAll(fieldsToRemove.get(qs.get_id()));
+					String id = qs.get_id();
+					String table = qs.getTable_name();
+					List<Field> fields = qs.getFields();
+					List<Field> newFields = new ArrayList<Field>();
+					for(Field field: fields) {
+						String column = field.getField_name();
+						Field newField = null;
+						if(updates.get(id).get("retained").contains(column)) {
+							newField = field;
+							newField.setFieldPos(currents.get(table).get(column).getFieldPos());
+							System.out.println("retain " + field.getField_name());
+						}
+						if(newField != null) {
+							newFields.add(newField);
+						}
+					}
+					if(! updates.get(id).get("added").isEmpty()) {
+						for(String fieldName: updates.get(id).get("added")) {
+							Field newField = currents.get(table).get(fieldName);
+							newFields.add(newField);
+							System.out.println("added " + newField.getField_name());
+						}
+					}
+					if(! updates.get(id).get("removed").isEmpty()) {
+						
 					}
 
-					if(fieldsToAdd.get(qs.get_id()) != null) {
-						fields.addAll(fieldsToAdd.get(qs.get_id()));
-					}
-					
-					if(fieldsToUpdate.get(qs.get_id()) != null) {
-						fields.addAll(fieldsToUpdate.get(qs.get_id()));
-					}
-					
-					int fieldPos = fields.size();
+					int fieldPos = newFields.size();
 					if(customFields.get(qs.get_id()) != null) {
 						for(Field customField: customFields.get(qs.get_id())) {
 							customField.setFieldPos(++fieldPos);
-							fields.add(customField);
+							newFields.add(customField);
 						}
 					}
-					qs.setFields(new ArrayList<>(fields));
+					
+					qs.setFields(newFields);
 				}
 				
+				for(Entry<String, Map<String, Set<String>>> update: updates.entrySet()) {
+					String qs_id = update.getKey();
+					System.out.println("qs_id=" + qs_id);
+					for(Entry<String, Set<String>> states: update.getValue().entrySet()) {
+						String state = states.getKey();
+						System.out.println("state=" + state);
+						switch (state) {
+							case "added":
+								fieldsToAdd.put(qs_id, updates.get(qs_id).get("added"));
+								break;
+							case "removed":
+								fieldsToRemove.put(qs_id, updates.get(qs_id).get("removed"));
+								break;
+							case "retained":
+								fieldsToUpdate.put(qs_id, updates.get(qs_id).get("retained"));
+								break;
+							}
+					}
+				}
+				
+				
 				result.put("MODEL", qss);
+				result.put("UPDATED", fieldsToUpdate);
 				result.put("REMOVED", fieldsToRemove);
 				result.put("ADDED", fieldsToAdd);
-				result.put("UPDATED", fieldsToUpdate);
 				result.put("CUSTOMFIELDS", customFields);
 				result.put("STATUS", "OK");
 			}

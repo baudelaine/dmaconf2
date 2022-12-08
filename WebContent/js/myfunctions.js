@@ -6377,10 +6377,14 @@ $("#updateModel").click(function(){
           $datasTable.bootstrapTable("load", data.MODEL);
           var list = '<ul class="list-group">';
           $.each(Object(data.ADDED), function(key, value){
-            list += '<li class="list-group-item">' + key + '<span class="badge badge-primary">+ ' + value.length + '</span></li>';
+            if(value.length > 0){
+              list += '<li class="list-group-item">' + key + '<span class="badge badge-primary">+ ' + value.length + '</span></li>';
+            }
           })
           $.each(Object(data.REMOVED), function(key, value){
-            list += '<li class="list-group-item">' + key + '<span class="badge badge-warning">- ' + value.length + '</span></li>';
+            if(value.length > 0){
+              list += '<li class="list-group-item">' + key + '<span class="badge badge-warning">- ' + value.length + '</span></li>';
+            }
           })
           list += '</ul>';
 
