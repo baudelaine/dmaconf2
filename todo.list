@@ -1,0 +1,11 @@
+Correction DMA - Hidden if no label (Mode deconnecté)
+               - Chargement des labels csv (Lorsqu'on charge ensuit les labels des QS. Le labels des champs fonctionne qd on le fait en premier (vérifier charser)
+               - % Mode connecté SQL server, et %par lien parent
+               - Remonter l'erreur comme avant dans le message rouge et dans le error.txt
+               - SQL Label par QS
+               - Bug quand on a fait watch content et qu'on ajoute un ref ou final par la suite
+               - Gérer la poubelle des final
+               - Ajouter la tarification (Comtpe Objets DMA, Relation Ref, Niveau et Mesure)
+               - Pouvoir télécharger le model.xml à tout moment
+               - Gérer le shutdown aléatoire
+               - Search Tool en mode déconnecté
