@@ -7992,7 +7992,7 @@ $("#metrics").click(function(){
       var measureCount = metricsObj.measureCount;
       var measureCountLabel = "MeasureCount"
       var customCount = metricsObj.customCount;
-      var customCountLabel = "CustomFieldsCount"
+      var customCountLabel = "CustomFieldCount"
 
       var list = '<ul class="list-group">';
           list += '<li class="list-group-item">' + qsCountLabel + '<span class="badge badge-primary">+ ' + qsCount + '</span></li>';
