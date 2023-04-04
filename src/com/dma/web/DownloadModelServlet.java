@@ -61,7 +61,7 @@ public class DownloadModelServlet extends HttpServlet {
 			result.put("PRJ", prj.toString());
 			
 			parms = Tools.fromJSON(request.getInputStream());
-			result.put("PARMS", parms);
+//			result.put("PARMS", parms);
 
 			if(parms != null) {
 				

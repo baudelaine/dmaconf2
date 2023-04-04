@@ -7949,6 +7949,76 @@ $("#ulPrjFile").change(function(){
 
 })
 
+$("#metrics").click(function(){
+
+  $datasTable.bootstrapTable("filterBy", {});
+  var qss = $datasTable.bootstrapTable('getData');
+  var view = $('#ViewsTable').bootstrapTable("getData");
+
+  if (qss.length == 0) {
+    showalert("GetMetrics()", "No query subject loaded.", "alert-warning", "bottom");
+    return;
+  }
+  
+  var parms = { 
+    qss: JSON.stringify(qss),
+    view: JSON.stringify(view)
+  };
+  console.log(parms);
+
+  $.ajax({
+		type: 'POST',
+		url: "GetMetrics",
+		dataType: 'json',
+    data: JSON.stringify(parms),
+
+		success: function(data) {
+      console.log(data.DATAS);
+
+      /*
+      {"qsCount":108,"finCount":24,"refCount":172,"dimensionCount":82,"measureCount":25,"customCount":88}
+      */
+
+      var jsonObj = data.DATAS;
+      var metricsObj = JSON.parse(jsonObj);
+      var qsCount = metricsObj.qsCount;
+      var qsCountLabel = "qsCount"
+      var finCount = metricsObj.finCount;
+      var finCountLabel = "finCount"
+      var refCount = metricsObj.refCount;
+      var refCountLabel = "refCount"
+      var dimensionCount = metricsObj.dimensionCount;
+      var dimensionCountLabel = "dimensionCount"
+      var measureCount = metricsObj.measureCount;
+      var measureCountLabel = "measureCount"
+      var customCount = metricsObj.customCount;
+      var customCountLabel = "customCount"
+
+      var list = '<ul class="list-group">';
+          list += '<li class="list-group-item">' + qsCountLabel + '<span class="badge badge-primary">+ ' + qsCount + '</span></li>';
+          list += '<li class="list-group-item">' + finCountLabel + '<span class="badge badge-primary">+ ' + finCount + '</span></li>';
+          list += '<li class="list-group-item">' + refCountLabel + '<span class="badge badge-primary">+ ' + refCount + '</span></li>';
+          list += '<li class="list-group-item">' + dimensionCountLabel + '<span class="badge badge-primary">+ ' + dimensionCount + '</span></li>';
+          list += '<li class="list-group-item">' + measureCountLabel + '<span class="badge badge-primary">+ ' + measureCount + '</span></li>';
+          list += '<li class="list-group-item">' + customCountLabel + '<span class="badge badge-primary">+ ' + customCount + '</span></li>';
+      list += '</ul>';
+
+      bootbox.alert({
+        title: "Metrics :",
+        message: list,
+        callback: function(result){
+        }
+      });        
+
+		},
+		error: function(data) {
+      console.log(data);
+		}
+	});
+
+})
+
+
 $("#settings").click(function(){
 
   $.ajax({
