@@ -7982,17 +7982,17 @@ $("#metrics").click(function(){
       var jsonObj = data.DATAS;
       var metricsObj = JSON.parse(jsonObj);
       var qsCount = metricsObj.qsCount;
-      var qsCountLabel = "qsCount"
+      var qsCountLabel = "QuerySubjectCount"
       var finCount = metricsObj.finCount;
-      var finCountLabel = "finCount"
+      var finCountLabel = "RelationFinalCount"
       var refCount = metricsObj.refCount;
-      var refCountLabel = "refCount"
+      var refCountLabel = "RelationRefCount"
       var dimensionCount = metricsObj.dimensionCount;
-      var dimensionCountLabel = "dimensionCount"
+      var dimensionCountLabel = "LevelDimensionCount"
       var measureCount = metricsObj.measureCount;
-      var measureCountLabel = "measureCount"
+      var measureCountLabel = "MeasureCount"
       var customCount = metricsObj.customCount;
-      var customCountLabel = "customCount"
+      var customCountLabel = "CustomFieldsCount"
 
       var list = '<ul class="list-group">';
           list += '<li class="list-group-item">' + qsCountLabel + '<span class="badge badge-primary">+ ' + qsCount + '</span></li>';

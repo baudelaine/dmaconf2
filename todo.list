@@ -9,3 +9,4 @@ Correction DMA - Hidden if no label (Mode deconnecté)
                - Pouvoir télécharger le model.xml à tout moment
                - Gérer le shutdown aléatoire
                - Search Tool en mode déconnecté
+ - Ajouter indicateur DMA (Nb Fields in table)
