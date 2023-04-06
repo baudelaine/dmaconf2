@@ -14,12 +14,12 @@ public class Test15 {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 
-		Path path = Paths.get("/home/fr054721/dmagui/ca/model.xml");
+		Path path = Paths.get("/home/fr054721/Downloads/bdxmet/model.xml");
 
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(path.toFile());
 
-		String namespaceName = "SHARED_ZONE";
+		String namespaceName = "Model";
 		String spath = "/project/namespace/namespace";
 		int k=1;
 		

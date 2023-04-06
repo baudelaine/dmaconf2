@@ -25,7 +25,7 @@ public class Test14
     {
         //Get DOM Node for XML
 //        String fileName= "/home/fr054721/dmagui/ca/employees.xml";
-		Path path = Paths.get("/home/fr054721/dmagui/ca/model.xml");
+		Path path = Paths.get("/home/fr054721/Downloads/bdxmet/model.xml");
         Document document = getDocument(path);
          
         String xpathExpression = "";
@@ -34,7 +34,7 @@ public class Test14
 
 
         //Get all employee ids
-        xpathExpression = "/project/namespace/namespace[name='SHARED_ZONE']/querySubject";
+        xpathExpression = "/project/namespace/namespace/querySubject";
         System.out.println( evaluateXPath(document, xpathExpression) );
         
 //        //Get all employee ids

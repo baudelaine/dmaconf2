@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -124,10 +125,30 @@ public class UploadXMLServlet extends HttpServlet {
 					for(int index = 0; index < nodeList.getLength(); index++){
 						Node qss = nodeList.item(index);
 						String table_name = getTextContent(qss, "name");
-						System.out.println(table_name);
+//						System.out.println(table_name);
 						QuerySubject querySubject = new QuerySubject();
 						querySubject.setTable_name(table_name);
-						querySubject.setType("TABLE");
+						
+						// Get tableType in definition/dbQuery
+						NodeList qssChildNodes = qss.getChildNodes();
+						for(int i = 0; i < qssChildNodes.getLength(); i++){
+							Node qssChildNode = qssChildNodes.item(i);
+							if(qssChildNode.getNodeName() == "definition") {
+								NodeList defNodes = qssChildNode.getChildNodes();
+								for(int j = 0; j < defNodes.getLength(); j++){
+									Node defNode = defNodes.item(j);
+									if(defNode.getNodeName() == "dbQuery") {
+										String table_type = getTextContent(defNode, "tableType");
+//										System.out.println(table_type);
+										querySubject.setType(table_type.toUpperCase());
+									}
+								}
+							}
+						}
+						
+						
+						
+						
 						NodeList qs = qss.getChildNodes();
 						List<Field> fields = new ArrayList<Field>();
 						int fieldPos = 1;
@@ -156,7 +177,13 @@ public class UploadXMLServlet extends HttpServlet {
 					}				
 					request.getSession().setAttribute("QSFromXML", querySubjects);
 	
-					result.put("TABLES", querySubjects.keySet());
+					Map<String, String> tables = new HashMap<String, String>();
+					for(Entry<String, QuerySubject> qs: querySubjects.entrySet()) {
+						tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
+					}
+				    result.put("TABLES", tables);
+					
+//					result.put("TABLES", querySubjects.keySet());
 					
 					nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/relationship", document, XPathConstants.NODESET);
 					
