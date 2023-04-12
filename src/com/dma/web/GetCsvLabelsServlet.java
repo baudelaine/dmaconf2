@@ -127,7 +127,7 @@ public class GetCsvLabelsServlet extends HttpServlet {
 				
 					Properties props = new java.util.Properties();
 					props.put("separator",";");
-					props.put("charset", "ISO-8859-1");
+					props.put("charset", "UTF-8");
 					Connection csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
 					Statement csvStmt = csvCon.createStatement();
 					ResultSet csvRst = null;
@@ -150,11 +150,12 @@ public class GetCsvLabelsServlet extends HttpServlet {
 						
 						String sql = null;
 						if(lang != null) {
-							sql = "SELECT " + selectClause + " FROM tableLabel-" + lang + "where " + whereClause + " in " + inClause;
+							sql = "SELECT " + selectClause + " FROM tableLabel-" + lang + " where " + whereClause + " in " + inClause;
 						}
 						else {
 							sql = "SELECT " + selectClause + " FROM tableLabel where " + whereClause + " in " + inClause;
 						}
+						System.out.println("sql=" + sql);
 						csvRst = csvStmt.executeQuery(sql);
 						while(csvRst.next()){
 							tlMap.put(csvRst.getString("Table_Name").toUpperCase(), csvRst.getString("Table_Label"));
