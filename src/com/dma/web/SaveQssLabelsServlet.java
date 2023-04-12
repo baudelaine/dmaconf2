@@ -110,7 +110,7 @@ public class SaveQssLabelsServlet extends HttpServlet {
 						StringBuffer clBuf = new StringBuffer();
 						StringBuffer cdBuf = new StringBuffer();
 						clBuf.append(qs.getTable_name() + delim + field.getField_name());
-						cdBuf.append(qs.getTable_name());
+						cdBuf.append(qs.getTable_name() + delim + field.getField_name());
 						String cLabel = "";
 						if(field.getLabels().containsKey(lang)) {
 							cLabel = field.getLabels().get(lang);

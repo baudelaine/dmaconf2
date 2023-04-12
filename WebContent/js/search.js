@@ -1188,7 +1188,7 @@ function GetCsvLabels(){
 
   $.ajax({
     type: 'POST',
-    url: "GetCsvLabels",
+    url: "GetDBMDCsvLabels",
     dataType: 'json',
     data: JSON.stringify(parms),
 
