@@ -6061,8 +6061,13 @@ $('#XMLFile').change(function(){
 
           table.empty();
 
-          $.each(data.TABLES, function(i, obj){
-            var option = '<option class="fontsize" value="' + obj + '">' + obj + '</option>';
+          $.each(data.TABLES, function(tableName, tableType){
+            if(tableType == "VIEW"){
+              var option = '<option class="fontsize" value="' + tableName + '" data-subtext="(' + tableType + ')">' + tableName + '</option>';
+            }
+            if(tableType == "TABLE"){
+              var option = '<option class="fontsize" value="' + tableName + '">' + tableName + '</option>';
+            }
             table.append(option);
           });
           table.selectpicker('refresh');

@@ -1,3 +1,4 @@
+var currentProject;
 var queriesList = [];
 var searchCols = [];
 searchCols.push({field:"table_name", title: "Table<br>Name", sortable: true, searchable: false});
@@ -47,6 +48,7 @@ function isIndexedFormatter(value, row, index) {
 
 $(document)
 .ready(function() {
+  GetCurrentProject();
   buildTable($('#searchTable'), searchCols);
   checkDBMD();
   ChooseTable($('#searchSelect'));
@@ -67,6 +69,7 @@ $(document)
 });
 
 $('#dynamicModal').on('shown.bs.modal', function(){
+
     console.log("dynamicModal shown.bs.modal");
     $(this).find('.modal-header').find('.modal-title').empty();
     $(this).find('.modal-body').empty();
@@ -124,7 +127,58 @@ $('#dynamicModal').on('shown.bs.modal', function(){
 
 });
 
+function GetCurrentProject(){
+  $.ajax({
+    type: 'POST',
+    url: "GetCurrentProject",
+    dataType: 'json',
+    async: true,
+    success: function(data) {
+      currentProject = data.data;
+    },
+    error: function(data) {
+      console.log(data);
+    }
+  });
+}
+
+
+function promptTeasing(){
+
+  bootbox.confirm({
+    title: "Feature is not available",
+    message: "Some features are available only when project is connected to a database.<br>Ask for more informations ?",
+    buttons: {
+      cancel: {
+          label: 'Cancel',
+          className: 'btn btn-default'
+      },
+      confirm: {
+          label: 'Ask',
+          className: 'btn btn-primary'
+      }
+    },
+    callback: function(result){
+      if(result){
+        console.log("ask was clicked...");
+        window.open("http://data-accelerator.com/contact/");
+      }
+    }
+  });
+}
+
 $("#watchContent").click(function(){
+
+  if(currentProject){
+    console.log(currentProject.resource.jndiName);
+    if(currentProject.resource.jndiName == "XML"){
+      promptTeasing();  
+    }
+  }
+
+  else{
+
+
   var table_name = $('#searchSelect').find("option:selected").val();
   if(!table_name == ""){
   var query = "select * from " + table_name;
@@ -136,6 +190,7 @@ $("#watchContent").click(function(){
   else{
     showalert("No Table selected.", "Select a table first.", "alert-warning", "bottom");
     $("#tables").selectpicker("toggle");
+  }
   }
 })
 
@@ -173,7 +228,15 @@ $('#queryModal').on('hidden.bs.modal', function() {
 // START
 
 $("#addSqlLabel").click(function(){
-  $('#queryModal').modal('toggle');
+  if(currentProject){
+    console.log(currentProject.resource.jndiName);
+    if(currentProject.resource.jndiName == "XML"){
+      promptTeasing();  
+    }
+    else{
+      $('#queryModal').modal('toggle');
+    }
+  }
 })
 
 $("#addCsvLabel").click(function(){
@@ -646,7 +709,15 @@ function UploadCSV($el, fileName, $table){
 
 
 $("#addSqlRel").click(function(){
-  $('#relsQueryModal').modal('toggle');
+  if(currentProject){
+    console.log(currentProject.resource.jndiName);
+    if(currentProject.resource.jndiName == "XML"){
+      promptTeasing();  
+    }
+    else{
+      $('#relsQueryModal').modal('toggle');
+    }
+  }
 })
 
 $('#relsQueryModal').on('shown.bs.modal', function() {
