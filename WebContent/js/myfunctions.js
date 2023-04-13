@@ -5344,7 +5344,6 @@ function GetCurrentProject(){
                     table.append(option);
                   });
                   table.selectpicker('refresh');
-        
                 }
                 if(data.MESSAGE == "model.xml not found."){
                   bootbox.confirm({
@@ -6419,45 +6418,37 @@ $("#updateModel").click(function(){
 
 $('#setHiddenINL').click(function(){
 
-  if(currentProject){
-    console.log(currentProject.resource.jndiName);
-    if(currentProject.resource.jndiName == "XML"){
-      promptTeasing();  
+    var table = $("#qsSelect").find("option:selected").val();
+    var lang = $("#langSelect").find("option:selected").val();
+    console.log(table);
+    console.log(lang);
+    if(!table == ""){
+  
+      var qsId = $("#qsSelect").find("option:selected").text();
+      var qss = $datasTable.bootstrapTable('getData');
+      var qs;
+      var index;
+      $.each(qss, function(i, o){
+        if(o._id.match(qsId)){
+          qs = o;
+          index = i;
+          console.log(qs);
+          $.each(qs.fields, function(j, field){
+            if(!field.labels[lang]){
+              field.hidden = true;
+            }
+          })
+        }
+      })
+      $refTab.tab('show');
+      $qsTab.tab('show');
+      $datasTable.bootstrapTable('expandRow', index);
+  
     }
     else{
-      var table = $("#qsSelect").find("option:selected").val();
-      var lang = $("#langSelect").find("option:selected").val();
-      console.log(table);
-      console.log(lang);
-      if(!table == ""){
-    
-        var qsId = $("#qsSelect").find("option:selected").text();
-        var qss = $datasTable.bootstrapTable('getData');
-        var qs;
-        var index;
-        $.each(qss, function(i, o){
-          if(o._id.match(qsId)){
-            qs = o;
-            index = i;
-            console.log(qs);
-            $.each(qs.fields, function(j, field){
-              if(!field.labels[lang]){
-                field.hidden = true;
-              }
-            })
-          }
-        })
-        $refTab.tab('show');
-        $qsTab.tab('show');
-        $datasTable.bootstrapTable('expandRow', index);
-    
-      }
-      else{
-        showalert("No Query Subject selected.", "Select a Query Subject first.", "alert-warning", "bottom");
-        $("#qsSelect").selectpicker("toggle");
-      }
+      showalert("No Query Subject selected.", "Select a Query Subject first.", "alert-warning", "bottom");
+      $("#qsSelect").selectpicker("toggle");
     }
-  }
 })
 
 function saveHiddenQuery(){
