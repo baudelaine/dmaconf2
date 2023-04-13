@@ -341,10 +341,6 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 		    	PreparedStatement stmt = null;
 		    	Connection csvCon = null;
 		    	
-		    	int FKSeqCount = 0;
-		    	Set<String> FKSet = new HashSet<String>();
-		    	int PKSeqCount = 0;
-		    	Set<String> PKSet = new HashSet<String>();
 		    	
 				if(Files.exists(Paths.get(prj + "/relation.csv"))) {
 					Properties props = new java.util.Properties();
@@ -353,6 +349,11 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 				}
 		    	
 				for(Entry<String, QuerySubject> qss: qsFromXML.entrySet()) {
+
+			    	int FKSeqCount = 0;
+			    	Set<String> FKSet = new HashSet<String>();
+			    	int PKSeqCount = 0;
+			    	Set<String> PKSet = new HashSet<String>();
 					String tableName = qss.getKey();
 					QuerySubject qs = qss.getValue();
 
@@ -402,6 +403,11 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 		    		table.setTable_exportedKeysCount(PKSet.size());
 		    		table.setTable_exportedKeysSeqCount(PKSeqCount);
 		            
+		    		String stats = "(0) (" + FKSet.size() + ") (" + FKSeqCount + ") (" + PKSet.size() +
+		    				") (" + PKSeqCount + ") (0) (0)";  
+		    		table.setTable_stats(stats);
+		    		
+		    		
 		            Map<String, DBMDColumn> cols = new HashMap<String, DBMDColumn>();
 				    for(Field field: qs.getFields()){
 					    DBMDColumn col = new DBMDColumn();

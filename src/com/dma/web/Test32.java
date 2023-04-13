@@ -31,15 +31,22 @@ public class Test32 {
 		}
 
 		String tableName = "WORKORDER";
-		String sql = "SELECT distinct(FK_NAME), PKTABLE_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
+//		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";
+//		String sql = "SELECT FK_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
+//		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
+//		String sql = "SELECT FK_NAME FROM relation where PKTABLE_NAME = '" + tableName + "'";
+		String sql = "SELECT * FROM relation where FKTABLE_NAME = '" + tableName + "'";
+
+//		String sql = "SELECT KEY_SEQ FROM relation where PKTABLE_NAME = '" + tableName + "'";
+//		String sql = "SELECT distinct(PKCOLUMN_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
 		System.out.println("sql=" + sql);
 		stmt = csvCon.prepareStatement(sql);
 		rst = stmt.executeQuery();
 		int count = 0;
 		
     	while(rst.next()){
-    		String FKName = rst.getString("FK_NAME");
-    		System.out.println("FKName=" + FKName);
+//    		String FKName = rst.getString("FK_NAME");
+//    		System.out.println("FKName=" + FKName);
     		++count;
     	}
         if(rst != null) {
