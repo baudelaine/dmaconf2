@@ -2114,7 +2114,19 @@ function duplicateFormatter(value, row, index) {
 
 function removeRootTableFormatter(value, row, index) {
 
-  if(!row.linker && row.linker_ids[0] == "Root"){
+// console.log(row.relations);
+
+var relChecked = false;
+
+$.each(row.relations, function(i, rel){
+  if(rel.fin || rel.ref || rel.tra || rel.sec){
+    relChecked = true;
+  }
+});
+
+// console.log(relChecked);
+
+  if(!relChecked){
 
   return [
       '<a class="remove" href="javascript:void(0)" title="Remove">',
@@ -3792,16 +3804,37 @@ function buildTable($el, cols, data) {
           if(activeTab.match("Final")){
             if(field.match("remove")){
 
-              if(row.linker_ids){
-                if(row.linker_ids[0].match("Root") && !row.linker){
+              // console.log(row.relations);
+
+              var relChecked = false;
+              
+              $.each(row.relations, function(i, rel){
+                if(rel.fin || rel.ref || rel.tra || rel.sec){
+                  relChecked = true;
+                }
+              });
+              
+              // console.log(relChecked);
+              if(!relChecked){
                   $el.bootstrapTable("filterBy", {});
                   $el.bootstrapTable('remove', {
                     field: 'index',
                     values: [row.index]
                   });
                   $el.bootstrapTable("filterBy", {type: 'Final'});
-                }
               }
+
+
+              // if(row.linker_ids){
+              //   if(row.linker_ids[0].match("Root") && !row.linker){
+              //     $el.bootstrapTable("filterBy", {});
+              //     $el.bootstrapTable('remove', {
+              //       field: 'index',
+              //       values: [row.index]
+              //     });
+              //     $el.bootstrapTable("filterBy", {type: 'Final'});
+              //   }
+              // }
             }
           }
 
