@@ -336,13 +336,71 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 			    if(rst0 != null){rst0.close();}
 		    }
 		    else {
+		    	
+		    	ResultSet rst = null;
+		    	PreparedStatement stmt = null;
+		    	Connection csvCon = null;
+		    	
+		    	int FKSeqCount = 0;
+		    	Set<String> FKSet = new HashSet<String>();
+		    	int PKSeqCount = 0;
+		    	Set<String> PKSet = new HashSet<String>();
+		    	
+				if(Files.exists(Paths.get(prj + "/relation.csv"))) {
+					Properties props = new java.util.Properties();
+					props.put("separator",";");
+					csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
+				}
+		    	
 				for(Entry<String, QuerySubject> qss: qsFromXML.entrySet()) {
 					String tableName = qss.getKey();
 					QuerySubject qs = qss.getValue();
+
+					String sql = "SELECT * FROM relation where FKTABLE_NAME = '" + tableName + "'";
+					stmt = csvCon.prepareStatement(sql);
+					rst = stmt.executeQuery();
+					result.put("FKS", "CSV");
+					
+			    	while(rst.next()){
+			    		String FKName = rst.getString("FK_NAME");
+			    		FKSet.add(FKName);
+			    		FKSeqCount++;
+			    	}
+		            if(rst != null) {
+		            	rst.close();
+		            	rst = null;
+		            }
+		    		if(stmt != null) {
+		    			stmt.close();
+		    			stmt = null;
+		    		}
+					
+					sql = "SELECT * FROM relation where PKTABLE_NAME = '" + tableName + "'";
+					stmt = csvCon.prepareStatement(sql);
+					rst = stmt.executeQuery();
+					result.put("PKS", "CSV");
+		    		
+			    	while(rst.next()){
+			    		String PKName = rst.getString("FK_NAME");
+			    		PKSet.add(PKName);
+			    		PKSeqCount++;
+			    	}
+		            if(rst != null) {
+		            	rst.close();
+		            	rst = null;
+		            }
+		    		if(stmt != null) {
+		    			stmt.close();
+		    			stmt = null;
+		    		}
 					
 		            DBMDTable table = new DBMDTable();
 		            table.setTable_name(qs.getTable_name());
 		            table.setTable_type(qs.getType());
+		    		table.setTable_importedKeysCount(FKSet.size());
+		    		table.setTable_importedKeysSeqCount(FKSeqCount);
+		    		table.setTable_exportedKeysCount(PKSet.size());
+		    		table.setTable_exportedKeysSeqCount(PKSeqCount);
 		            
 		            Map<String, DBMDColumn> cols = new HashMap<String, DBMDColumn>();
 				    for(Field field: qs.getFields()){
@@ -354,7 +412,11 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 				    }
 				    table.setColumns(cols);
 				    dbmd.put(tableName, table);					
-				}		    	
+				}
+	    		if(csvCon != null) {
+	    			csvCon.close();
+	    			csvCon = null;
+	    		}
 		    }
 		    
 			request.getSession().setAttribute("dbmd", dbmd);

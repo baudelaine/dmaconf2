@@ -184,34 +184,38 @@ public class UploadXMLServlet extends HttpServlet {
 				    result.put("TABLES", tables);
 					
 //					result.put("TABLES", querySubjects.keySet());
+
+					Path relationsPath = Paths.get(prj + "/relation.csv");
 					
-					nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/relationship", document, XPathConstants.NODESET);
-					
-					List<String> relations = new ArrayList<String>();
-					
-					for(int index = 0; index < nodeList.getLength(); index++){
-						Node qss = nodeList.item(index);
-						NodeList qs = qss.getChildNodes();
-						for(int i = 0; i < qs.getLength(); i++){
-							if(qs.item(i).getNodeName().equalsIgnoreCase("expression")) {
-								if(qs.item(i).getTextContent().contains("[PHYSICAL]")) {
-									String exp = "";
-									exp = qs.item(i).getTextContent();
-									exp = exp.replace("[PHYSICAL].", "");
-									exp = exp.replaceAll("[\\[\\]]", "");
-									relations.addAll(getCSV(exp));
-									
+					if(! Files.exists(relationsPath)) {
+				    
+						nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/relationship", document, XPathConstants.NODESET);
+						
+						List<String> relations = new ArrayList<String>();
+						
+						for(int index = 0; index < nodeList.getLength(); index++){
+							Node qss = nodeList.item(index);
+							NodeList qs = qss.getChildNodes();
+							for(int i = 0; i < qs.getLength(); i++){
+								if(qs.item(i).getNodeName().equalsIgnoreCase("expression")) {
+									if(qs.item(i).getTextContent().contains("[PHYSICAL]")) {
+										String exp = "";
+										exp = qs.item(i).getTextContent();
+										exp = exp.replace("[PHYSICAL].", "");
+										exp = exp.replaceAll("[\\[\\]]", "");
+										relations.addAll(getCSV(exp));
+										
+									}
 								}
 							}
+							
 						}
-						
+		
+						List<String> header = Arrays.asList("FK_NAME;PK_NAME;FKTABLE_NAME;PKTABLE_NAME;KEY_SEQ;FKCOLUMN_NAME;PKCOLUMN_NAME");
+						Files.write(relationsPath, header);
+						Files.write(relationsPath, relations, StandardOpenOption.APPEND);
+						relationsPath.toFile().setReadable(true, false);
 					}
-	
-					Path relationsPath = Paths.get(prj + "/relation.csv");
-					List<String> header = Arrays.asList("FK_NAME;PK_NAME;FKTABLE_NAME;PKTABLE_NAME;KEY_SEQ;FKCOLUMN_NAME;PKCOLUMN_NAME");
-					Files.write(relationsPath, header);
-					Files.write(relationsPath, relations, StandardOpenOption.APPEND);
-					relationsPath.toFile().setReadable(true, false);
 					result.put("MESSAGE", "model.xml uploaded successfully.");
 					result.put("STATUS", "OK");
 					
