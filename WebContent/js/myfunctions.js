@@ -3834,7 +3834,8 @@ function buildTable($el, cols, data) {
                 })
               })
   
-              $("#DatasTable").bootstrapTable('expandAllRows');
+              // $("#DatasTable").bootstrapTable('expandAllRows');
+              $("#DatasTable").bootstrapTable('expandRow', 0);
               $refTab.tab('show');
               $finTab.tab('show');
 
