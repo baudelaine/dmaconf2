@@ -2125,7 +2125,7 @@ $.each(row.relations, function(i, rel){
 });
 
 // console.log(relChecked);
-
+// if(!row.linker && row.linker_ids[0] == "Root"){
   if(!relChecked){
 
   return [
@@ -3804,7 +3804,9 @@ function buildTable($el, cols, data) {
           if(activeTab.match("Final")){
             if(field.match("remove")){
 
-              // console.log(row.relations);
+              console.log(row.relations);
+              var alias = row.table_alias;
+              console.log(alias);
 
               var relChecked = false;
               
@@ -3814,7 +3816,7 @@ function buildTable($el, cols, data) {
                 }
               });
               
-              // console.log(relChecked);
+              console.log(relChecked);
               if(!relChecked){
                   $el.bootstrapTable("filterBy", {});
                   $el.bootstrapTable('remove', {
@@ -3824,7 +3826,19 @@ function buildTable($el, cols, data) {
                   $el.bootstrapTable("filterBy", {type: 'Final'});
               }
 
+              $.each($datasTable.bootstrapTable('getData'), function(i, qs){
+                $.each(qs.relations, function(j, relation){
+                  if(relation.pktable_alias == alias && relation.type == "FINAL"){
+                    relation.fin = false;
+                  }
+                })
+              })
+  
+              $("#DatasTable").bootstrapTable('expandAllRows');
+              $refTab.tab('show');
+              $finTab.tab('show');
 
+        
               // if(row.linker_ids){
               //   if(row.linker_ids[0].match("Root") && !row.linker){
               //     $el.bootstrapTable("filterBy", {});
