@@ -50,7 +50,7 @@ $(document)
 .ready(function() {
   GetCurrentProject();
   buildTable($('#searchTable'), searchCols);
-  // checkDBMD();
+  checkDBMD();
   ChooseTable($('#searchSelect'));
   ChooseColumn($('#searchColumnSelect'));
   // GetDBMD($('#searchTable'));
@@ -1551,7 +1551,7 @@ function RemoveDBMD(){
                 $('#searchSelect').empty();
                 $('#searchSelect').selectpicker('refresh');
                 ChooseTable($('#searchSelect'));
-                // checkDBMD();
+                checkDBMD();
               }
               else{
                 alert = "alert-warning";
