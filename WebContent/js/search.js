@@ -1447,7 +1447,9 @@ function GetDBMD(table) {
             },
             callback: function (result) {
                 console.log(result);
-                SaveDBMD();
+                if(result){
+                  SaveDBMD();
+                }
             }
           });
         }
