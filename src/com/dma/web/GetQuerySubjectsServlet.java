@@ -107,12 +107,14 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 			if(project != null) {
 				language = project.languages.get(0);
 				qsFromXML = (Map<String, QuerySubject>) request.getSession().getAttribute("QSFromXML");
+				relationCount = false;
+				dbmd = (Map<String, DBMDTable>) request.getSession().getAttribute("dbmd");
+//				if(!project.getResource().getJndiName().equalsIgnoreCase("XML")) {
 				if(qsFromXML == null) {
 					withRecCount = (Boolean) request.getServletContext().getAttribute("withRecCount");
 					relationCount = project.isRelationCount();
 					con = (Connection) request.getSession().getAttribute("con");
 					schema = (String) request.getSession().getAttribute("schema");
-					dbmd = (Map<String, DBMDTable>) request.getSession().getAttribute("dbmd");
 					tableAliases = (Map<String, String>) request.getSession().getAttribute("tableAliases");
 					metaData = con.getMetaData();
 				}
@@ -239,9 +241,10 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 			
 		}
 		
-		if(importLabel && qsFromXML == null) {
-		
+		if(importLabel) {
+			System.out.println("l245");
 			if(dbmd != null){
+				System.out.println("l247");
 				DBMDTable dbmdTable = dbmd.get(table);
 				if(dbmdTable != null){
 					label = dbmdTable.getTable_remarks();

@@ -5392,6 +5392,7 @@ function GetCurrentProject(){
                     table.append(option);
                   });
                   table.selectpicker('refresh');
+                  GetDBMDFromCache();
                 }
                 if(data.MESSAGE == "model.xml not found."){
                   bootbox.confirm({
