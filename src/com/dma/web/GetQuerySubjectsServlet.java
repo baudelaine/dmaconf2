@@ -242,9 +242,7 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		}
 		
 		if(importLabel) {
-			System.out.println("l245");
 			if(dbmd != null){
-				System.out.println("l247");
 				DBMDTable dbmdTable = dbmd.get(table);
 				if(dbmdTable != null){
 					label = dbmdTable.getTable_remarks();
@@ -264,11 +262,38 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 	}
 	
 	protected List<Field> getFields() throws SQLException{
-		
-//		Map<String, Field> result = new HashMap<String, Field>();
-		
+
 		if(qsFromXML != null) {
-			return qsFromXML.get(table).getFields();
+			List<Field> fields = new ArrayList<Field>();
+	        Map<String, DBMDColumn> dbmdColumns = null;
+	        if(importLabel) {
+		        if(dbmd != null){
+		        	DBMDTable dbmdTable = dbmd.get(table);
+					if(dbmdTable != null){
+						dbmdColumns = dbmdTable.getColumns();
+					}
+		        }
+	        	if(dbmdColumns != null){
+	        		for(Field field: qsFromXML.get(table).getFields()) {
+		    			DBMDColumn dbmdColumn = dbmdColumns.get(field.getField_name());
+		    			if(dbmdColumn != null){
+		    				String label = (String) dbmdColumn.getColumn_remarks();
+			    			field.setLabel(label);
+			    			String desc = (String) dbmdColumn.getColumn_description();
+			    			field.setDescription(desc);
+			           		if(!language.isEmpty()) {
+			        			field.getLabels().put(language, label);
+			        			field.getDescriptions().put(language, desc);
+			        		}	    			
+		    			}
+		    			fields.add(field);
+	        		}
+	    		}
+		        return fields;
+	        }
+			else {
+				return qsFromXML.get(table).getFields();
+			}
 		}
 
 	    boolean tableIsView = false;
