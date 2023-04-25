@@ -103,9 +103,12 @@ public class UploadCSVServlet extends HttpServlet {
 					    	if(fileName.equalsIgnoreCase("relation.csv") && line.split(";").length >= 7) {
 					    		lines.add(line.replaceAll("\"", ""));
 					    	}
+					    	if(fileName.equalsIgnoreCase("relationExp.csv") && line.split(";").length >= 4) {
+					    		lines.add(line.replaceAll("\"", ""));
+					    	}
 					    }
 						
-					    Files.write(csv, lines, StandardCharsets.ISO_8859_1);
+					    Files.write(csv, lines, StandardCharsets.UTF_8);
 						csv.toFile().setReadable(true);
 					}
 				}
@@ -200,6 +203,23 @@ public class UploadCSVServlet extends HttpServlet {
 						data.put("KEY_SEQ", line.split(";")[4]);
 						data.put("FKCOLUMN_NAME", line.split(";")[5]);
 						data.put("PKCOLUMN_NAME", line.split(";")[6]);
+						result.put("STATUS", "OK");
+						result.put("MESSAGE", "CSV successfully saved in " + csv.toString());
+					}
+					else if(fileName.equalsIgnoreCase("relationExp.csv")) {
+						if(line.split(";").length != 4) {
+							Files.deleteIfExists(csv);
+							throw new ArrayIndexOutOfBoundsException();
+						}
+//						if(reader.getLineNumber() == 1 && !line.equalsIgnoreCase("FK_NAME;PK_NAME;FKTABLE_NAME;PKTABLE_NAME;KEY_SEQ;FKCOLUMN_NAME;PKCOLUMN_NAME")) {
+//							Files.deleteIfExists(csv);
+//							result.put("TROUBLESHOOTING", "Have a look at CSV format and e.g.");
+//							throw new Exception("First row have to match column headers.");
+//						}
+						data.put("JOIN_NAME", line.split(";")[0]);
+						data.put("FKTABLE_NAME", line.split(";")[1]);
+						data.put("PKTABLE_NAME", line.split(";")[2]);
+						data.put("RELATION_EXPRESSION", line.split(";")[3]);
 						result.put("STATUS", "OK");
 						result.put("MESSAGE", "CSV successfully saved in " + csv.toString());
 					}

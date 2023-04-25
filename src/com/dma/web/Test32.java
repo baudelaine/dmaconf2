@@ -21,21 +21,21 @@ public class Test32 {
     	PreparedStatement stmt = null;
     	Connection csvCon = null;
     	
-    	Path prj = Paths.get("/home/fr054721/Downloads/bdxmet");
+    	Path prj = Paths.get("/home/fr054721/Downloads/antibia");
     	
-		if(Files.exists(Paths.get(prj + "/relation.csv"))) {
+		if(Files.exists(Paths.get(prj + "/relationExp.csv"))) {
 			Properties props = new java.util.Properties();
 			props.put("separator",";");
 			Class.forName("org.relique.jdbc.csv.CsvDriver");
 			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
 		}
 
-		String tableName = "WORKORDER";
+		String tableName = "Tabtypco";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where PKTABLE_NAME = '" + tableName + "'";
-		String sql = "SELECT * FROM relation where FKTABLE_NAME = '" + tableName + "'";
+		String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + tableName + "'";
 
 //		String sql = "SELECT KEY_SEQ FROM relation where PKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT distinct(PKCOLUMN_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";

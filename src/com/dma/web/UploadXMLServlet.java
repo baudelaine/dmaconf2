@@ -117,8 +117,12 @@ public class UploadXMLServlet extends HttpServlet {
 					XPathFactory xfact = XPathFactory.newInstance();
 					XPath xpath = xfact.newXPath();
 					
-					NodeList nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/querySubject", document, XPathConstants.NODESET);
-	
+					NodeList nodeList = null;
+					
+					nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/querySubject", document, XPathConstants.NODESET);
+					if(nodeList.getLength() == 0) {
+						nodeList = (NodeList) xpath.evaluate("/project/namespace/querySubject", document, XPathConstants.NODESET);
+					}	
 	
 					Map<String, QuerySubject> querySubjects = new HashMap<String, QuerySubject>(); 
 					

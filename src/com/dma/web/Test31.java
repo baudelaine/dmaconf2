@@ -30,7 +30,13 @@ public class Test31 {
 		XPathFactory xfact = XPathFactory.newInstance();
 		XPath xpath = xfact.newXPath();
 		
-		NodeList nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/querySubject", document, XPathConstants.NODESET);
+		NodeList nodeList = null;
+		
+		
+		nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/querySubject", document, XPathConstants.NODESET);
+		if(nodeList.getLength() == 0) {
+			nodeList = (NodeList) xpath.evaluate("/project/namespace/querySubject", document, XPathConstants.NODESET);
+		}
 		
 		for(int index = 0; index < nodeList.getLength(); index++){
 			Node qss = nodeList.item(index);
