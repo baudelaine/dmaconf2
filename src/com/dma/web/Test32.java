@@ -47,6 +47,8 @@ public class Test32 {
     	while(rst.next()){
 //    		String FKName = rst.getString("FK_NAME");
 //    		System.out.println("FKName=" + FKName);
+//    		JOIN_NAME;FKTABLE_NAME;PKTABLE_NAME;RELATION_EXPRESSION
+    		System.out.println(rst.getString("FKTABLE_NAME") + ";" + rst.getString("PKTABLE_NAME") + ";" + rst.getString("RELATION_EXPRESSION"));
     		++count;
     	}
         if(rst != null) {

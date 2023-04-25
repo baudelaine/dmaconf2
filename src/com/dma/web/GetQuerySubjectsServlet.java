@@ -480,16 +480,16 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		PreparedStatement stmt = null;
 		ResultSet rst = null;
 		
-		if(Files.exists(Paths.get(prj + "/relationExp.csv"))) {
-			Properties props = new java.util.Properties();
-			props.put("separator",";");
-			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
-			String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + table + "'";
-			stmt = csvCon.prepareStatement(sql);
-			rst = stmt.executeQuery();
-			relationMode = "CSVEXP";
-		}
-		else if(Files.exists(Paths.get(prj + "/relation.csv"))) {
+//		if(Files.exists(Paths.get(prj + "/relationExp.csv"))) {
+//			Properties props = new java.util.Properties();
+//			props.put("separator",";");
+//			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
+//			String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + table + "'";
+//			stmt = csvCon.prepareStatement(sql);
+//			rst = stmt.executeQuery();
+//			relationMode = "CSVEXP";
+//		}
+		if(Files.exists(Paths.get(prj + "/relation.csv"))) {
 			Properties props = new java.util.Properties();
 			props.put("separator",";");
 			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
