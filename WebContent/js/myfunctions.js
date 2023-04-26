@@ -3371,6 +3371,11 @@ function buildRelationTable($el, cols, data, qs){
               updateCell($el, row.index, field, newValue);
               ChangeIcon(row, qs, "Identifier");
               if(row.fin && activeTab == "Final"){
+                console.log(row.pktable_name);
+                console.log(row.pktable_alias);
+                console.log("Final");
+                console.log(row._id);
+                console.log(qs.index);
                 GetQuerySubjects(row.pktable_name, row.pktable_alias, "Final", row._id, qs.index);
               }
               if(row.ref && activeTab == "Reference"){
@@ -4234,6 +4239,8 @@ function GetQuerySubjects(table_name, table_alias, type, linker_id, index) {
     linker_id = "Root";
   }
 
+  console.log(table_name);
+
 	if (table_name == undefined){
 		table_name = $tableList.find("option:selected").val();
 	}
@@ -4249,8 +4256,12 @@ function GetQuerySubjects(table_name, table_alias, type, linker_id, index) {
 		table_alias = table_name;
 	}
 
-  if($('#alias').val() != ""){
+  var a = $tableList.find("option:selected").val();
+  var b = $('#alias').val();
+
+  if(b != "" && b != a){
     table_alias = $('#alias').val();
+    console.log(table_alias);
   }
 
 	if(type == undefined){
