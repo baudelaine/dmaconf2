@@ -82,7 +82,7 @@ public class UploadCSVServlet extends HttpServlet {
 
 						String fileName = csv.getFileName().toString();
 						
-						LineNumberReader reader = new LineNumberReader(new BufferedReader(new InputStreamReader(item.getInputStream(), StandardCharsets.ISO_8859_1)));
+						LineNumberReader reader = new LineNumberReader(new BufferedReader(new InputStreamReader(item.getInputStream(), StandardCharsets.UTF_8)));
 
 						List<String> lines = new ArrayList<String>();
 						String line;

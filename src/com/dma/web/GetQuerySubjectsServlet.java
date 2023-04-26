@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.Properties;
 import java.util.Set;
 
@@ -480,15 +483,73 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		PreparedStatement stmt = null;
 		ResultSet rst = null;
 		
-//		if(Files.exists(Paths.get(prj + "/relationExp.csv"))) {
-//			Properties props = new java.util.Properties();
-//			props.put("separator",";");
-//			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
-//			String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + table + "'";
-//			stmt = csvCon.prepareStatement(sql);
-//			rst = stmt.executeQuery();
-//			relationMode = "CSVEXP";
-//		}
+		if(Files.exists(Paths.get(prj + "/relationExp.csv"))) {
+			Properties props = new java.util.Properties();
+			props.put("separator",";");
+			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
+			String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + table + "'";
+			stmt = csvCon.prepareStatement(sql);
+			rst = stmt.executeQuery();
+			relationMode = "CSVEXP";
+			
+    		List<Relation> result = new ArrayList<Relation>();
+    		// JOIN_NAME;FKTABLE_NAME;PKTABLE_NAME;RELATION_EXPRESSION
+    		// Jointure789;Pomphistservsec;Pomphistburosec;Pomphistservsec.CLEENREG=Pomphistburosec.CLEENREG and Pomphistservsec.CLEPERS=Pomphistburosec.CLEPERS
+    		
+    	    while (rst.next()) {
+
+		    	String fkName = "FK_" + rst.getString("JOIN_NAME"); 
+		    	String pkName = "PK_" + rst.getString("JOIN_NAME"); 
+		    	String fkTableName = rst.getString("FKTABLE_NAME");
+		    	String pkTableName = rst.getString("PKTABLE_NAME");
+//		    	String fkColumnName = "notAvailable";
+//		    	String pkColumnName = "notAvailable";
+		    	String relExp = rst.getString("RELATION_EXPRESSION");
+//		    	short keySeq = 1;
+	    		
+		    	Relation relation = new Relation();
+	        	relation.set_id(fkName + "F");
+	        	relation.setKey_name(fkName);
+	        	relation.setFk_name(fkName);
+	        	relation.setPk_name(pkName);
+	        	relation.setTable_name(fkTableName);
+	        	relation.setTable_alias(alias);
+	        	relation.setPktable_name(pkTableName);
+	        	relation.setPktable_alias(pkTableName);
+	//        	relation.setRelashionship("[" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
+	    		try {
+		    		relExp = relExp.replaceAll(fkTableName, "[" + type.toUpperCase() + "].[" + alias + "]");
+		    		relExp = relExp.replaceAll(pkTableName, "[" + pkTableName + "]");
+		    		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
+		    		Matcher m = p.matcher(relExp);
+		    		while (m.find()) {
+//		    		    System.out.println("m.group(1)=" + m.group(1));
+//		    		    System.out.println("m.group(2)=" + m.group(2));
+		    		    String field = m.group(2);
+		    		    relExp = relExp.replaceAll(field, "[" + field + "]");
+		    		}
+		    		relExp = relExp.replaceAll("\\[\\[", "[");
+		    		relExp = relExp.replaceAll("\\]\\]", "]");
+	    		}
+	    		catch(PatternSyntaxException e) {
+	    			continue;
+	    		}
+	        	
+	        	relation.setRelashionship(relExp);
+	//        	relation.setWhere(fktable_name + "." + fkcolumn_name + " = " + pktable_name + "." + pkcolumn_name);
+	        	relation.setKey_type("F");
+	        	relation.setType(type.toUpperCase());
+	        	relation.set_id("FK_" + relation.getPktable_alias() + "_" + alias + "_" + type.toUpperCase());
+//	        	relation.setAbove(fkColumnName);
+	        	result.add(relation);
+    	    }
+    	    if(rst != null) {rst.close();}
+    	    if(stmt != null) {stmt.close();}
+    	    if(csvCon != null) {csvCon.close();}
+    		
+	    	return result;
+			
+		}
 		if(Files.exists(Paths.get(prj + "/relation.csv"))) {
 			Properties props = new java.util.Properties();
 			props.put("separator",";");
@@ -514,152 +575,157 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 	    
 	    while (rst.next()) {
 	    	
-	    	String key_name = rst.getString("FK_NAME");
-	    	String fk_name = rst.getString("FK_NAME");
-	    	String pk_name = rst.getString("PK_NAME");
-	    	String key_seq = rst.getString("KEY_SEQ");
-	    	String fkcolumn_name = rst.getString("FKCOLUMN_NAME");
-	    	String pkcolumn_name = rst.getString("PKCOLUMN_NAME");
-	        String fktable_name = rst.getString("FKTABLE_NAME");
-	        String pktable_name = rst.getString("PKTABLE_NAME");
-	        String _id = key_name + "F";
-	        boolean isAlias = false;
-	        
-	        if(tableAliases != null){
-		        if(tableAliases.containsKey(fktable_name)){
-		        	fktable_name = tableAliases.get(fktable_name);
+	    	if(relationMode.equalsIgnoreCase("CSVEXP")) {
+		    	
+	    	}
+	    	else {
+		    	String key_name = rst.getString("FK_NAME");
+		    	String fk_name = rst.getString("FK_NAME");
+		    	String pk_name = rst.getString("PK_NAME");
+		    	String key_seq = rst.getString("KEY_SEQ");
+		    	String fkcolumn_name = rst.getString("FKCOLUMN_NAME");
+		    	String pkcolumn_name = rst.getString("PKCOLUMN_NAME");
+		        String fktable_name = rst.getString("FKTABLE_NAME");
+		        String pktable_name = rst.getString("PKTABLE_NAME");
+		        String _id = key_name + "F";
+		        boolean isAlias = false;
+		        
+		        if(tableAliases != null){
+			        if(tableAliases.containsKey(fktable_name)){
+			        	fktable_name = tableAliases.get(fktable_name);
+			        }
+		
+			        if(tableAliases.containsKey(pktable_name)){
+			        	pktable_name = tableAliases.get(pktable_name);
+			        	isAlias = true;
+			        }
 		        }
 	
-		        if(tableAliases.containsKey(pktable_name)){
-		        	pktable_name = tableAliases.get(pktable_name);
-		        	isAlias = true;
-		        }
-	        }
-
-	        // Jump to other key if pktable is an alias
-	        if(isAlias){continue;}
-
-	        if(!map.containsKey(_id)){
-	        	
-	        	Relation relation = new Relation();
-	        	
-	        	relation.set_id(_id);
-	        	relation.setKey_name(key_name);
-	        	relation.setFk_name(fk_name);
-	        	relation.setPk_name(pk_name);
-	        	relation.setTable_name(fktable_name);
-	        	relation.setTable_alias(alias);
-	        	relation.setPktable_name(pktable_name);
-	        	relation.setPktable_alias(pktable_name);
-	        	relation.setRelashionship("[" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
-	        	relation.setWhere(fktable_name + "." + fkcolumn_name + " = " + pktable_name + "." + pkcolumn_name);
-	        	relation.setKey_type("F");
-	        	relation.setType(type.toUpperCase());
-	        	relation.set_id("FK_" + relation.getPktable_alias() + "_" + alias + "_" + type.toUpperCase());
-	        	relation.setAbove(fkcolumn_name);
-	        	
-	        	if(importLabel && qsFromXML == null) {
-	        		
-//				    String[] types = {"TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM"};
-				    String[] types = {"TABLE"}; 
-				    		
-				    if(project != null) {
-					    String tableTypes = project.getResource().getTableTypes();
-					    List<String> typesList = new ArrayList<String>();
-					    switch(tableTypes.toUpperCase()) {
-					    	case "TABLE":
-					    		typesList.add("TABLE");
-					    		break;
-					    	case "VIEW":
-					    		typesList.add("VIEW");
-					    		break;
-					    	case "BOTH":
-					    		typesList.add("TABLE");
-					    		typesList.add("VIEW");
-					    		break;
+		        // Jump to other key if pktable is an alias
+		        if(isAlias){continue;}
+	
+		        if(!map.containsKey(_id)){
+		        	
+		        	Relation relation = new Relation();
+		        	
+		        	relation.set_id(_id);
+		        	relation.setKey_name(key_name);
+		        	relation.setFk_name(fk_name);
+		        	relation.setPk_name(pk_name);
+		        	relation.setTable_name(fktable_name);
+		        	relation.setTable_alias(alias);
+		        	relation.setPktable_name(pktable_name);
+		        	relation.setPktable_alias(pktable_name);
+		        	relation.setRelashionship("[" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
+		        	relation.setWhere(fktable_name + "." + fkcolumn_name + " = " + pktable_name + "." + pkcolumn_name);
+		        	relation.setKey_type("F");
+		        	relation.setType(type.toUpperCase());
+		        	relation.set_id("FK_" + relation.getPktable_alias() + "_" + alias + "_" + type.toUpperCase());
+		        	relation.setAbove(fkcolumn_name);
+		        	
+		        	if(importLabel && qsFromXML == null) {
+		        		
+	//				    String[] types = {"TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM"};
+					    String[] types = {"TABLE"}; 
+					    		
+					    if(project != null) {
+						    String tableTypes = project.getResource().getTableTypes();
+						    List<String> typesList = new ArrayList<String>();
+						    switch(tableTypes.toUpperCase()) {
+						    	case "TABLE":
+						    		typesList.add("TABLE");
+						    		break;
+						    	case "VIEW":
+						    		typesList.add("VIEW");
+						    		break;
+						    	case "BOTH":
+						    		typesList.add("TABLE");
+						    		typesList.add("VIEW");
+						    		break;
+						    }
+						    types = typesList.stream().toArray(String[]::new);
 					    }
-					    types = typesList.stream().toArray(String[]::new);
-				    }
-				    
-		    		ResultSet rst0 = metaData.getTables(con.getCatalog(), schema, pktable_name, types);
-		    		while (rst0.next()) {
-		    			String label = rst0.getString("REMARKS");
-		    	    	relation.setLabel(label);
-		    	    	
-		    	    	if(label == null) {
-		    	    		relation.setLabel("");
-		    	    		relation.setDescription("");
-				    		if(!language.isEmpty()) {
-				    			relation.getLabels().put(language, "");
-				    			relation.getDescriptions().put(language, "");
-				    		}
-		    	    	}
-		    	    	else {
-	    			    	relation.setDescription(label);
-	    		    		relation.setLabel(label);
-				    		if(!language.isEmpty()) {
-				    			relation.getLabels().put(language, label);
-				    			relation.getDescriptions().put(language, label);
-				    		}
-		    	    	}
-		    	    	
-		    	    }
-		    		if(rst0 != null){rst0.close();}
-	        	}
-	    		
-	    		if(relation.getLabel() == null) {relation.setLabel("");}
-	    		if(relation.getDescription() == null) {relation.setDescription("");}
-	        	
-	    		if(importLabel && qsFromXML == null) {
-		    		if(dbmd != null){
-		    			DBMDTable dbmdTable = dbmd.get(pktable_name);
-		    			if(dbmdTable != null){
-		    				String label = dbmdTable.getTable_remarks();
-			    			relation.setLabel(label);
-			    			String desc = dbmdTable.getTable_description();
-			    			relation.setDescription(desc);
-			           		if(!language.isEmpty()) {
-			           			relation.getLabels().put(language, label);
-			           			relation.getDescriptions().put(language, desc);
-			        		}	    			
-		    			}
+					    
+			    		ResultSet rst0 = metaData.getTables(con.getCatalog(), schema, pktable_name, types);
+			    		while (rst0.next()) {
+			    			String label = rst0.getString("REMARKS");
+			    	    	relation.setLabel(label);
+			    	    	
+			    	    	if(label == null) {
+			    	    		relation.setLabel("");
+			    	    		relation.setDescription("");
+					    		if(!language.isEmpty()) {
+					    			relation.getLabels().put(language, "");
+					    			relation.getDescriptions().put(language, "");
+					    		}
+			    	    	}
+			    	    	else {
+		    			    	relation.setDescription(label);
+		    		    		relation.setLabel(label);
+					    		if(!language.isEmpty()) {
+					    			relation.getLabels().put(language, label);
+					    			relation.getDescriptions().put(language, label);
+					    		}
+			    	    	}
+			    	    	
+			    	    }
+			    		if(rst0 != null){rst0.close();}
+		        	}
+		    		
+		    		if(relation.getLabel() == null) {relation.setLabel("");}
+		    		if(relation.getDescription() == null) {relation.setDescription("");}
+		        	
+		    		if(importLabel && qsFromXML == null) {
+			    		if(dbmd != null){
+			    			DBMDTable dbmdTable = dbmd.get(pktable_name);
+			    			if(dbmdTable != null){
+			    				String label = dbmdTable.getTable_remarks();
+				    			relation.setLabel(label);
+				    			String desc = dbmdTable.getTable_description();
+				    			relation.setDescription(desc);
+				           		if(!language.isEmpty()) {
+				           			relation.getLabels().put(language, label);
+				           			relation.getDescriptions().put(language, desc);
+				        		}	    			
+			    			}
+			    		}
 		    		}
-	    		}
-	        	
-	        	Seq seq = new Seq();
-	        	seq.setTable_name(fktable_name);
-	        	seq.setPktable_name(pktable_name);
-	        	seq.setColumn_name(fkcolumn_name);
-	        	seq.setPkcolumn_name(pkcolumn_name);
-	        	seq.setKey_seq(Short.parseShort(key_seq));
-	        	relation.addSeq(seq);
-	        	
-	        	map.put(_id, relation);
-
-	        }
-	        else{
-	        	
-	        	Relation relation = map.get(_id);
-	        	if(!relation.getSeqs().isEmpty()){
-	        		Seq seq = new Seq();
+		        	
+		        	Seq seq = new Seq();
 		        	seq.setTable_name(fktable_name);
 		        	seq.setPktable_name(pktable_name);
 		        	seq.setColumn_name(fkcolumn_name);
 		        	seq.setPkcolumn_name(pkcolumn_name);
 		        	seq.setKey_seq(Short.parseShort(key_seq));
-		        	
 		        	relation.addSeq(seq);
 		        	
-		        	StringBuffer sb = new StringBuffer((String) relation.getRelationship());
-		        	sb.append(" AND [" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
-		        	relation.setRelashionship(sb.toString());
+		        	map.put(_id, relation);
+	
+		        }
+		        else{
 		        	
-		        	sb = new StringBuffer((String) relation.getWhere());
-		        	sb.append(" AND " + fktable_name + "." + fkcolumn_name + " = " + pktable_name + "." + pkcolumn_name);
-		        	relation.setWhere(sb.toString());
-		        	
-	        	}
-	        }
+		        	Relation relation = map.get(_id);
+		        	if(!relation.getSeqs().isEmpty()){
+		        		Seq seq = new Seq();
+			        	seq.setTable_name(fktable_name);
+			        	seq.setPktable_name(pktable_name);
+			        	seq.setColumn_name(fkcolumn_name);
+			        	seq.setPkcolumn_name(pkcolumn_name);
+			        	seq.setKey_seq(Short.parseShort(key_seq));
+			        	
+			        	relation.addSeq(seq);
+			        	
+			        	StringBuffer sb = new StringBuffer((String) relation.getRelationship());
+			        	sb.append(" AND [" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
+			        	relation.setRelashionship(sb.toString());
+			        	
+			        	sb = new StringBuffer((String) relation.getWhere());
+			        	sb.append(" AND " + fktable_name + "." + fkcolumn_name + " = " + pktable_name + "." + pkcolumn_name);
+			        	relation.setWhere(sb.toString());
+			        	
+		        	}
+		        }
+	    	}
 	        	
 	    }
 	    if(rst != null) {rst.close();}

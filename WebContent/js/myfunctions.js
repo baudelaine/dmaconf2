@@ -7315,6 +7315,10 @@ $("#addCsvRel").click(function(){
   $("#csvRelationModal").modal('toggle');
 })
 
+$("#addCsvRelExp").click(function(){
+  $("#csvRelationExpModal").modal('toggle');
+})
+
 $('#csvRelationModal').on('hidden.bs.modal', function() {
   $('#csvRelationModal .collapse').each(function () {
       $(this).collapse('hide');
@@ -7518,6 +7522,10 @@ $("#csvRelationFile").change(function(){
   UploadCSV($(this), 'relation.csv', $("#csvRelationTable"));
 });
 
+$("#csvRelationExpFile").change(function(){
+  UploadCSV($(this), 'relationExp.csv', $("#csvRelationExpTable"));
+});
+
 delCsvTableLabel.addEventListener('click', function(event){
   var $table = $("#csvTableLabelTable");
   $table.find("tr:gt(0)").remove();
@@ -7678,6 +7686,9 @@ function UploadCSV($el, fileName, $table){
             case 'relation.csv':
               ShowAlert(data.MESSAGE, "alert-success", $("#csvRelationModalAlert"));
               break;
+            case 'relationExp.csv':
+              ShowAlert(data.MESSAGE, "alert-success", $("#csvRelationExpModalAlert"));
+              break;
             default:
               ShowAlert(data.MESSAGE, "alert-success", $("#csvLabelModalAlert"));
           }
@@ -7726,6 +7737,15 @@ function UploadCSV($el, fileName, $table){
                   .append($('<td>').append(record.PKCOLUMN_NAME))
                   )
                   $('#delCsvRelation').prop('disabled', false);
+                  break;
+                case 'relationExp.csv':
+                  $table.append($('<tr>')
+                  .append($('<td>').append(record.JOIN_NAME))
+                  .append($('<td>').append(record.FKTABLE_NAME))
+                  .append($('<td>').append(record.PKTABLE_NAME))
+                  .append($('<td>').append(record.RELATION_EXPRESSION))
+                  )
+                  $('#delCsvRelationExp').prop('disabled', false);
                   break;
             }
           })

@@ -661,15 +661,15 @@ function UploadCSV($el, fileName, $table){
                 )
                 $('#delCsvRelation').prop('disabled', false);
                 break;
-                case 'relationExp.csv':
-                  $table.append($('<tr>')
-                  .append($('<td>').append(record.JOIN_NAME))
-                  .append($('<td>').append(record.FKTABLE_NAME))
-                  .append($('<td>').append(record.PKTABLE_NAME))
-                  .append($('<td>').append(record.RELATION_EXPRESSION))
-                  )
-                  $('#delCsvRelationExp').prop('disabled', false);
-                  break;
+              case 'relationExp.csv':
+                $table.append($('<tr>')
+                .append($('<td>').append(record.JOIN_NAME))
+                .append($('<td>').append(record.FKTABLE_NAME))
+                .append($('<td>').append(record.PKTABLE_NAME))
+                .append($('<td>').append(record.RELATION_EXPRESSION))
+                )
+                $('#delCsvRelationExp').prop('disabled', false);
+                break;
             }
         })
         switch(fileName){

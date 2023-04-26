@@ -11,6 +11,9 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Test32 {
 
@@ -31,6 +34,8 @@ public class Test32 {
 		}
 
 		String tableName = "Pompers";
+		String type = "Final";
+		String alias = "POMPERS_ALIAS";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
@@ -42,14 +47,34 @@ public class Test32 {
 		System.out.println("sql=" + sql);
 		stmt = csvCon.prepareStatement(sql);
 		rst = stmt.executeQuery();
-		int count = 0;
 		
     	while(rst.next()){
 //    		String FKName = rst.getString("FK_NAME");
 //    		System.out.println("FKName=" + FKName);
 //    		JOIN_NAME;FKTABLE_NAME;PKTABLE_NAME;RELATION_EXPRESSION
-    		System.out.println(rst.getString("FKTABLE_NAME") + ";" + rst.getString("PKTABLE_NAME") + ";" + rst.getString("RELATION_EXPRESSION"));
-    		++count;
+    		String relExp = rst.getString("RELATION_EXPRESSION");
+    		String fkTable = rst.getString("FKTABLE_NAME").trim();
+    		String pkTable = rst.getString("PKTABLE_NAME").trim();
+    		System.out.println("Before update=" + relExp);
+    		
+    		try {
+	    		relExp = relExp.replaceAll(fkTable, "[" + type.toUpperCase() + "].[" + alias + "]");
+	    		relExp = relExp.replaceAll(pkTable, "[" + pkTable + "]");
+	    		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
+	    		Matcher m = p.matcher(relExp);
+	    		while (m.find()) {
+//	    		    System.out.println("m.group(1)=" + m.group(1));
+//	    		    System.out.println("m.group(2)=" + m.group(2));
+	    		    String field = m.group(2);
+	    		    relExp = relExp.replaceAll(field, "[" + field + "]");
+	    		}
+	    		relExp = relExp.replaceAll("\\[\\[", "[");
+	    		relExp = relExp.replaceAll("\\]\\]", "]");
+    		}
+    		catch(PatternSyntaxException e) {
+    			continue;
+    		}
+    		System.out.println(relExp);
     	}
         if(rst != null) {
         	rst.close();
@@ -65,9 +90,19 @@ public class Test32 {
 			csvCon = null;
 		}
 		
-		System.out.println("count=" + count);
+//		String s = "[FINAL].[POMPERS_ALIAS].P_GPTFCT=[RH_dbo_Pompgserv2].CLE_GRPFONC";
+//		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
+//		Matcher m = p.matcher(s);
+//		while (m.find()) {
+//		    System.out.println("m.group(1)=" + m.group(1));
+//		    System.out.println("m.group(2)=" + m.group(2));
+//		    String field = m.group(2);
+//		    // A12, W28 etc is here
+//		    s = s.replaceAll(field, "[" + field + "]");
+//		}
+//	    System.out.println("s=" + s);
 		
-
+		
 	}
 
 }
