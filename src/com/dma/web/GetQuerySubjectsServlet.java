@@ -498,10 +498,10 @@ public class GetQuerySubjectsServlet extends HttpServlet {
     		
     	    while (rst.next()) {
 
-		    	String fkName = "FK_" + rst.getString("JOIN_NAME"); 
-		    	String pkName = "PK_" + rst.getString("JOIN_NAME"); 
-		    	String fkTableName = rst.getString("FKTABLE_NAME");
-		    	String pkTableName = rst.getString("PKTABLE_NAME");
+		    	String fkName = "FK_" + rst.getString("JOIN_NAME").trim(); 
+		    	String pkName = "PK_" + rst.getString("JOIN_NAME").trim(); 
+		    	String fkTableName = rst.getString("FKTABLE_NAME").trim();
+		    	String pkTableName = rst.getString("PKTABLE_NAME").trim();
 //		    	String fkColumnName = "notAvailable";
 //		    	String pkColumnName = "notAvailable";
 		    	String relExp = rst.getString("RELATION_EXPRESSION");
