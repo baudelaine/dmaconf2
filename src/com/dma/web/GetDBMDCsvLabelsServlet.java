@@ -134,7 +134,8 @@ public class GetDBMDCsvLabelsServlet extends HttpServlet {
 						sql = "SELECT " + selectClause + " FROM tableLabel where " + whereClause + " in " + inClause;
 						csvRst = csvStmt.executeQuery(sql);
 						while(csvRst.next()){
-							tlMap.put(csvRst.getString("Table_Name").toUpperCase(), csvRst.getString("Table_Label"));
+//							tlMap.put(csvRst.getString("Table_Name").toUpperCase(), csvRst.getString("Table_Label"));
+							tlMap.put(csvRst.getString("Table_Name"), csvRst.getString("Table_Label"));
 						}
 						csvRst.close();
 					}
@@ -152,7 +153,8 @@ public class GetDBMDCsvLabelsServlet extends HttpServlet {
 						sql = "SELECT " + selectClause + " FROM tableDescription where TABLE_NAME in " + inClause;
 						csvRst = csvStmt.executeQuery(sql);
 						while(csvRst.next()){
-							tdMap.put(csvRst.getString("Table_Name").toUpperCase(), csvRst.getString("Table_Description"));
+//							tdMap.put(csvRst.getString("Table_Name").toUpperCase(), csvRst.getString("Table_Description"));
+							tdMap.put(csvRst.getString("Table_Name"), csvRst.getString("Table_Description"));
 						}
 						csvRst.close();
 					}
@@ -196,10 +198,12 @@ public class GetDBMDCsvLabelsServlet extends HttpServlet {
 							sql = "SELECT " + selectClause + " FROM columnLabel where " + whereClause + " = '" + element + "' and COLUMN_NAME in " + columnInClause;
 							csvRst = csvStmt.executeQuery(sql);
 							while(csvRst.next()){
-								cols.put(csvRst.getString("Column_Name").toUpperCase(), csvRst.getString("Column_Label"));
+//								cols.put(csvRst.getString("Column_Name").toUpperCase(), csvRst.getString("Column_Label"));
+								cols.put(csvRst.getString("Column_Name"), csvRst.getString("Column_Label"));
 							}
 							csvRst.close();
-							clMap.put(element.toUpperCase(), cols);
+//							clMap.put(element.toUpperCase(), cols);
+							clMap.put(element, cols);
 							
 						}
 						
@@ -247,20 +251,22 @@ public class GetDBMDCsvLabelsServlet extends HttpServlet {
 							try {
 								csvRst = csvStmt.executeQuery(sql);
 								while(csvRst.next()){
-									cols.put(csvRst.getString("Column_Name").toUpperCase(), csvRst.getString("Column_Description"));
+//									cols.put(csvRst.getString("Column_Name").toUpperCase(), csvRst.getString("Column_Description"));
+									cols.put(csvRst.getString("Column_Name"), csvRst.getString("Column_Description"));
 								}
 							}
 							catch(SQLException e){
 				            	System.out.println("CATCHING SQLEXCEPTION...");
 				            	System.out.println(e.getSQLState());
 				            	System.out.println(e.getMessage());
-				            	
+				    			continue;
 				            }
 				            finally {
 								if(csvRst != null) {csvRst.close();}
 				            }
 							
-							cdMap.put(element.toUpperCase(), cols);
+//							cdMap.put(element.toUpperCase(), cols);
+							cdMap.put(element, cols);
 							
 						}
 						
