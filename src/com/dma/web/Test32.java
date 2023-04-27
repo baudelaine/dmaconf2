@@ -15,6 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Test32 {
 
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
@@ -33,9 +35,9 @@ public class Test32 {
 			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
 		}
 
-		String tableName = "Pompers";
+		String tableName = "Pompabs";
 		String type = "Final";
-		String alias = "POMPERS_ALIAS";
+		String alias = "Pompabs_ALIAS";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
@@ -70,6 +72,18 @@ public class Test32 {
 	    		}
 	    		relExp = relExp.replaceAll("\\[\\[", "[");
 	    		relExp = relExp.replaceAll("\\]\\]", "]");
+	    		
+	    		p = Pattern.compile("\\[([^\\]]+)\\]");
+	    		m = p.matcher(relExp);
+	    	    while (m.find()) {
+//	    		    System.out.println("m.group(1)=" + m.group(1));
+//	    		    System.out.println("m.group(2)=" + m.group(2));
+	    		    String field = m.group(1);
+	    		    String fixedField = StringUtils.remove(field, "[");
+//	    		    System.out.println("fixedField=" + fixedField);
+	    		    relExp = StringUtils.replace(relExp, field, fixedField);
+	    		}
+	    		
     		}
     		catch(PatternSyntaxException e) {
     			continue;
@@ -90,15 +104,17 @@ public class Test32 {
 			csvCon = null;
 		}
 		
-//		String s = "[FINAL].[POMPERS_ALIAS].P_GPTFCT=[RH_dbo_Pompgserv2].CLE_GRPFONC";
-//		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
+//		String s = "[FINAL].[Pompabs].[A_[MAT]=[Pompabc].[MAT] and [FINAL].[Pompabs].[A_[MOTIF]=[Pompabc].[MOTIF] and [FINAL].[Pompabs].[A_[ANNEE]=[Pompabc].[ANNEE]";
+//		Pattern p = Pattern.compile("\\[([^\\]]+)\\]");
 //		Matcher m = p.matcher(s);
-//		while (m.find()) {
+//	    System.out.println("s=" + s);
+//	    while (m.find()) {
 //		    System.out.println("m.group(1)=" + m.group(1));
-//		    System.out.println("m.group(2)=" + m.group(2));
-//		    String field = m.group(2);
-//		    // A12, W28 etc is here
-//		    s = s.replaceAll(field, "[" + field + "]");
+////		    System.out.println("m.group(2)=" + m.group(2));
+//		    String field = m.group(1);
+//		    String fixedField = StringUtils.remove(field, "[");
+//		    System.out.println("fixedField=" + fixedField);
+//		    s = StringUtils.replace(s, field, fixedField);
 //		}
 //	    System.out.println("s=" + s);
 		

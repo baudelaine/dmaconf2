@@ -530,6 +530,18 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		    		}
 		    		relExp = relExp.replaceAll("\\[\\[", "[");
 		    		relExp = relExp.replaceAll("\\]\\]", "]");
+		    		
+		    		p = Pattern.compile("\\[([^\\]]+)\\]");
+		    		m = p.matcher(relExp);
+		    	    while (m.find()) {
+//		    		    System.out.println("m.group(1)=" + m.group(1));
+//		    		    System.out.println("m.group(2)=" + m.group(2));
+		    		    String field = m.group(1);
+		    		    String fixedField = StringUtils.remove(field, "[");
+//		    		    System.out.println("fixedField=" + fixedField);
+		    		    relExp = StringUtils.replace(relExp, field, fixedField);
+		    		}
+		    		
 	    		}
 	    		catch(PatternSyntaxException e) {
 	    			continue;
