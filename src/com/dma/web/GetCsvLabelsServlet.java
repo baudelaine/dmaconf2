@@ -158,7 +158,7 @@ public class GetCsvLabelsServlet extends HttpServlet {
 						System.out.println("sql=" + sql);
 						csvRst = csvStmt.executeQuery(sql);
 						while(csvRst.next()){
-							tlMap.put(csvRst.getString("Table_Name").toUpperCase(), csvRst.getString("Table_Label"));
+							tlMap.put(csvRst.getString("Table_Name"), csvRst.getString("Table_Label"));
 						}
 						csvRst.close();
 					}
@@ -188,7 +188,7 @@ public class GetCsvLabelsServlet extends HttpServlet {
 						}
 						csvRst = csvStmt.executeQuery(sql);
 						while(csvRst.next()){
-							tdMap.put(csvRst.getString("Table_Name").toUpperCase(), csvRst.getString("Table_Description"));
+							tdMap.put(csvRst.getString("Table_Name"), csvRst.getString("Table_Description"));
 						}
 						csvRst.close();
 					}
@@ -250,10 +250,10 @@ public class GetCsvLabelsServlet extends HttpServlet {
 							}
 							csvRst = csvStmt.executeQuery(sql);
 							while(csvRst.next()){
-								cols.put(csvRst.getString("Column_Name").toUpperCase(), csvRst.getString("Column_Label"));
+								cols.put(csvRst.getString("Column_Name"), csvRst.getString("Column_Label"));
 							}
 							csvRst.close();
-							clMap.put(element.toUpperCase(), cols);
+							clMap.put(element, cols);
 							
 						}
 						
@@ -319,7 +319,7 @@ public class GetCsvLabelsServlet extends HttpServlet {
 							try {
 								csvRst = csvStmt.executeQuery(sql);
 								while(csvRst.next()){
-									cols.put(csvRst.getString("Column_Name").toUpperCase(), csvRst.getString("Column_Description"));
+									cols.put(csvRst.getString("Column_Name"), csvRst.getString("Column_Description"));
 								}
 							}
 							catch(SQLException e){
@@ -332,7 +332,7 @@ public class GetCsvLabelsServlet extends HttpServlet {
 								if(csvRst != null) {csvRst.close();}
 				            }
 							
-							cdMap.put(element.toUpperCase(), cols);
+							cdMap.put(element, cols);
 							
 						}
 						

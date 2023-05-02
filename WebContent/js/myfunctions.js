@@ -8442,9 +8442,9 @@ $("#ulModelFile").change(function(){
 		success: function(data) {
     console.log(data);
       if(data.STATUS == "OK" && data.DATAS != null){
-        if(data.DATAS.querySubjects){
-          console.log(data.DATAS.querySubjects);
-          $datasTable.bootstrapTable("load", data.DATAS.querySubjects);
+        if(data.DATAS.qss){
+          console.log(data.DATAS.qss);
+          $datasTable.bootstrapTable("load", data.DATAS.qss);
         }
         if(data.DATAS.views){
           $("#viewTab").removeClass('disabled');
