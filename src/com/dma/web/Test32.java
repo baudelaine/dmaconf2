@@ -35,7 +35,7 @@ public class Test32 {
 			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
 		}
 
-		String tableName = "Pompabs";
+		String tableName = "Tababs";
 		String type = "Final";
 		String alias = "Pompabs_ALIAS";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";

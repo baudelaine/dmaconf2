@@ -2971,8 +2971,9 @@ function buildRelationTable($el, cols, data, qs){
           var newValue = row.pktable_alias;
           if($activeSubDatasTable != undefined){
             var re = new RegExp("[^.]\\[" + oldValue + "\\]", "gi");
+            var re = new RegExp("\\[" + oldValue + "\\]", "gi");
             // updateCell($activeSubDatasTable, row.index, 'relationship', row.relationship.split(" [" + oldValue + "]").join(" [" + newValue + "]"));
-            updateCell($activeSubDatasTable, row.index, 'relationship', row.relationship.replace(re, " [" + newValue + "]"));
+            updateCell($activeSubDatasTable, row.index, 'relationship', row.relationship.replace(re, "[" + newValue + "]"));
           }
         }
 
@@ -3231,10 +3232,10 @@ function buildRelationTable($el, cols, data, qs){
             newRow.ref = false;
             newRow.sec = false;
             newRow.tra = false;
-            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[FINAL\]\./g, " = ");
-            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[REF\]\./g, " = ");
-            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[SEC\]\./g, " = ");
-            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[TRA\]\./g, " = ");
+            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[FINAL\]\./g, " = ");
+            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[REF\]\./g, " = ");
+            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[SEC\]\./g, " = ");
+            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[TRA\]\./g, " = ");
             newRow.relationship = newRow.relationship.split("[" + row.pktable_alias + "]").join("[]");
             newRow.nommageRep = false;
             if(newRow.key_type == "F"){
