@@ -328,7 +328,9 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 					    fields.put(rst1.getString("COLUMN_NAME"), field);
 				    }
 				    if(rst1 != null){rst1.close();}
+				    table.setTable_fieldCount(fields.size());
 				    table.setColumns(fields);
+				    table.setTable_stats(stats + " (" + fields.size() + ")");
 				    dbmd.put(table_name, table);
 				    
 			    }		    
@@ -451,7 +453,9 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 					    
 					    cols.put(field.getField_name(), col);
 				    }
+				    table.setTable_fieldCount(cols.size());
 				    table.setColumns(cols);
+		    		table.setTable_stats(stats + " (" + cols.size() + ")");
 				    dbmd.put(tableName, table);					
 				}
 	    		if(csvCon != null) {

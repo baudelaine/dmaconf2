@@ -3231,10 +3231,10 @@ function buildRelationTable($el, cols, data, qs){
             newRow.ref = false;
             newRow.sec = false;
             newRow.tra = false;
-            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[FINAL\]\./g, " = ");
-            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[REF\]\./g, " = ");
-            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[SEC\]\./g, " = ");
-            newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[TRA\]\./g, " = ");
+            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[FINAL\]\./g, " = ");
+            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[REF\]\./g, " = ");
+            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[SEC\]\./g, " = ");
+            // newRow.relationship = newRow.relationship.replace(/\s{1,}=\s{1,}\[TRA\]\./g, " = ");
             newRow.relationship = newRow.relationship.split("[" + row.pktable_alias + "]").join("[]");
             newRow.nommageRep = false;
             if(newRow.key_type == "F"){
@@ -3355,18 +3355,21 @@ function buildRelationTable($el, cols, data, qs){
             if(value == false){
 
               var re = new RegExp("[^\\.]\\[" + row.pktable_alias + "\\]", "gi");
+              var re = new RegExp("\\[" + row.pktable_alias + "\\]", "gi");
+
+              console.log(row);
 
               if(!row.fin && activeTab == "Final"){
-                row.relationship = row.relationship.replace(re, " [FINAL].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, "[FINAL].[" + row.pktable_alias + "]");
               }
               if(!row.ref && activeTab == "Reference"){
-                row.relationship = row.relationship.replace(re, " [REF].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, "[REF].[" + row.pktable_alias + "]");
               }
               if(!row.sec && activeTab == "Security"){
-                row.relationship = row.relationship.replace(re, " [SEC].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, "[SEC].[" + row.pktable_alias + "]");
               }
               if(!row.tra && activeTab == "Translation"){
-                row.relationship = row.relationship.replace(re, " [TRA].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, "[TRA].[" + row.pktable_alias + "]");
               }
               updateCell($el, row.index, field, newValue);
               ChangeIcon(row, qs, "Identifier");

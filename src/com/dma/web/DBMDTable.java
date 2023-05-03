@@ -19,6 +19,7 @@ public class DBMDTable {
 	String table_type = "";
 	long table_recCount = 0L;
 	Map<String, DBMDColumn> columns = new HashMap<String, DBMDColumn>();
+	int table_fieldCount = 0;
 	
 	public String getTable_name() {
 		return table_name;
@@ -103,6 +104,12 @@ public class DBMDTable {
 	}
 	public void setColumns(Map<String, DBMDColumn> columns) {
 		this.columns = columns;
+	}
+	public int getTable_fieldCount() {
+		return table_fieldCount;
+	}
+	public void setTable_fieldCount(int table_fieldCount) {
+		this.table_fieldCount = table_fieldCount;
 	}
 	
 }
