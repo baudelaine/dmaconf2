@@ -35,9 +35,9 @@ public class Test32 {
 			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
 		}
 
-		String tableName = "Tababs";
+		String tableName = "Pompabs";
 		String type = "Final";
-		String alias = "Pompabs_ALIAS";
+		String alias = "Pompabs_alias";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
@@ -60,29 +60,50 @@ public class Test32 {
     		System.out.println("Before update=" + relExp);
     		
     		try {
-	    		relExp = relExp.replaceAll(fkTable, "[" + type.toUpperCase() + "].[" + alias + "]");
-	    		relExp = relExp.replaceAll(pkTable, "[" + pkTable + "]");
-	    		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
-	    		Matcher m = p.matcher(relExp);
-	    		while (m.find()) {
-//	    		    System.out.println("m.group(1)=" + m.group(1));
-//	    		    System.out.println("m.group(2)=" + m.group(2));
-	    		    String field = m.group(2);
-	    		    relExp = relExp.replaceAll(field, "[" + field + "]");
-	    		}
-	    		relExp = relExp.replaceAll("\\[\\[", "[");
-	    		relExp = relExp.replaceAll("\\]\\]", "]");
+    			
+    		Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
+    		Matcher m = p.matcher(relExp);
+    		while (m.find()) {
+//    		    System.out.println("m.group(1)=" + m.group(1));
+//    		    System.out.println("m.group(2)=" + m.group(2));
+    		    String table = m.group(1);
+    		    String field = m.group(2);
+    		    String exp = null;
+    		    if (table.contentEquals(tableName)) {
+    		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
+    		    }
+    		    else {
+    		    	exp = ("[" + table + "].[" + field + "]");
+    		    }
+    		    relExp = relExp.replaceFirst(table + "." + field, exp);
+    		    
+    		}
+    			
+    			
+//	    		relExp = relExp.replaceAll(fkTable, "[" + type.toUpperCase() + "].[" + alias + "]");
+//	    		relExp = relExp.replaceAll(pkTable, "[" + pkTable + "]");
+//	    		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
+////	    		Pattern p = Pattern.compile("([^\\]]+]\\.)([^\\=]+)");
+//	    		Matcher m = p.matcher(relExp);
+//	    		while (m.find()) {
+////	    		    System.out.println("m.group(1)=" + m.group(1));
+////	    		    System.out.println("m.group(2)=" + m.group(2));
+//	    		    String field = m.group(2);
+//	    		    relExp = relExp.replaceAll(field, "[" + field + "]");
+//	    		}
+//	    		relExp = relExp.replaceAll("\\[\\[", "[");
+//	    		relExp = relExp.replaceAll("\\]\\]", "]");
 	    		
-	    		p = Pattern.compile("\\[([^\\]]+)\\]");
-	    		m = p.matcher(relExp);
-	    	    while (m.find()) {
-//	    		    System.out.println("m.group(1)=" + m.group(1));
-//	    		    System.out.println("m.group(2)=" + m.group(2));
-	    		    String field = m.group(1);
-	    		    String fixedField = StringUtils.remove(field, "[");
-//	    		    System.out.println("fixedField=" + fixedField);
-	    		    relExp = StringUtils.replace(relExp, field, fixedField);
-	    		}
+//	    		p = Pattern.compile("\\[([^\\]]+)\\]");
+//	    		m = p.matcher(relExp);
+//	    	    while (m.find()) {
+////	    		    System.out.println("m.group(1)=" + m.group(1));
+////	    		    System.out.println("m.group(2)=" + m.group(2));
+//	    		    String field = m.group(1);
+//	    		    String fixedField = StringUtils.remove(field, "[");
+////	    		    System.out.println("fixedField=" + fixedField);
+//	    		    relExp = StringUtils.replace(relExp, field, fixedField);
+//	    		}
 	    		
     		}
     		catch(PatternSyntaxException e) {
@@ -104,19 +125,19 @@ public class Test32 {
 			csvCon = null;
 		}
 		
-//		String s = "[FINAL].[Pompabs].[A_[MAT]=[Pompabc].[MAT] and [FINAL].[Pompabs].[A_[MOTIF]=[Pompabc].[MOTIF] and [FINAL].[Pompabs].[A_[ANNEE]=[Pompabc].[ANNEE]";
-//		Pattern p = Pattern.compile("\\[([^\\]]+)\\]");
-//		Matcher m = p.matcher(s);
-//	    System.out.println("s=" + s);
-//	    while (m.find()) {
-//		    System.out.println("m.group(1)=" + m.group(1));
-////		    System.out.println("m.group(2)=" + m.group(2));
-//		    String field = m.group(1);
-//		    String fixedField = StringUtils.remove(field, "[");
-//		    System.out.println("fixedField=" + fixedField);
-//		    s = StringUtils.replace(s, field, fixedField);
-//		}
-//	    System.out.println("s=" + s);
+		String s = "[FINAL].[Pompabs_ALIAS].[CLE]=[Na_abs].[A_MOTIF] AND [FINAL].[Pompabs_ALIAS].[CLE_FILI]=[Na_abs].[A_FILI]";
+		Pattern p = Pattern.compile("\\[([^\\]]+)\\]");
+		Matcher m = p.matcher(s);
+	    System.out.println("s=" + s);
+	    while (m.find()) {
+		    System.out.println("m.group(1)=" + m.group(1));
+//		    System.out.println("m.group(2)=" + m.group(2));
+		    String field = m.group(1);
+		    String fixedField = StringUtils.remove(field, "[");
+		    System.out.println("fixedField=" + fixedField);
+		    s = StringUtils.replace(s, field, fixedField);
+		}
+	    System.out.println("s=" + s);
 		
 		
 	}

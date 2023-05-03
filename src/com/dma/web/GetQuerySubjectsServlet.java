@@ -518,30 +518,48 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 	        	relation.setPktable_alias(pkTableName);
 	//        	relation.setRelashionship("[" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
 	    		try {
-		    		relExp = relExp.replaceAll(fkTableName, "[" + type.toUpperCase() + "].[" + alias + "]");
-		    		relExp = relExp.replaceAll(pkTableName, "[" + pkTableName + "]");
-		    		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
-		    		Matcher m = p.matcher(relExp);
-		    		while (m.find()) {
-//		    		    System.out.println("m.group(1)=" + m.group(1));
-//		    		    System.out.println("m.group(2)=" + m.group(2));
-		    		    String field = m.group(2);
-		    		    relExp = relExp.replaceAll(field, "[" + field + "]");
-		    		}
-		    		relExp = relExp.replaceAll("\\[\\[", "[");
-		    		relExp = relExp.replaceAll("\\]\\]", "]");
-		    		
-		    		p = Pattern.compile("\\[([^\\]]+)\\]");
-		    		m = p.matcher(relExp);
-		    	    while (m.find()) {
-//		    		    System.out.println("m.group(1)=" + m.group(1));
-//		    		    System.out.println("m.group(2)=" + m.group(2));
-		    		    String field = m.group(1);
-		    		    String fixedField = StringUtils.remove(field, "[");
-//		    		    System.out.println("fixedField=" + fixedField);
-		    		    relExp = StringUtils.replace(relExp, field, fixedField);
-		    		}
-		    		
+//		    		relExp = relExp.replaceAll(fkTableName, "[" + type.toUpperCase() + "].[" + alias + "]");
+//		    		relExp = relExp.replaceAll(pkTableName, "[" + pkTableName + "]");
+//		    		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
+//		    		Matcher m = p.matcher(relExp);
+//		    		while (m.find()) {
+////		    		    System.out.println("m.group(1)=" + m.group(1));
+////		    		    System.out.println("m.group(2)=" + m.group(2));
+//		    		    String field = m.group(2);
+//		    		    relExp = relExp.replaceAll(field, "[" + field + "]");
+//		    		}
+//		    		relExp = relExp.replaceAll("\\[\\[", "[");
+//		    		relExp = relExp.replaceAll("\\]\\]", "]");
+//		    		
+//		    		p = Pattern.compile("\\[([^\\]]+)\\]");
+//		    		m = p.matcher(relExp);
+//		    	    while (m.find()) {
+////		    		    System.out.println("m.group(1)=" + m.group(1));
+////		    		    System.out.println("m.group(2)=" + m.group(2));
+//		    		    String field = m.group(1);
+//		    		    String fixedField = StringUtils.remove(field, "[");
+////		    		    System.out.println("fixedField=" + fixedField);
+//		    		    relExp = StringUtils.replace(relExp, field, fixedField);
+//		    		}
+
+	        		Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
+	        		Matcher m = p.matcher(relExp);
+	        		while (m.find()) {
+//	        		    System.out.println("m.group(1)=" + m.group(1));
+//	        		    System.out.println("m.group(2)=" + m.group(2));
+	        		    String tableName = m.group(1);
+	        		    String field = m.group(2);
+	        		    String exp = null;
+	        		    if (table.contentEquals(tableName)) {
+	        		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
+	        		    }
+	        		    else {
+	        		    	exp = ("[" + tableName + "].[" + field + "]");
+	        		    }
+	        		    relExp = relExp.replaceFirst(tableName + "." + field, exp);
+	        		    
+	        		}
+	    			
 	    		}
 	    		catch(PatternSyntaxException e) {
 	    			continue;
