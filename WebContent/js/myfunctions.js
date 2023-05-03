@@ -6965,12 +6965,12 @@ $("#addTableAlias").click(function(){
 $("#sortTables").click(function(){
   if(currentProject){
     console.log(currentProject.resource.jndiName);
-    if(currentProject.resource.jndiName == "XML"){
-      promptTeasing();  
-    }
-    else{
+    // if(currentProject.resource.jndiName == "XML"){
+    //   promptTeasing();  
+    // }
+    // else{
       SortOnStats();
-    }
+    // }
   }
 })
 

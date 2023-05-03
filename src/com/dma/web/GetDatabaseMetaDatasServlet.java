@@ -341,8 +341,13 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 		    	PreparedStatement stmt = null;
 		    	Connection csvCon = null;
 		    	
+		    	boolean isCsvExp = false;
 		    	
-				if(Files.exists(Paths.get(prj + "/relation.csv"))) {
+		    	if(Files.exists(Paths.get(prj + "/relationExp.csv"))) {
+		    		isCsvExp = true;
+		    	}
+		    	
+				if(Files.exists(Paths.get(prj + "/relation.csv")) || Files.exists(Paths.get(prj + "/relationExp.csv"))) {
 					Properties props = new java.util.Properties();
 					props.put("separator",";");
 					csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
@@ -357,14 +362,23 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 					String tableName = qss.getKey();
 					QuerySubject qs = qss.getValue();
 
-					String sql = "SELECT * FROM relation where FKTABLE_NAME = '" + tableName + "'";
+					String sql = null;
+					if(isCsvExp) {
+						sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + tableName + "'";
+						result.put("FKS", "CSVEXP");
+					}
+					else {
+						sql = "SELECT * FROM relation where FKTABLE_NAME = '" + tableName + "'";
+						result.put("FKS", "CSV");
+					}
 					stmt = csvCon.prepareStatement(sql);
 					rst = stmt.executeQuery();
-					result.put("FKS", "CSV");
 					
 			    	while(rst.next()){
-			    		String FKName = rst.getString("FK_NAME");
-			    		FKSet.add(FKName);
+			    		if(!isCsvExp) {
+				    		String FKName = rst.getString("FK_NAME");
+				    		FKSet.add(FKName);
+			    		}
 			    		FKSeqCount++;
 			    	}
 		            if(rst != null) {
@@ -376,14 +390,22 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 		    			stmt = null;
 		    		}
 					
-					sql = "SELECT * FROM relation where PKTABLE_NAME = '" + tableName + "'";
+					if(isCsvExp) {
+						sql = "SELECT * FROM relationExp where PKTABLE_NAME = '" + tableName + "'";
+						result.put("PKS", "CSVEXP");
+					}
+					else {
+						sql = "SELECT * FROM relation where PKTABLE_NAME = '" + tableName + "'";
+						result.put("PKS", "CSV");
+					}
 					stmt = csvCon.prepareStatement(sql);
 					rst = stmt.executeQuery();
-					result.put("PKS", "CSV");
 		    		
 			    	while(rst.next()){
-			    		String PKName = rst.getString("FK_NAME");
-			    		PKSet.add(PKName);
+			    		if(!isCsvExp) {
+				    		String PKName = rst.getString("FK_NAME");
+				    		PKSet.add(PKName);
+			    		}
 			    		PKSeqCount++;
 			    	}
 		            if(rst != null) {
@@ -398,13 +420,26 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 		            DBMDTable table = new DBMDTable();
 		            table.setTable_name(qs.getTable_name());
 		            table.setTable_type(qs.getType());
-		    		table.setTable_importedKeysCount(FKSet.size());
-		    		table.setTable_importedKeysSeqCount(FKSeqCount);
-		    		table.setTable_exportedKeysCount(PKSet.size());
-		    		table.setTable_exportedKeysSeqCount(PKSeqCount);
+		            if(isCsvExp) {
+			    		table.setTable_importedKeysCount(FKSeqCount);
+			    		table.setTable_exportedKeysCount(PKSeqCount);
+		            }
+		            else {
+			    		table.setTable_importedKeysCount(FKSet.size());
+			    		table.setTable_importedKeysSeqCount(FKSeqCount);
+			    		table.setTable_exportedKeysCount(PKSet.size());
+			    		table.setTable_exportedKeysSeqCount(PKSeqCount);
+		            }
 		            
-		    		String stats = "(0) (" + FKSet.size() + ") (" + FKSeqCount + ") (" + PKSet.size() +
-		    				") (" + PKSeqCount + ") (0) (0)";  
+		    		String stats = null; 
+		    		
+		    		if(!isCsvExp) {
+		    			stats = "(0) (" + FKSet.size() + ") (" + FKSeqCount + ") (" + PKSet.size() +
+		    				") (" + PKSeqCount + ") (0) (0)";
+		    		}
+		    		else {
+		    			stats = "(0) (" + FKSeqCount + ") (0) (" + PKSeqCount + ") (0) (0) (0)";
+		    		}
 		    		table.setTable_stats(stats);
 		    		
 		    		
