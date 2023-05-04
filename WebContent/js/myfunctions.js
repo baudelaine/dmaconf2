@@ -4465,7 +4465,11 @@ function SortOnStats(){
           {
               text: '...number of records (DESC).',
               value: '7',
-          }
+          },
+          {
+              text: '...number of fields (DESC).',
+              value: '8',
+          }          
       ],
       callback: function (result) {
           ChooseTable($tableList, result);
@@ -4524,6 +4528,9 @@ function ChooseTable(table, sort) {
             case "7":
               tables.sort(function(a, b){return b.table_recCount - a.table_recCount});
               break;
+            case "8":
+              tables.sort(function(a, b){return b.table_fieldCount - a.table_fieldCount});
+              break;              
             default:
               tables.sort(function(a, b){return b.table_primaryKeyFieldsCount - a.table_primaryKeyFieldsCount});
           }

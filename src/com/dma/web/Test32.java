@@ -35,14 +35,14 @@ public class Test32 {
 			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
 		}
 
-		String tableName = "Pompabs";
+		String table = "Pompabs";
 		String type = "Final";
 		String alias = "Pompabs_alias";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where PKTABLE_NAME = '" + tableName + "'";
-		String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + tableName + "'";
+		String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + table + "'";
 
 //		String sql = "SELECT KEY_SEQ FROM relation where PKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT distinct(PKCOLUMN_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
@@ -59,29 +59,46 @@ public class Test32 {
     		String pkTable = rst.getString("PKTABLE_NAME").trim();
     		System.out.println("Before update=" + relExp);
     		
+	    	Relation relation = new Relation();
+
     		try {
     			
 	    		Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
 	    		Matcher m = p.matcher(relExp);
-        		int matchCount = 1;
+        		short matchCount = 1;
+        		Seq seq = null;
 	    		while (m.find()) {
 	//    		    System.out.println("m.group(1)=" + m.group(1));
 	//    		    System.out.println("m.group(2)=" + m.group(2));
-	    		    String table = m.group(1);
+	    		    String tableName = m.group(1);
 	    		    String field = m.group(2);
 	    		    String exp = null;
-	    		    if (table.contentEquals(tableName)) {
+	    		    if(matchCount % 2 != 0) {
+			        	seq = new Seq();
+	    		    }
+	    		    if (tableName.contentEquals(table)) {
 	    		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
+			        	seq.setTable_name(tableName);
+			        	seq.setColumn_name(field);
+			        	if(matchCount > 1) {
+			        		seq.setKey_seq((short) (matchCount -1));
+			        	}
+			        	else {
+			        		seq.setKey_seq(matchCount);
+			        	}
 	    		    }
 	    		    else {
-	    		    	exp = ("[" + table + "].[" + field + "]");
+	    		    	exp = ("[" + tableName + "].[" + field + "]");
+			        	seq.setPktable_name(tableName);
+			        	seq.setPkcolumn_name(field);
+			        	relation.addSeq(seq);
 	    		    }
-	    		    relExp = relExp.replaceFirst(table + "." + field, exp);
+	    		    relExp = relExp.replaceFirst(tableName + "." + field, exp);
 		        	System.out.println("relExp=" + relExp);
 		        	System.out.println(matchCount);
 		        	matchCount++;
     		    
-    		}
+	    		}
     			
     			
 //	    		relExp = relExp.replaceAll(fkTable, "[" + type.toUpperCase() + "].[" + alias + "]");
@@ -114,6 +131,7 @@ public class Test32 {
     			continue;
     		}
     		System.out.println(relExp);
+    		System.out.println(Tools.toJSON(relation.getSeqs()));
     	}
         if(rst != null) {
         	rst.close();

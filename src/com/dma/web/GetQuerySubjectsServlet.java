@@ -521,35 +521,42 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 
 	    			Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
 	        		Matcher m = p.matcher(relExp);
-	        		int matchCount = 1;
-	        		while (m.find()) {
-//	        		    System.out.println("m.group(1)=" + m.group(1));
-//	        		    System.out.println("m.group(2)=" + m.group(2));
-	        		    String tableName = m.group(1);
-	        		    String field = m.group(2);
-	        		    String exp = null;
-	        		    if (table.contentEquals(tableName)) {
-	        		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
-	        		    }
-	        		    else {
-	        		    	exp = ("[" + tableName + "].[" + field + "]");
-	        		    }
-	        		    relExp = relExp.replaceFirst(tableName + "." + field, exp);
-	        		    
-//			        	Seq seq = new Seq();
-//			        	seq.setTable_name(fktable_name);
-//			        	seq.setPktable_name(pktable_name);
-//			        	seq.setColumn_name(fkcolumn_name);
-//			        	seq.setPkcolumn_name(pkcolumn_name);
-//			        	seq.setKey_seq(Short.parseShort(key_seq));
-//			        	relation.addSeq(seq);
-	        		    if(matchCount == 1) {
-	        		    	relation.setAbove(field);
-	        		    }
+	        		short matchCount = 1;
+	        		Seq seq = null;
+		    		while (m.find()) {
+		//    		    System.out.println("m.group(1)=" + m.group(1));
+		//    		    System.out.println("m.group(2)=" + m.group(2));
+		    		    String tableName = m.group(1);
+		    		    String field = m.group(2);
+		    		    String exp = null;
+		    		    if(matchCount == 1) {
+		    		    	relation.setAbove(field);
+		    		    }
+		    		    if(matchCount % 2 != 0) {
+				        	seq = new Seq();
+		    		    }
+		    		    if (tableName.contentEquals(table)) {
+		    		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
+				        	seq.setTable_name(tableName);
+				        	seq.setColumn_name(field);
+				        	if(matchCount > 1) {
+				        		seq.setKey_seq((short) (matchCount -1));
+				        	}
+				        	else {
+				        		seq.setKey_seq(matchCount);
+				        	}
+		    		    }
+		    		    else {
+		    		    	exp = ("[" + tableName + "].[" + field + "]");
+				        	seq.setPktable_name(tableName);
+				        	seq.setPkcolumn_name(field);
+				        	relation.addSeq(seq);
+		    		    }
+		    		    relExp = relExp.replaceFirst(tableName + "." + field, exp);
+			        	System.out.println("relExp=" + relExp);
 			        	System.out.println(matchCount);
 			        	matchCount++;
-	        		}
-	    			
+		    		}
 	    		}
 	    		catch(PatternSyntaxException e) {
 	    			continue;

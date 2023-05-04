@@ -12,7 +12,8 @@ searchCols.push({field:"table_importedKeysSeqCount", title: 'IPKS<br><i class="g
 searchCols.push({field:"table_exportedKeysCount", title: 'EFK<br><i class="glyphicon glyphicon-question-sign"></i>', titleTooltip: "Number of foreign keys exported", sortable: true, searchable: false});
 searchCols.push({field:"table_exportedKeysSeqCount", title: 'EFKS<br><i class="glyphicon glyphicon-question-sign"></i>', titleTooltip: "Number of sequence within foreign keys exported", sortable: true, searchable: false});
 searchCols.push({field:"table_indexesCount", title: 'Indexes<br><i class="glyphicon glyphicon-question-sign"></i>', titleTooltip: "Number of indexed fields", sortable: true, searchable: false});
-searchCols.push({field:"table_recCount", title: "Select<br>count(*)", sortable: true, searchable: false});
+searchCols.push({field:"table_recCount", title: 'Records<br>Count<br><i class="glyphicon glyphicon-question-sign"></i>', titleTooltip: "Number of records in table", sortable: true, searchable: false});
+searchCols.push({field:"table_fieldCount", title: 'Fields<br>Count<br><i class="glyphicon glyphicon-question-sign"></i>', titleTooltip: "Number of fields in table", sortable: true, searchable: false});
 
 searchCols.push({field:"column_name", title: "Column<br>Name", sortable: true, searchable: false});
 searchCols.push({field:"column_type", title: "Column<br>Type", sortable: true, searchable: false});
@@ -1504,6 +1505,7 @@ function loadDBMD(dbmd){
       field.table_remarks = table.table_remarks;
       field.table_description = table.table_description;
       field.table_recCount = table.table_recCount;
+      field.table_fieldCount = table.table_fieldCount;
       field.table_importedKeysCount = table.table_importedKeysCount;
       field.table_exportedKeysCount = table.table_exportedKeysCount;
       field.table_importedKeysSeqCount = table.table_importedKeysSeqCount;
@@ -1695,7 +1697,12 @@ function SortOnStats(){
           {
               text: '...number of records (DESC).',
               value: '7',
-          }
+          },
+          {
+            text: '...number of fields (DESC).',
+            value: '8',
+        }
+
       ],
       callback: function (result) {
           console.log(result);
@@ -1749,6 +1756,9 @@ function ChooseTable(table, sort) {
           break;
         case "7":
           tables.sort(function(a, b){return b.table_recCount - a.table_recCount});
+          break;
+        case "8":
+          tables.sort(function(a, b){return b.table_fieldCount - a.table_fieldCount});
           break;
         default:
           tables.sort(function(a, b){return b.table_primaryKeyFieldsCount - a.table_primaryKeyFieldsCount});
