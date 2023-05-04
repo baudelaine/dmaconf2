@@ -518,32 +518,10 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 	        	relation.setPktable_alias(pkTableName);
 	//        	relation.setRelashionship("[" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
 	    		try {
-//		    		relExp = relExp.replaceAll(fkTableName, "[" + type.toUpperCase() + "].[" + alias + "]");
-//		    		relExp = relExp.replaceAll(pkTableName, "[" + pkTableName + "]");
-//		    		Pattern p = Pattern.compile("([^\\]]+]\\.)(\\w+)");
-//		    		Matcher m = p.matcher(relExp);
-//		    		while (m.find()) {
-////		    		    System.out.println("m.group(1)=" + m.group(1));
-////		    		    System.out.println("m.group(2)=" + m.group(2));
-//		    		    String field = m.group(2);
-//		    		    relExp = relExp.replaceAll(field, "[" + field + "]");
-//		    		}
-//		    		relExp = relExp.replaceAll("\\[\\[", "[");
-//		    		relExp = relExp.replaceAll("\\]\\]", "]");
-//		    		
-//		    		p = Pattern.compile("\\[([^\\]]+)\\]");
-//		    		m = p.matcher(relExp);
-//		    	    while (m.find()) {
-////		    		    System.out.println("m.group(1)=" + m.group(1));
-////		    		    System.out.println("m.group(2)=" + m.group(2));
-//		    		    String field = m.group(1);
-//		    		    String fixedField = StringUtils.remove(field, "[");
-////		    		    System.out.println("fixedField=" + fixedField);
-//		    		    relExp = StringUtils.replace(relExp, field, fixedField);
-//		    		}
 
-	        		Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
+	    			Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
 	        		Matcher m = p.matcher(relExp);
+	        		int matchCount = 1;
 	        		while (m.find()) {
 //	        		    System.out.println("m.group(1)=" + m.group(1));
 //	        		    System.out.println("m.group(2)=" + m.group(2));
@@ -558,6 +536,18 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 	        		    }
 	        		    relExp = relExp.replaceFirst(tableName + "." + field, exp);
 	        		    
+//			        	Seq seq = new Seq();
+//			        	seq.setTable_name(fktable_name);
+//			        	seq.setPktable_name(pktable_name);
+//			        	seq.setColumn_name(fkcolumn_name);
+//			        	seq.setPkcolumn_name(pkcolumn_name);
+//			        	seq.setKey_seq(Short.parseShort(key_seq));
+//			        	relation.addSeq(seq);
+	        		    if(matchCount == 1) {
+	        		    	relation.setAbove(field);
+	        		    }
+			        	System.out.println(matchCount);
+			        	matchCount++;
 	        		}
 	    			
 	    		}

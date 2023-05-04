@@ -61,21 +61,25 @@ public class Test32 {
     		
     		try {
     			
-    		Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
-    		Matcher m = p.matcher(relExp);
-    		while (m.find()) {
-//    		    System.out.println("m.group(1)=" + m.group(1));
-//    		    System.out.println("m.group(2)=" + m.group(2));
-    		    String table = m.group(1);
-    		    String field = m.group(2);
-    		    String exp = null;
-    		    if (table.contentEquals(tableName)) {
-    		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
-    		    }
-    		    else {
-    		    	exp = ("[" + table + "].[" + field + "]");
-    		    }
-    		    relExp = relExp.replaceFirst(table + "." + field, exp);
+	    		Pattern p = Pattern.compile("(\\w+)\\.(\\w+)");
+	    		Matcher m = p.matcher(relExp);
+        		int matchCount = 1;
+	    		while (m.find()) {
+	//    		    System.out.println("m.group(1)=" + m.group(1));
+	//    		    System.out.println("m.group(2)=" + m.group(2));
+	    		    String table = m.group(1);
+	    		    String field = m.group(2);
+	    		    String exp = null;
+	    		    if (table.contentEquals(tableName)) {
+	    		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
+	    		    }
+	    		    else {
+	    		    	exp = ("[" + table + "].[" + field + "]");
+	    		    }
+	    		    relExp = relExp.replaceFirst(table + "." + field, exp);
+		        	System.out.println("relExp=" + relExp);
+		        	System.out.println(matchCount);
+		        	matchCount++;
     		    
     		}
     			
@@ -125,19 +129,19 @@ public class Test32 {
 			csvCon = null;
 		}
 		
-		String s = "[FINAL].[Pompabs_ALIAS].[CLE]=[Na_abs].[A_MOTIF] AND [FINAL].[Pompabs_ALIAS].[CLE_FILI]=[Na_abs].[A_FILI]";
-		Pattern p = Pattern.compile("\\[([^\\]]+)\\]");
-		Matcher m = p.matcher(s);
-	    System.out.println("s=" + s);
-	    while (m.find()) {
-		    System.out.println("m.group(1)=" + m.group(1));
-//		    System.out.println("m.group(2)=" + m.group(2));
-		    String field = m.group(1);
-		    String fixedField = StringUtils.remove(field, "[");
-		    System.out.println("fixedField=" + fixedField);
-		    s = StringUtils.replace(s, field, fixedField);
-		}
-	    System.out.println("s=" + s);
+//		String s = "[FINAL].[Pompabs_ALIAS].[CLE]=[Na_abs].[A_MOTIF] AND [FINAL].[Pompabs_ALIAS].[CLE_FILI]=[Na_abs].[A_FILI]";
+//		Pattern p = Pattern.compile("\\[([^\\]]+)\\]");
+//		Matcher m = p.matcher(s);
+//	    System.out.println("s=" + s);
+//	    while (m.find()) {
+//		    System.out.println("m.group(1)=" + m.group(1));
+////		    System.out.println("m.group(2)=" + m.group(2));
+//		    String field = m.group(1);
+//		    String fixedField = StringUtils.remove(field, "[");
+//		    System.out.println("fixedField=" + fixedField);
+//		    s = StringUtils.replace(s, field, fixedField);
+//		}
+//	    System.out.println("s=" + s);
 		
 		
 	}
