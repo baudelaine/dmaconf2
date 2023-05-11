@@ -37,12 +37,12 @@ public class Test32 {
 
 		String table = "Pompabs";
 		String type = "Final";
-		String alias = "Pompabs_alias";
+		String alias = "Pompabs";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where FKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT DISTINCT(FK_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT FK_NAME FROM relation where PKTABLE_NAME = '" + tableName + "'";
-		String sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + table + "'";
+		String sql = "SELECT * FROM relationExp where PKTABLE_NAME = '" + table + "'";
 
 //		String sql = "SELECT KEY_SEQ FROM relation where PKTABLE_NAME = '" + tableName + "'";
 //		String sql = "SELECT distinct(PKCOLUMN_NAME) FROM relation where PKTABLE_NAME = '" + tableName + "'";
@@ -67,19 +67,23 @@ public class Test32 {
 	    		Matcher m = p.matcher(relExp);
         		short matchCount = 1;
         		Seq seq = null;
+        		String fldR = null;
+        		String fldL = null;
+    		    String expR = null;
+    		    String expL = null;
 	    		while (m.find()) {
 	//    		    System.out.println("m.group(1)=" + m.group(1));
 	//    		    System.out.println("m.group(2)=" + m.group(2));
 	    		    String tableName = m.group(1);
 	    		    String field = m.group(2);
-	    		    String exp = null;
 	    		    if(matchCount % 2 != 0) {
 			        	seq = new Seq();
 	    		    }
 	    		    if (tableName.contentEquals(table)) {
-	    		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
-			        	seq.setTable_name(tableName);
-			        	seq.setColumn_name(field);
+	    		    	expR = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
+	    		    	fldR = tableName + "." + field;
+			        	seq.setPktable_name(tableName);
+			        	seq.setPkcolumn_name(field);
 			        	if(matchCount > 1) {
 			        		seq.setKey_seq((short) (matchCount -1));
 			        	}
@@ -88,14 +92,20 @@ public class Test32 {
 			        	}
 	    		    }
 	    		    else {
-	    		    	exp = ("[" + tableName + "].[" + field + "]");
-			        	seq.setPktable_name(tableName);
-			        	seq.setPkcolumn_name(field);
+	    		    	expL = ("[" + tableName + "].[" + field + "]");
+	    		    	fldL = tableName + "." + field;
+			        	seq.setTable_name(tableName);
+			        	seq.setColumn_name(field);
+	    		    }
+	    		    System.out.println("expR=" + expR);
+	    		    System.out.println("expL=" + expL);
+	    		    if(expL != null && expR != null) {
+		    		    relExp = relExp.replaceFirst(fldR, expL);
+		    		    relExp = relExp.replaceFirst(fldL, expR);
+			        	System.out.println("relExp=" + relExp);
+			        	System.out.println(matchCount);
 			        	relation.addSeq(seq);
 	    		    }
-	    		    relExp = relExp.replaceFirst(tableName + "." + field, exp);
-		        	System.out.println("relExp=" + relExp);
-		        	System.out.println(matchCount);
 		        	matchCount++;
     		    
 	    		}

@@ -1,5 +1,6 @@
 Correction DMA - Hidden if no label (Mode deconnecté)
-               - Chargement des labels csv (Lorsqu'on charge ensuit les labels des QS. Le labels des champs fonctionne qd on le fait en premier (vérifier charser)
+               - Chargement des labels csv (Lorsqu'on charge ensuit les labels des QS. 
+                 Le labels des champs fonctionne qd on le fait en premier (vérifier charser)
                - % Mode connecté SQL server, et %par lien parent
                - Remonter l'erreur comme avant dans le message rouge et dans le error.txt
                - SQL Label par QS

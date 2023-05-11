@@ -6620,7 +6620,9 @@ function setHidden(){
 $("#setHiddenAll").click(function(){
 
   var qss = $datasTable.bootstrapTable('getData');
+  console.log(qss);
   var parms = {"qss": JSON.stringify(qss)};
+  console.log(parms);
 
   $.ajax({
 		type: 'POST',
