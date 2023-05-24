@@ -12,3 +12,5 @@ Correction DMA
 - Gérer le shutdown aléatoire -> A faire
 - Search Tool en mode déconnecté -> A tester
 - Ajouter indicateur DMA (Nb Fields in table) -> A tester
+- Gérer les delim = ; avec des doubles quotes dans les descriptions
+
