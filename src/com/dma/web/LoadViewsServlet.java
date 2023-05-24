@@ -103,8 +103,7 @@ public class LoadViewsServlet extends HttpServlet {
 				
 			}
 			
-			
-			if(lines.get(0).startsWith(header)) {
+			if(lines.get(0).equalsIgnoreCase(header) || lines.get(0).equalsIgnoreCase(header + delim)) {
 				lines.remove(0);
 			}
 			else {
