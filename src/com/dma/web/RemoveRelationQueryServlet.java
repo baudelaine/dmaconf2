@@ -60,8 +60,8 @@ public class RemoveRelationQueryServlet extends HttpServlet {
 
 			List<Path> paths = Arrays.asList(
 					Paths.get(prj + "/queries/relations.json"),
-					Paths.get(prj + "/relation.csv"),
-					Paths.get(prj + "/relationExp.csv")
+					Paths.get(prj + "/relation.csv")
+//					Paths.get(prj + "/relationExp.csv")
 					);
 					
 			
