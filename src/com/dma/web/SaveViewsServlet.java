@@ -87,9 +87,8 @@ public class SaveViewsServlet extends HttpServlet {
 					String description = "";
 					if(view.getDescriptions().containsKey(lang)) {
 						description = view.getDescriptions().get(lang);
-						description.replaceAll(delim, " ");
 					}
-					tblBuf.append(delim + label + delim + description);
+					tblBuf.append(delim + label + delim + description.replaceAll(delim, " "));
 					String tbl = tblBuf.toString();
 					for(Field field: view.getFields()) {
 						StringBuffer fldBuf = new StringBuffer();
