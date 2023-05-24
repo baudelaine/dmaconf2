@@ -101,7 +101,7 @@ public class SaveViewsServlet extends HttpServlet {
 						if(field.getLabels().containsKey(lang)) {
 							fdescription = field.getDescriptions().get(lang);
 						}
-						fldBuf.append(delim + flabel + delim + fdescription + delim + field.getExpression() + delim +
+						fldBuf.append(delim + flabel + delim + fdescription.replaceAll(delim, " ") + delim + field.getExpression() + delim +
 								String.valueOf(field.isHidden()) + delim + field.getIcon() + delim + 
 								field.getAlias() + delim + field.getFolder() + delim + field.getRole());
 						lines.add(fldBuf.toString());
