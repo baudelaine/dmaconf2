@@ -130,10 +130,14 @@ public class GetPKRelationsServlet extends HttpServlet {
 		        	relation.setKey_name(pkName);
 		        	relation.setFk_name(fkName);
 		        	relation.setPk_name(pkName);
-		        	relation.setTable_name(fkTableName);
-		        	relation.setTable_alias(fkTableName);
-		        	relation.setPktable_name(pkTableName);
-		        	relation.setPktable_alias(alias);
+//		        	relation.setTable_name(fkTableName);
+//		        	relation.setTable_alias(fkTableName);
+//		        	relation.setPktable_name(pkTableName);
+//		        	relation.setPktable_alias(alias);
+		        	relation.setTable_name(pkTableName);
+		        	relation.setTable_alias(alias);
+		        	relation.setPktable_name(fkTableName);
+		        	relation.setPktable_alias(fkTableName);
 		//        	relation.setRelashionship("[" + type.toUpperCase() + "].[" + alias + "].[" + fkcolumn_name + "] = [" + pktable_name + "].[" + pkcolumn_name + "]");
 		    		try {
 
