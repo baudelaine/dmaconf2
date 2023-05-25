@@ -292,11 +292,14 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		    			fields.add(field);
 	        		}
 	    		}
+	        	if(fields.isEmpty()) {
+	    			return qsFromXML.get(table).getFields();
+	        	}
 		        return fields;
 	        }
-			else {
-				return qsFromXML.get(table).getFields();
-			}
+//			else {
+//				return qsFromXML.get(table).getFields();
+//			}
 		}
 
 	    boolean tableIsView = false;

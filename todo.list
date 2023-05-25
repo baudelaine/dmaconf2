@@ -13,4 +13,7 @@ Correction DMA
 - Search Tool en mode déconnecté -> A tester
 - Ajouter indicateur DMA (Nb Fields in table) -> A tester
 - Gérer les delim = ; avec des doubles quotes dans les descriptions
+- Il manque des tables dans search tool (ORA deconnecté CCMO table STA_GRC_INTERACTION)
+- IL manque des champs dans le DMA (ACTOR STA_GRC_INTERACTION)
+- Labels table pas chargés
 

@@ -186,6 +186,7 @@ public class UploadXMLServlet extends HttpServlet {
 						tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
 					}
 				    result.put("TABLES", tables);
+				    result.put("QSFromXML", querySubjects);
 					
 //					result.put("TABLES", querySubjects.keySet());
 
