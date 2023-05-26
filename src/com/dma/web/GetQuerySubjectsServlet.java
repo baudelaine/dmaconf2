@@ -180,7 +180,7 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		QuerySubject result = new QuerySubject();
 		
 		if(qsFromXML != null) {
-			result = qsFromXML.get(table);
+			result.setTable_name(qsFromXML.get(table).getTable_name());
 			result.set_id(alias + result.getType());
 		}
 		else {
@@ -581,6 +581,7 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 			
 		}
 		if(Files.exists(Paths.get(prj + "/relation.csv"))) {
+			System.out.println("on passe dans relation.csv...");
 			Properties props = new java.util.Properties();
 			props.put("separator",";");
 			csvCon = DriverManager.getConnection("jdbc:relique:csv:" + prj.toString(), props);
@@ -590,6 +591,7 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 			relationMode = "CSV";
 		}
 		else if(FKQuery != null && !FKQuery.isEmpty()) {
+			System.out.println("on passe dans FKQuery...");
 //			System.out.println("FKQuery=" + FKQuery);
 			FKQuery = StringUtils.replace(FKQuery, " $TABLE", " '" + table + "'");
 //			System.out.println("FKQuery=" + FKQuery);
