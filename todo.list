@@ -17,3 +17,13 @@ Correction DMA
 - IL manque des champs dans le DMA (ACTOR STA_GRC_INTERACTION)
 - Labels table pas chargés
 
+Import fichier labels, gérer double cote
+Import fichier view, gérer double cote
+Remove expression relations
+Liste champs above par expression régulière depuis l'expression de relation
+Ajouter une case à cocher dans l'onglet Ref - Invert Cardinality
+Ajouter case à cocher (Label table parent)
+setHidden (if no label) All
+Ne pas fermer le panneau qd on chose une case ref que l'alias existe déjà
+Créer un autre bouton Generate view (différent) pour un algo différent
+
