@@ -4356,7 +4356,9 @@ function GetQuerySubjects(table_name, table_alias, type, linker_id, index) {
           $datasTable.bootstrapTable('expandRow', index);
         }
 
-        showalert(data.FROM, 'Operation failed.<br>' + data.EXCEPTION + "<br>" + data.MESSAGE + '<br><br><strong><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> ' + data.TROUBLESHOOTING + "</strong>", "alert-danger", "bottom");
+        showalert(data.FROM, 'Operation failed.<br>' + 
+        '<br><br><strong><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> ' + 
+        data.TROUBLESHOOTING + "</strong>", "alert-danger", "bottom");
       }
 
   	},
@@ -6486,6 +6488,34 @@ $("#updateModel").click(function(){
 
 })
 
+$('#setHiddenINLAll').click(function(){
+
+  var lang = $("#langSelect").find("option:selected").val();
+  console.log(lang);
+  var qss = $datasTable.bootstrapTable('getData');
+  if(qss.length > 0){
+
+    $.each(qss, function(i, qs){
+      $.each(qs.fields, function(j, field){
+        if(!field.labels[lang]){
+          field.hidden = true;
+        }
+        else{
+          field.hidden = false;
+        }
+      })
+
+    })
+    $refTab.tab('show');
+    $qsTab.tab('show');
+
+  }
+  else{qs
+    showalert("No Query Subject found.", "alert-warning", "bottom");
+    // $("#qsSelect").selectpicker("toggle");
+  }
+})
+
 
 $('#setHiddenINL').click(function(){
 
@@ -6618,6 +6648,11 @@ function setHidden(){
 }
 
 $("#setHiddenAll").click(function(){
+
+  if(currentProject.resource.jndiName == "XML"){
+    promptTeasing();
+    return;  
+  }  
 
   var qss = $datasTable.bootstrapTable('getData');
   console.log(qss);
@@ -7006,6 +7041,36 @@ $("#expandQS").click(function(){
 $("#collapseQS").click(function(){
   $("#DatasTable").bootstrapTable('collapseAllRows');
 })
+
+$("#removeViews").click(function(){
+  if($("#ViewsTable").bootstrapTable("getData").length == 0){
+    return;
+  }
+
+  bootbox.confirm({
+    title: "Removing Views.",
+    message: "All Views will be dropped.",
+    buttons: {
+      cancel: {
+          label: 'Cancel',
+          className: 'btn btn-default'
+      },
+      confirm: {
+          label: 'Confirm',
+          className: 'btn btn-warning'
+      }
+    },
+    callback: function(result){
+      if(result){
+        $("#ViewsTable").bootstrapTable("removeAll");
+        $("#qsSelect").empty();
+        $("#qsSelect").selectpicker('refresh');
+      }
+    }
+  });
+
+})
+
 
 $("#removeQS").click(function(){
   if($("#DatasTable").bootstrapTable("getData").length == 0){

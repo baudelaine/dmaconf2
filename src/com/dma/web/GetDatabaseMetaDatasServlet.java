@@ -363,61 +363,66 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 			    	Set<String> PKSet = new HashSet<String>();
 					String tableName = qss.getKey();
 					QuerySubject qs = qss.getValue();
-
 					String sql = null;
-					if(isCsvExp) {
-						sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + tableName + "'";
-						result.put("FKS", "CSVEXP");
-					}
-					else {
-						sql = "SELECT * FROM relation where FKTABLE_NAME = '" + tableName + "'";
-						result.put("FKS", "CSV");
-					}
-					stmt = csvCon.prepareStatement(sql);
-					rst = stmt.executeQuery();
-					
-			    	while(rst.next()){
-			    		if(!isCsvExp) {
-				    		String FKName = rst.getString("FK_NAME");
-				    		FKSet.add(FKName);
+
+					if(csvCon != null) {
+						if(isCsvExp) {
+							sql = "SELECT * FROM relationExp where FKTABLE_NAME = '" + tableName + "'";
+							result.put("FKS", "CSVEXP");
+						}
+						else {
+							sql = "SELECT * FROM relation where FKTABLE_NAME = '" + tableName + "'";
+							result.put("FKS", "CSV");
+						}
+						stmt = csvCon.prepareStatement(sql);
+						rst = stmt.executeQuery();
+						
+				    	while(rst.next()){
+				    		if(!isCsvExp) {
+					    		String FKName = rst.getString("FK_NAME");
+					    		FKSet.add(FKName);
+				    		}
+				    		FKSeqCount++;
+				    	}
+			            if(rst != null) {
+			            	rst.close();
+			            	rst = null;
+			            }
+			    		if(stmt != null) {
+			    			stmt.close();
+			    			stmt = null;
 			    		}
-			    		FKSeqCount++;
-			    	}
-		            if(rst != null) {
-		            	rst.close();
-		            	rst = null;
-		            }
-		    		if(stmt != null) {
-		    			stmt.close();
-		    			stmt = null;
-		    		}
+					}
 					
-					if(isCsvExp) {
-						sql = "SELECT * FROM relationExp where PKTABLE_NAME = '" + tableName + "'";
-						result.put("PKS", "CSVEXP");
-					}
-					else {
-						sql = "SELECT * FROM relation where PKTABLE_NAME = '" + tableName + "'";
-						result.put("PKS", "CSV");
-					}
-					stmt = csvCon.prepareStatement(sql);
-					rst = stmt.executeQuery();
-		    		
-			    	while(rst.next()){
-			    		if(!isCsvExp) {
-				    		String PKName = rst.getString("FK_NAME");
-				    		PKSet.add(PKName);
+					if(csvCon != null) {
+	
+						if(isCsvExp) {
+							sql = "SELECT * FROM relationExp where PKTABLE_NAME = '" + tableName + "'";
+							result.put("PKS", "CSVEXP");
+						}
+						else {
+							sql = "SELECT * FROM relation where PKTABLE_NAME = '" + tableName + "'";
+							result.put("PKS", "CSV");
+						}
+						stmt = csvCon.prepareStatement(sql);
+						rst = stmt.executeQuery();
+			    		
+				    	while(rst.next()){
+				    		if(!isCsvExp) {
+					    		String PKName = rst.getString("FK_NAME");
+					    		PKSet.add(PKName);
+				    		}
+				    		PKSeqCount++;
+				    	}
+			            if(rst != null) {
+			            	rst.close();
+			            	rst = null;
+			            }
+			    		if(stmt != null) {
+			    			stmt.close();
+			    			stmt = null;
 			    		}
-			    		PKSeqCount++;
-			    	}
-		            if(rst != null) {
-		            	rst.close();
-		            	rst = null;
-		            }
-		    		if(stmt != null) {
-		    			stmt.close();
-		    			stmt = null;
-		    		}
+					}
 					
 		            DBMDTable table = new DBMDTable();
 		            table.setTable_name(qs.getTable_name());
