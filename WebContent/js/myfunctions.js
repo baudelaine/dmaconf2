@@ -8742,6 +8742,7 @@ downloadViews.addEventListener('click', function(event){
 
   var parms = {"views": JSON.stringify(vues), "delim": ";", "lang": lang}
 
+  console.log(JSON.stringify(vues));
   console.log(parms);
 
   $.ajax({
