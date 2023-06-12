@@ -4564,11 +4564,16 @@ function ChooseTable(table, sort) {
         success: function(data) {
           console.log(data);
           $.each(data.TABLES, function(tableName, tableType){
+            var option;
             if(tableType == "VIEW"){
-              var option = '<option class="fontsize" value="' + tableName + '" data-subtext="(' + tableType + ')">' + tableName + '</option>';
+              option = '<option class="fontsize" value="' + tableName + '" data-subtext="(' + tableType + ')">' + tableName + '</option>';
             }
             if(tableType == "TABLE"){
-              var option = '<option class="fontsize" value="' + tableName + '">' + tableName + '</option>';
+              option = '<option class="fontsize" value="' + tableName + '">' + tableName + '</option>';
+            }
+            if(tableType == ""){
+              option = '<option class="fontsize" value="' + tableName + '" data-subtext="(OTHER)">' + tableName + '</option>';
+              console.log(option);
             }
             table.append(option);
           });
@@ -6134,11 +6139,16 @@ $('#XMLFile').change(function(){
           table.empty();
 
           $.each(data.TABLES, function(tableName, tableType){
+            var option;
             if(tableType == "VIEW"){
-              var option = '<option class="fontsize" value="' + tableName + '" data-subtext="(' + tableType + ')">' + tableName + '</option>';
+              option = '<option class="fontsize" value="' + tableName + '" data-subtext="(' + tableType + ')">' + tableName + '</option>';
             }
             if(tableType == "TABLE"){
-              var option = '<option class="fontsize" value="' + tableName + '">' + tableName + '</option>';
+              option = '<option class="fontsize" value="' + tableName + '">' + tableName + '</option>';
+            }
+            if(tableType == ""){
+              option = '<option class="fontsize" value="' + tableName + '" data-subtext="(OTHER)">' + tableName + '</option>';
+              console.log(option);
             }
             table.append(option);
           });

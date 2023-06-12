@@ -14,7 +14,7 @@ public class Test15 {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 
-		Path path = Paths.get("/home/fr054721/Downloads/bdxmet/model.xml");
+		Path path = Paths.get("/home/fr054721/Documents/antibia/parsingxml/model.xml");
 
 		SAXReader reader = new SAXReader();
 		Document document = reader.read(path.toFile());

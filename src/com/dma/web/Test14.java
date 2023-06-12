@@ -25,7 +25,7 @@ public class Test14
     {
         //Get DOM Node for XML
 //        String fileName= "/home/fr054721/dmagui/ca/employees.xml";
-		Path path = Paths.get("/home/fr054721/Downloads/bdxmet/model.xml");
+		Path path = Paths.get("/home/fr054721/Documents/antibia/parsingxml/model.xml");
         Document document = getDocument(path);
          
         String xpathExpression = "";
