@@ -7063,8 +7063,8 @@ $("#removeViews").click(function(){
     callback: function(result){
       if(result){
         $("#ViewsTable").bootstrapTable("removeAll");
-        $("#qsSelect").empty();
-        $("#qsSelect").selectpicker('refresh');
+        // $("#qsSelect").empty();
+        // $("#qsSelect").selectpicker('refresh');
       }
     }
   });
