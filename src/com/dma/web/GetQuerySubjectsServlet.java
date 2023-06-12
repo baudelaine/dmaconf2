@@ -533,12 +533,12 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		    		    String field = m.group(2);
 		    		    String exp = null;
 		    		    if(matchCount == 1) {
-		    		    	relation.setAbove(field);
 		    		    }
 		    		    if(matchCount % 2 != 0) {
 				        	seq = new Seq();
 		    		    }
 		    		    if (tableName.contentEquals(table)) {
+		    		    	relation.setAbove(field);
 		    		    	exp = ("[" + type.toUpperCase() + "]." + "[" + alias + "].[" + field + "]");
 				        	seq.setTable_name(tableName);
 				        	seq.setColumn_name(field);
