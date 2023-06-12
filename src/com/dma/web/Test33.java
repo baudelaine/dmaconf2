@@ -50,7 +50,7 @@ public class Test33 {
 			
 //			NodeList nodeList = null;
 			
-			NodeList nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/querySubject", document, XPathConstants.NODESET);
+			NodeList nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace[1]/querySubject", document, XPathConstants.NODESET);
 //			if(nodeList.getLength() == 0) {
 //				nodeList = (NodeList) xpath.evaluate("/project/namespace/querySubject", document, XPathConstants.NODESET);
 //			}	
