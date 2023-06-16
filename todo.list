@@ -27,3 +27,18 @@ setHidden (if no label) All
 Ne pas fermer le panneau qd on chose une case ref que l'alias existe déjà
 Créer un autre bouton Generate view (différent) pour un algo différent
 
+en dev cool et rapide
+setHidden (if no label) All
+remove expression relation
+remove views
+
+Ajouter une case à cocher dans l'onglet Ref au niveau des relations - Invert Cardinality
+Ajouter case à cocher dans l'onglet Final au niveau des relations - Right join
+Ajouter case à cocher dans l'onglet QuerySubjet (table label in braket) au niveau du field (avec un cocher tout qqp) par ex en dessous du bouton setHidden All
+Ajouter case à cocher dans l'onglet QuerySubjet (path label in braket) au niveau du QS (avec un cocher tout qqp) par ex en dessous du bouton setHidden All
+Ajouter une case à cocher dans l'onglet Ref au niveau des relations - Invert Cardinality
+Ajouter case à cocher dans l'onglet Final au niveau des relations - Right join
+Ajouter case à cocher dans l'onglet QuerySubjet (table label in braket) au niveau du field (avec un cocher tout qqp) par ex en dessous du bouton setHidden All
+Ajouter case à cocher dans l'onglet QuerySubjet (path label in braket) au niveau du QS 
+deplacer le champ folder dans l'onglet final (de QS vers Final)
+
