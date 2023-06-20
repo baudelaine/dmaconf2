@@ -53,4 +53,8 @@ Est-ce possible d'ajouter une poubelle sur les Views (Au niveau du QS et du Fiel
 et aussi un QS
 
 
+du coup tu peux virer le champ position
+de l'onglet vue
+on va gagner un peu de place
+car l'ID du field peut etre un peu long
 
