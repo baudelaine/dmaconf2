@@ -42,3 +42,15 @@ Ajouter case à cocher dans l'onglet QuerySubjet (table label in braket) au nive
 Ajouter case à cocher dans l'onglet QuerySubjet (path label in braket) au niveau du QS 
 deplacer le champ folder dans l'onglet final (de QS vers Final)
 
+download model.json -> corriger qss doit etre querySubject
+
+la fonction upload model.json ne fonctionne pas
+
+table label et table description ne sortent pas dans l'extract des views.csv
+le champ n'est pas rempli, mais les colonnes sont la
+
+Est-ce possible d'ajouter une poubelle sur les Views (Au niveau du QS et du Field stp) Merci d'avance camarade. y a aucune règle, aucune prise de tete, juste un poubelle pour enlever un champ qu'on veut plus
+et aussi un QS
+
+
+
