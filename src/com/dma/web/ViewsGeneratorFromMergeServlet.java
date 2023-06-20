@@ -119,7 +119,8 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 		        
 		        gRefMap = new HashMap<String, Integer>();
 		        
-		        
+				System.out.println("Start Generate Views");
+				
 				//scan final views
 				for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
 					
@@ -136,8 +137,8 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 								qsView.setTable_name(viewName);
 								qsView.setTable_alias(viewName);
 								qsView.setType("Final");
-								if (query_subjects_views.get(qsView.getTable_alias()) == null) {
-									query_subjects_views.put(qsView.getTable_alias(), qsView);
+								if (query_subjects_views.get(qsView.getTable_name()) == null) {
+									query_subjects_views.put(qsView.getTable_name(), qsView);
 								}
 							}
 						}
@@ -150,7 +151,6 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 					
 					if (query_subject.getValue().getType().equalsIgnoreCase("Ref")){
 						
-						//Views Final
 						if(!query_subject.getValue().getMerge().equals("")) {
 							String viewsTab[] = StringUtils.split(query_subject.getValue().getMerge(), ";");
 							
@@ -161,67 +161,74 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 								qsView.setTable_name(viewName);
 								qsView.setTable_alias(viewName);
 								qsView.setType("Ref");
-								if (query_subjects_views.get(qsView.getTable_alias()) == null) {
-									query_subjects_views.put(qsView.getTable_alias(), qsView);
+								if (query_subjects_views.get(qsView.getTable_name()) == null) {
+									query_subjects_views.put(qsView.getTable_name(), qsView);
 								}
 							}
 						}
 						//End Views
 					}
 				}
+
 				//Itération pour chaque vue
 				for(Entry<String, QuerySubject> query_subjects_view: query_subjects_views.entrySet()){
-					System.out.println("query_subjects_view: " + query_subjects_view.getValue().get_id() );
+					
 					if (query_subjects_view.getValue().getType().equalsIgnoreCase("Final")){
 						for(Entry<String, QuerySubject> query_subject: query_subjects.entrySet()){
 							
-							
-							if (query_subject.getValue().getType().equalsIgnoreCase("Final")){
-								
-								System.out.println("query_subject: " + query_subject.getValue().get_id() );
-								//ajout filter
-								String filterNameSpaceSource = "[FINAL]";
-								
-								//lancement f1 ref
-								for(QuerySubject qs: qsList){
-						        	recurseCountQs.put(qs.getTable_alias(), 0);
-						        }
-								
-									f1(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias(), "", "[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_alias(), recurseCountQs, "Final", filterNameSpaceSource, query_subjects_view.getValue().get_id(), "");
-
-								if(query_subject.getValue().getMerge().contains(query_subjects_view.getValue().get_id()) ) {
-									System.out.println("Final: " + query_subject.getValue().getTable_alias() + " getMerge: " + query_subject.getValue().getMerge());
+							String viewsTab[] = StringUtils.split(query_subject.getValue().getMerge(), ";");
+							for (int i=0;i<viewsTab.length;i++) {
+								if(query_subjects_view.getValue().getTable_name().equals(viewsTab[i])) {
 									
-									for(Field field: query_subject.getValue().getFields()) {
-										
-										//views
-										if(!field.isHidden()) {
+										if (query_subject.getValue().getType().equalsIgnoreCase("Final")){
+											
+											//ajout filter
+											String filterNameSpaceSource = "[FINAL]";
+											
+											//lancement f1 ref
+											for(QuerySubject qs: qsList){
+									        	recurseCountQs.put(qs.getTable_alias(), 0);
+									        }
+												f1(query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias(), "", "[DATA].[" + query_subject.getValue().getTable_alias() + "]", query_subject.getValue().getTable_alias(), recurseCountQs, "Final", filterNameSpaceSource, query_subjects_view.getValue().getTable_name(), "");
 
-											String viewName = query_subjects_view.getValue().get_id();
-											QuerySubject qsView = query_subjects_views.get(viewName);
-											Field f = new Field();
-											f = field;
-											f.set_id(query_subject.getValue().getTable_alias() + "." + field.getField_name());
-											f.setField_name(field.getField_name());
-											String ex = "[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]";
-											f.setExpression(ex);
-											f.setRole("Field");
-											Boolean addField = true;
-											for(Field existingfield: qsView.getFields()) {
-												if (existingfield.get_id().equals(f.get_id())) {
-													if(addField) {
-														addField = false;
+
+											
+											for(Field field: query_subject.getValue().getFields()) {
+												
+												//views
+												if(!field.isHidden()) {
+
+													String viewName = query_subjects_view.getValue().getTable_name();
+													QuerySubject qsView = query_subjects_views.get(viewName);
+													Field f = new Field();
+													f = field;
+													f.set_id(query_subject.getValue().getTable_alias() + "." + field.getField_name());
+													f.setField_name(field.getField_name());
+													String ex = "[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]";
+													f.setExpression(ex);
+													f.setRole("Field");
+													Boolean addField = true;
+													for(Field existingfield: qsView.getFields()) {
+														if (existingfield.get_id().equals(f.get_id())) {
+															if(addField) {
+																addField = false;
+															}
+														}
+													}
+													
+													if (addField) {
+														qsView.addField(f);
 													}
 												}
-											}
-											if (addField) {
-												qsView.addField(f);
+												//end views	
 											}
 										}
-										//end views	
-									}
+									
+									
 								}
 							}
+							
+
 						}
 					}
 				}
@@ -344,36 +351,45 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 					//Ajout du field(folder) de type RefView dans la vue de type Final
 					for(Entry<String, QuerySubject> query_subjects_view: query_subjects_views.entrySet()){
 						if (query_subjects_view.getValue().getType().equalsIgnoreCase("Ref")){
-							if(query_subjects.get(pkAlias + namespaceID).getMerge().contains(query_subjects_view.getValue().get_id())) {
-								
-								if(!query_subjects_view.getValue().get_id().equals(mergeView)) {
-									System.out.println("QS: " + pkAlias + namespaceID + "* * * getMerge() " + query_subjects_view.getValue().get_id() + " sera dans " + mergeView);
+							
+							String viewsTab[] = StringUtils.split(query_subjects.get(pkAlias + namespaceID).getMerge(), ";");
+							for (int j=0;j<viewsTab.length;j++) {
+								if(query_subjects_view.getValue().getTable_name().equals(viewsTab[j])) {
 									
-									QuerySubject qsview = query_subjects_views.get(mergeView);
-									Field f = new Field();
-									f.set_id(qsFinalName + gDirNameCurrent);
-									f.setField_name("(" + query_subjects_view.getValue().get_id() + ") " + qsFinalName + gDirNameCurrent);
-									String ex = "[DATA].[" + qsFinalName + "].[" + gDirNameCurrent.substring(1);
-									f.setExpression(ex);
-									f.setRole("FolderRefView");
-									
-									Boolean addField = true;
-									for(Field existingfield: qsview.getFields()) {
-										if (existingfield.get_id().equals(f.get_id())) {
-											if(addField) {
-												addField = false;
+//									if(query_subjects.get(pkAlias + namespaceID).getMerge().contains(query_subjects_view.getValue().getTable_name())) {
+										
+										if(!query_subjects_view.getValue().getTable_name().equals(mergeView)) {
+//											System.out.println("QS: " + pkAlias + namespaceID + "* * * getMerge() " + query_subjects_view.getValue().getTable_name() + " sera dans " + mergeView);
+											
+											QuerySubject qsview = query_subjects_views.get(mergeView);
+											Field f = new Field();
+											f.set_id(qsFinalName + gDirNameCurrent);
+											f.setField_name("(" + query_subjects_view.getValue().getTable_name() + ") " + qsFinalName + gDirNameCurrent);
+											String ex = "[DATA].[" + qsFinalName + "].[" + gDirNameCurrent.substring(1);
+											f.setExpression(ex);
+											f.setRole("FolderRefView");
+											
+											Boolean addField = true;
+											for(Field existingfield: qsview.getFields()) {
+												if (existingfield.get_id().equals(f.get_id())) {
+													if(addField) {
+														addField = false;
+													}
+												}
 											}
+											if (addField) {
+												qsview.addField(f);
+											}
+											
+										//	qsview.addField(f);
+											mergeView = query_subjects_view.getValue().get_id();
+											gDirNameCurrentView = "*";
 										}
-									}
-									if (addField) {
-										qsview.addField(f);
-									}
 									
-								//	qsview.addField(f);
-									mergeView = query_subjects_view.getValue().get_id();
-									gDirNameCurrentView = "*";
+//									}
 								}
 							}
+								
 							//End linked view
 						}
 						
@@ -381,66 +397,77 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 					
 		//end views field													
 					}
-					if(query_subjects.get(pkAlias + namespaceID).getMerge().contains(mergeView)) {
-						
-						for(Field field: query_subjects.get(pkAlias + namespaceID).getFields()){
-							
-							//views field
-							if(!field.isHidden()) {
+
+					
+					String viewsTab[] = StringUtils.split(query_subjects.get(pkAlias + namespaceID).getMerge(), ";");
+					for (int j=0;j<viewsTab.length;j++) {
+						if(mergeView.equals(viewsTab[j])) {
+//							if(query_subjects.get(pkAlias + namespaceID).getMerge().contains(mergeView)) {
 								
-								QuerySubject qsView = query_subjects_views.get(mergeView);
-								Field f = new Field();
-								//Copie des éléments du field afin d'éviter la copie d'objet qui n'est pas adapté ! f = field redonne une référence existante 
-								//lorsqu'on repasse par un field ou nous sommes déjà passé. 
-								f.setField_type(field.getField_type());
-								f.setPk(field.isPk());
-								f.setIndexed(field.isIndexed());
-								f.setLabel(field.getLabel());
-								f.setField_size(field.getField_size());
-								f.setNullable(field.getNullable());
-								f.setTraduction(field.isTraduction());
-								f.setHidden(field.isHidden());
-								f.setTimezone(field.isTimezone());
-								f.setIcon(field.getIcon());
-								f.setDisplayType(field.getDisplayType());
-								f.setDescription(field.getDescription());
-								f.setLabels(field.getLabels());
-								f.setDescriptions(field.getDescriptions());
-								f.setMeasure(field.getMeasure());
-								f.setCustom(field.isCustom());
-								f.setRole("Field");
-								
-								if (qsView.getType().equals("Final")) {
-									f.set_id(qsFinalName + gDirNameCurrent + "." + field.getField_name());
-									f.setField_name(field.getField_name());
-									String ex = "[DATA].[" + qsFinalName + "].[" + gFieldName + "." + field.getField_name() + "]";
-									f.setExpression(ex);
-								} else {
-									f.set_id(gDirNameCurrentView + "." + field.getField_name());
-									f.setField_name(field.getField_name());
-									String ex = gDirNameCurrentView + "." + field.getField_name() + "]";
-									f.setExpression(ex);
-								}
-								Boolean addField = true;
-								for(Field ff: qsView.getFields()) {
-									if (ff.get_id().equals(f.get_id())) {
-										addField = false;
+								for(Field field: query_subjects.get(pkAlias + namespaceID).getFields()){
+									
+									//views field
+									if(!field.isHidden()) {
+										
+										QuerySubject qsView = query_subjects_views.get(mergeView);
+										Field f = new Field();
+										//Copie des éléments du field afin d'éviter la copie d'objet qui n'est pas adapté ! f = field redonne une référence existante 
+										//lorsqu'on repasse par un field ou nous sommes déjà passé. 
+										f.setField_type(field.getField_type());
+										f.setPk(field.isPk());
+										f.setIndexed(field.isIndexed());
+										f.setLabel(field.getLabel());
+										f.setField_size(field.getField_size());
+										f.setNullable(field.getNullable());
+										f.setTraduction(field.isTraduction());
+										f.setHidden(field.isHidden());
+										f.setTimezone(field.isTimezone());
+										f.setIcon(field.getIcon());
+										f.setDisplayType(field.getDisplayType());
+										f.setDescription(field.getDescription());
+										f.setLabels(field.getLabels());
+										f.setDescriptions(field.getDescriptions());
+										f.setMeasure(field.getMeasure());
+										f.setCustom(field.isCustom());
+										f.setRole("Field");
+										
+										
+										if (qsView.getType().equals("Final")) {
+											f.set_id(qsFinalName + gDirNameCurrent + "." + field.getField_name());
+											f.setField_name(field.getField_name());
+											String ex = "[DATA].[" + qsFinalName + "].[" + gFieldName + "." + field.getField_name() + "]";
+											f.setExpression(ex);
+										} else {
+											f.set_id(gDirNameCurrentView + "." + field.getField_name());
+											f.setField_name(field.getField_name());
+											String ex = gDirNameCurrentView + "." + field.getField_name() + "]";
+											f.setExpression(ex);
+										}
+										Boolean addField = true;
+										for(Field ff: qsView.getFields()) {
+											if (ff.get_id().equals(f.get_id())) {
+												addField = false;
+											}
+										}
+										if (addField) {
+											qsView.addField(f);
+//											System.out.println("addField: " + f.get_id());
+										}											
 									}
 								}
-								if (addField) {
-									qsView.addField(f);
-								}											
-							}
-						
-						}
+//							}
+						}						
 					}
+
+					
+
 							
 
 				}
 
-				if (!query_subject.getMerge().equals("")) {
+//				if (!query_subject.getMerge().equals("")) {
 					f1(pkAlias, qsFinalName + gDirNameCurrent, gDirNameCurrent, qsFinal, qsFinalName, copyRecurseCount, namespaceID, filterNameSpaceSource, mergeView, gDirNameCurrentView);
-				}
+//				}
 			}
 		}
 	}	
