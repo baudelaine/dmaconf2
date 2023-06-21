@@ -58,3 +58,19 @@ de l'onglet vue
 on va gagner un peu de place
 car l'ID du field peut etre un peu long
 
+**********
+qd je charge un fichier views et que je me suis trompé dans les headers
+il me dit les headers sont pas bons
+et qd je rectifie, il continue de me dire la meme chose
+il faut que j'enregistre, le fichier sous un nom différent
+pour que ca se charge
+tu prends le projet antibia, le dernier modele
+tu telecharges les vues
+tu ajoutes une colonnes
+tu le recharges
+ca passe pas normal
+tu corriges
+ca passe toujours pas
+sauf en enregistrant sous un autre nom
+j'ai meme essayé de me déconnecter et me reconnecter, pourtant, je dois qd meme changer le nom du fichire
+***********
