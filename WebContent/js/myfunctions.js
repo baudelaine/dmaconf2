@@ -2158,6 +2158,18 @@ function removeRelationFormatter(value, row, index) {
 
 function removeFieldFormatter(value, row, index) {
 
+  // console.log(row);
+  // console.log(activeTab);
+
+  if(activeTab.match("View")){
+    return [
+      '<a class="remove" href="javascript:void(0)" title="Remove">',
+      '<i class="glyphicon glyphicon-trash"></i>',
+      '</a>'
+    ].join('');
+  }
+
+
   if(row.custom){
 
   return [
@@ -2866,7 +2878,11 @@ function buildFieldTable($el, cols, data, qs){
                 case "traduction":
                   var newValue = value == false ? true : false;
                   updateCell($el, row.index, field, newValue);
-                  break;
+                  break;                    $el.bootstrapTable('remove', {
+                    field: 'index',
+                    values: [row.index]
+                });
+
 
               case "hidden":
                 var newValue = value == false ? true : false;
@@ -2874,13 +2890,19 @@ function buildFieldTable($el, cols, data, qs){
                 break;
 
               case "remove":
-                if(activeTab.match("Query Subject|View")){
+                if(activeTab.match("Query Subject")){
                   if(row.custom == true){
                     $el.bootstrapTable('remove', {
                         field: 'index',
                         values: [row.index]
                     });
                   }
+                }
+                if(activeTab.match("View")){
+                  $el.bootstrapTable('remove', {
+                      field: 'index',
+                      values: [row.index]
+                  });
                 }
                 return;
 
@@ -4318,6 +4340,7 @@ function GetQuerySubjects(table_name, table_alias, type, linker_id, index) {
         // console.log(datas);
 
         $("#qsSelect").empty();
+        $("#qsSelect").append(emptyOption);
         $.each(datas, function(i, data){
           if(data.type.match("Final|Ref")){
             var option = '<option class="fontsize" value="' + data._id + '" data-subtext="' + data.type + '" data-content="">' + data._id + '</option>';
