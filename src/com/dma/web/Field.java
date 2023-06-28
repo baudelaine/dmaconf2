@@ -38,6 +38,7 @@ public class Field {
 	String folder = "";
 	String role = "Field";
 	int fieldPos = 0;
+	String OriginalTableAlias = "";
 	
 	public String getBK() {
 		return BK;
@@ -224,6 +225,12 @@ public class Field {
 	}
 	public void setFieldPos(int fieldPos) {
 		this.fieldPos = fieldPos;
+	}
+	public String getOriginalTableAlias() {
+		return OriginalTableAlias;
+	}
+	public void setOriginalTableAlias(String originalTableAlias) {
+		OriginalTableAlias = originalTableAlias;
 	}
 	
 }

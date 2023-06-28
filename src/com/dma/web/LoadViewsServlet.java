@@ -66,11 +66,11 @@ public class LoadViewsServlet extends HttpServlet {
 			Path prj = Paths.get((String) request.getSession().getAttribute("projectPath"));
 			result.put("PRJ", prj.toString());
 			
-			String delim = ";";
+			String delim = "\";\"";
 			String lang = "fr"; 
-			String header = "TABLE_NAME" + delim + "TABLE_TYPE" + delim + "TABLE_LABEL" + delim + "TABLE_DESCRIPTION" + delim +
+			String header = "\"" + "TABLE_NAME" + delim + "TABLE_TYPE" + delim + "TABLE_LABEL" + delim + "TABLE_DESCRIPTION" + delim +
 					"FIELD_ID" + delim  + "FIELD_NAME" + delim + "FIELD_TYPE" + delim + "FIELD_LABEL" + delim + "FIELD_DESCRIPTION" + delim +
-					"EXPRESSION" + delim + "HIDDEN" + delim + "ICON" + delim + "ALIAS" + delim + "FOLDER" + delim + "ROLE";				
+					"EXPRESSION" + delim + "HIDDEN" + delim + "ICON" + delim + "ALIAS" + delim + "FOLDER" + delim + "ROLE" + delim + "ORIGINALTABLEALIAS" + "\"";				
 			
 			List<String> lines = new ArrayList<String>();
 			
@@ -154,6 +154,7 @@ public class LoadViewsServlet extends HttpServlet {
 					field.setAlias(line.split(delim)[12]);
 					field.setFolder(line.split(delim)[13]);
 					field.setRole(line.split(delim)[14]);
+					field.setOriginalTableAlias(line.split(delim)[15]);
 					views.get(line.split(delim)[0]).addField(field);
 					
 				}
