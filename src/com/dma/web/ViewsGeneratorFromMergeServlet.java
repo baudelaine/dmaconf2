@@ -207,11 +207,16 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 													String ex = "[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]";
 													f.setExpression(ex);
 													f.setRole("Field");
+													f.setAlias(query_subject.getValue().getTable_alias());
 													Boolean addField = true;
 													for(Field existingfield: qsView.getFields()) {
 														if (existingfield.get_id().equals(f.get_id())) {
 															if(addField) {
 																addField = false;
+																//Provisoire, le temps d'ajouter le le champ originalTableAlias dans les field. les doublons d'alias, lorsqu'il est remplie, il remplace l'ID du champ
+																//Comme le champ ne sera pas vidé par le rapport de création des vues pour antibia, nous n'aurons pas besoin de le reremplir à chaque regénération
+																existingfield.setAlias(query_subject.getValue().getTable_alias());
+																//Provisoire, le temps d'ajouter le le champ originalTableAlias
 															}
 														}
 													}
@@ -430,6 +435,7 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 										f.setMeasure(field.getMeasure());
 										f.setCustom(field.isCustom());
 										f.setRole("Field");
+										f.setAlias(query_subjects.get(pkAlias + namespaceID).getTable_alias());
 										
 										
 										if (qsView.getType().equals("Final")) {
@@ -447,6 +453,10 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 										for(Field ff: qsView.getFields()) {
 											if (ff.get_id().equals(f.get_id())) {
 												addField = false;
+												//Provisoire, le temps d'ajouter le le champ originalTableAlias dans les field. les doublons d'alias, lorsqu'il est remplie, il remplace l'ID du champ
+												//Comme le champ ne sera pas vidé par le rapport de création des vues pour antibia, nous n'aurons pas besoin de le reremplir à chaque regénération
+												ff.setAlias(query_subjects.get(pkAlias + namespaceID).getTable_alias());
+												//Provisoire, le temps d'ajouter le le champ originalTableAlias
 											}
 										}
 										if (addField) {
