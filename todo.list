@@ -58,3 +58,54 @@ de l'onglet vue
 on va gagner un peu de place
 car l'ID du field peut etre un peu long
 
+**********
+qd je charge un fichier views et que je me suis trompé dans les headers
+il me dit les headers sont pas bons
+et qd je rectifie, il continue de me dire la meme chose
+il faut que j'enregistre, le fichier sous un nom différent
+pour que ca se charge
+tu prends le projet antibia, le dernier modele
+tu telecharges les vues
+tu ajoutes une colonnes
+tu le recharges
+ca passe pas normal
+tu corriges
+ca passe toujours pas
+sauf en enregistrant sous un autre nom
+j'ai meme essayé de me déconnecter et me reconnecter, pourtant, je dois qd meme changer le nom du fichire
+***********
+
+Yo camarade, qd tu ajouteras les poubelles pour les vues, il me faudra aussi un nouveau champ dans l'objet Field pour les vues - OriginalTableAlias
+Ne pas afficher dans la UI
+Ce champ devra faire partie de l'extraction view.csv
+en fait, capeut être bien de le faire rapidement tant que je peux encore coder un peu à l'iic
+
+***********
+
+A ajouter à la liste - bug remove label
+On perd les balises de langue et la géération bug
+user0 -> CCMO_STAG_FULL - > RemoveLabels
+
+**********
+
+Autre bug ou on pourrait ajouter une règle
+
+Si on fait un lien vers la meme table
+il faudrait ne pas renommer la table qui commence par final
+mais bon a noter mais pas urgent
+
+*********
+
+remove label - pas urgent, mais on sait qu'il faut pas s'en servir
+mais faut l'ajouter à la liste
+
+
+*********
+
+A ajouter dans la liste, on peut pas ne pas choisir de QS lorsqu'on a dejà choisi un -> fixed
+
+*********
+
+point virgule in download and upload views expression -> fixed
+
+*********

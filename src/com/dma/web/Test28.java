@@ -24,8 +24,8 @@ public class Test28 {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		Path path = Paths.get("/home/fr054721/dmaconf/mod1.json");
-		Path output = Paths.get("/home/fr054721/dmaconf/mod1-res.json");
+		Path path = Paths.get("/home/fr054721/Documents/antibia/bug-semi-column/Antibia_POC_V0.2.9-2023-06-27-9-54-41.json");
+		Path output = Paths.get("/home/fr054721/Documents/antibia/bug-semi-column/views-semi-column.csv");
 //		String selectedQs = "POFinal";
 //		String selectedQs = "POLINEFinal";
 //		String selectedQs = "ASSETFinal";
@@ -37,121 +37,62 @@ public class Test28 {
 			System.exit(1);
 		}
 		
-		List<QuerySubject> qssList = (List<QuerySubject>) Tools.fromJSON(path.toFile(), new TypeReference<List<QuerySubject>>(){});
+		Map<String, List<QuerySubject>> model = (Map<String, List<QuerySubject>>) Tools.fromJSON(path.toFile(), new TypeReference<Map<String, List<QuerySubject>>>(){});
 		
-		Map<String, QuerySubject> qss = new HashMap<String, QuerySubject>(); 
-		Set<String> qssRestant = new HashSet<String>();
-		Set<String> allQss = new HashSet<String>();
-		Set<String> qssToRemove = new HashSet<String>();
+		List<QuerySubject> views = (List<QuerySubject>) model.get("views");
 		
-		for(QuerySubject qs: qssList) {
-			qss.put(qs.get_id(), qs);
-			allQss.add(qs.get_id());
-		}
-
-		for(Entry<String, QuerySubject> qs: qss.entrySet()){
-			
-			
-			if (qs.getValue().getType().equalsIgnoreCase("Final")){
-				
-				if(qs.getValue().isRoot()) {
-					System.out.println(qs.getValue().get_id());
-					qssRestant.add(qs.getValue().get_id());
-					recurseFinal(qs.getValue(), qssRestant, qss);
+		System.out.println(views.size());
+		
+		String delim = "\";\"";
+		String lang = "fr";
+		
+		String header = "\"" + "TABLE_NAME" + delim + "TABLE_TYPE" + delim + "TABLE_LABEL" + delim + "TABLE_DESCRIPTION" + delim +
+				"FIELD_ID" + delim  + "FIELD_NAME" + delim + "FIELD_TYPE" + delim + "FIELD_LABEL" + delim + "FIELD_DESCRIPTION" + delim +
+				"EXPRESSION" + delim + "HIDDEN" + delim + "ICON" + delim + "ALIAS" + delim + "FOLDER" + delim + "ROLE" + "\"";				
+		
+		List<String> lines = new ArrayList<String>();
+		lines.add(header);
+		
+		for(QuerySubject view: views) {
+			StringBuffer tblBuf = new StringBuffer();
+			tblBuf.append("\"" + view.getTable_name() + delim + view.getType());
+			String label = "";
+			if(view.getDescriptions().containsKey(lang)) {
+				label = view.getLabels().get(lang);
+			}
+			String description = "";
+			if(view.getDescriptions().containsKey(lang)) {
+				description = view.getDescriptions().get(lang);
+			}
+			tblBuf.append(delim + label + delim + description.replaceAll(delim, " "));
+			String tbl = tblBuf.toString();
+			for(Field field: view.getFields()) {
+				StringBuffer fldBuf = new StringBuffer();
+				fldBuf.append(tbl + delim + field.get_id() + delim + field.getField_name() + delim + field.getField_type());
+				String flabel = "";
+				if(field.getLabels().containsKey(lang)) {
+					flabel = field.getLabels().get(lang);
 				}
+				String fdescription = null;
+				if(field.getLabels().containsKey(lang)) {
+					fdescription = field.getDescriptions().get(lang);
+				}
+				if(fdescription == null) {
+					fdescription = "";
+				}
+				fldBuf.append(delim + flabel + delim + fdescription.replaceAll(delim, " ") + delim + field.getExpression() + delim +
+						String.valueOf(field.isHidden()) + delim + field.getIcon() + delim + 
+						field.getAlias() + delim + field.getFolder() + delim + field.getRole() + "\"");
+				lines.add(fldBuf.toString());
 				
 			}
-			
-		}
-		System.out.println("***********************");
-		System.out.println(qssRestant);
-		System.out.println(qssRestant.size());
-		qssToRemove.addAll(allQss);
-		qssToRemove.removeAll(qssRestant);
-		System.out.println(allQss);
-		System.out.println(allQss.size());
-		System.out.println(qssToRemove);
-		System.out.println(qssToRemove.size());
-		
-		List<QuerySubject> querySubjects = new ArrayList<QuerySubject>();		
-		List<QuerySubject> views  = new ArrayList<QuerySubject>();		
-
-		for(String id: allQss) {
-			querySubjects.add(qss.get(id));
 		}
 		
+		Files.deleteIfExists(output);
 		
-		Map<String, List<QuerySubject>> content = new HashMap<String, List<QuerySubject>>();
-		content.put("querySubjects", querySubjects);
-		content.put("views", views);
-		
-		Files.write(output, Arrays.asList(Tools.toJSON(content)), StandardCharsets.UTF_8);		
+		Files.write(output, lines, StandardCharsets.UTF_8);
 		
 	}
 	
-	private static void recurseFinal(QuerySubject qs, Set<String> qssRestant, Map<String, QuerySubject> qss) {
-		for(Relation rel: qs.getRelations()){
-			String pkAlias = rel.getPktable_alias();
-			if(rel.isFin()) {
-				qssRestant.add(pkAlias + "Final");
-				recurseFinal(qss.get(pkAlias + "Final"), qssRestant, qss);
-			}
-			Map<String, Integer> recurseCount = new HashMap<String, Integer>();
-			
-			for(Entry<String, QuerySubject> rcqs: qss.entrySet()){
-	        	recurseCount.put(rcqs.getValue().getTable_alias(), 0);
-	        }
-			if(rel.isRef()) { 
-				recurseRef(pkAlias, "Ref", qss, recurseCount, qssRestant);
-			}
-			if(rel.isSec()) { 
-				recurseRef(pkAlias, "Sec", qss, recurseCount, qssRestant);
-			}
-			if(rel.isTra()) { 
-				recurseRef(pkAlias, "Tra", qss, recurseCount, qssRestant);
-			}
-		}
-	}
-
-	private static void recurseRef(String qsAlias, String qSleftType, Map<String, QuerySubject> qss, Map<String, Integer> recurseCount, Set<String> qssRestant) {
-		// TODO Auto-generated method stub
-		
-		Map<String, Integer> copyRecurseCount = new HashMap<String, Integer>();
-		copyRecurseCount.putAll(recurseCount);
-		
-		QuerySubject query_subject;
-		
-		if (!qSleftType.equals("Final")) {
-			
-			query_subject = qss.get(qsAlias + qSleftType);
-			
-			int j = copyRecurseCount.get(qsAlias);
-			if(j == query_subject.getRecurseCount()){
-				return;
-			}
-			copyRecurseCount.put(qsAlias, j + 1);
-		}
-		
-		query_subject = qss.get(qsAlias + qSleftType);
-		qssRestant.add(query_subject.get_id());
-		
-		for(Relation rel: query_subject.getRelations()){
-			String pkAlias = rel.getPktable_alias();
-			
-			if(rel.isRef()) { 
-				qssRestant.add(pkAlias + "Ref");
-				recurseRef(pkAlias, "Ref" ,qss, copyRecurseCount, qssRestant);	
-			}
-			if(rel.isSec()) { 
-				qssRestant.add(pkAlias + "Sec");
-				recurseRef(pkAlias, "Sec" ,qss, copyRecurseCount, qssRestant);	
-			}
-			if(rel.isTra()) { 
-				qssRestant.add(pkAlias + "Tra");
-				recurseRef(pkAlias, "Tra" ,qss, copyRecurseCount, qssRestant);	
-			}
-		}
-		
-	}
 
 }

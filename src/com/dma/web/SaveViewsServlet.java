@@ -64,22 +64,23 @@ public class SaveViewsServlet extends HttpServlet {
 			
 			if(parms.containsKey("views") && parms.containsKey("delim") && parms.containsKey("lang")) {
 				
-				String delim = (String) parms.get("delim");
+//				String delim = (String) parms.get("delim");
+				String delim = "\";\"";
 				String lang = (String) parms.get("lang");
 				
 				@SuppressWarnings("unchecked")
 				List<QuerySubject> views = (List<QuerySubject>) Tools.fromJSON(parms.get("views").toString(), new TypeReference<List<QuerySubject>>(){});				
 				
-				String header = "TABLE_NAME" + delim + "TABLE_TYPE" + delim + "TABLE_LABEL" + delim + "TABLE_DESCRIPTION" + delim +
+				String header = "\"" + "TABLE_NAME" + delim + "TABLE_TYPE" + delim + "TABLE_LABEL" + delim + "TABLE_DESCRIPTION" + delim +
 						"FIELD_ID" + delim  + "FIELD_NAME" + delim + "FIELD_TYPE" + delim + "FIELD_LABEL" + delim + "FIELD_DESCRIPTION" + delim +
-						"EXPRESSION" + delim + "HIDDEN" + delim + "ICON" + delim + "ALIAS" + delim + "FOLDER" + delim + "ROLE";				
+						"EXPRESSION" + delim + "HIDDEN" + delim + "ICON" + delim + "ALIAS" + delim + "FOLDER" + delim + "ROLE" + delim + "ORIGINALTABLEALIAS" + "\"";				
 				
 				List<String> lines = new ArrayList<String>();
 				lines.add(header);
 				
 				for(QuerySubject view: views) {
 					StringBuffer tblBuf = new StringBuffer();
-					tblBuf.append(view.getTable_name() + delim + view.getType());
+					tblBuf.append("\"" + view.getTable_name() + delim + view.getType());
 					String label = "";
 					if(view.getDescriptions().containsKey(lang)) {
 						label = view.getLabels().get(lang);
@@ -104,9 +105,9 @@ public class SaveViewsServlet extends HttpServlet {
 						if(fdescription == null) {
 							fdescription = "";
 						}
-						fldBuf.append(delim + flabel + delim + fdescription.replaceAll(delim, " ") + delim + field.getExpression() + delim +
+						fldBuf.append(delim + flabel + delim + fdescription + delim + field.getExpression() + delim +
 								String.valueOf(field.isHidden()) + delim + field.getIcon() + delim + 
-								field.getAlias() + delim + field.getFolder() + delim + field.getRole());
+								field.getAlias() + delim + field.getFolder() + delim + field.getRole() + delim + field.getOriginalTableAlias() + "\"");
 						lines.add(fldBuf.toString());
 						
 					}
