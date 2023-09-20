@@ -232,6 +232,8 @@ var measure = {
   ]
 };
 
+fieldCols.push({field:"merge", title: '<h4><span class="label label-default">Merge<span>', sortable: false, editable: {type: "textarea", mode: "inline", rows: 2}});
+
 fieldCols.push({field:"measure", title: '<h4><span class="label label-default">Measure</span>', editable: measure});
 fieldCols.push({field:"dimensions", title: '<h4><span class="label label-default">Dimensions</span>', formatter: "dimensionsFormatter", align: "center"});
 

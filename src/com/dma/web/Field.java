@@ -39,7 +39,14 @@ public class Field {
 	String role = "Field";
 	int fieldPos = 0;
 	String OriginalTableAlias = "";
-	
+	String merge = "";
+
+	public String getMerge() {
+		return merge;
+	}
+	public void setMerge(String merge) {
+		this.merge = merge;
+	}
 	public String getBK() {
 		return BK;
 	}
