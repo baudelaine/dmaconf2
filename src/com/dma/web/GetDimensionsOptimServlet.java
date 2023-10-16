@@ -123,7 +123,7 @@ public class GetDimensionsOptimServlet extends HttpServlet {
 
 				Map<String, DBMDTable> dbmd = (Map<String, DBMDTable>) request.getSession().getAttribute("dbmd");
 				
-		        if(dbmd != null){
+		        if(false){
 
 			        DBMDTable dbmdTable = new DBMDTable();
 			        Map<String, DBMDColumn> dbmdColumns = new HashMap<String, DBMDColumn>();
