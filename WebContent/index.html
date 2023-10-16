@@ -309,7 +309,7 @@
 	<!-- modal -->
 
 	<div class="modal fade" tabindex="-1" role="dialog" id="FiltersModal" data-keyboard="false" data-backdrop="static">
-		<div class="modal-dialog" role="document">
+		<div class="modal-dialog" style="width: auto; max-width: 100%" role="document">
 			<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -326,7 +326,7 @@
 						<div class="row">
 							<h4>Name</h4>
 									<div class="input-group-btn">
-								<select class="selectpicker form-control" data-dropup-auto="false" id="selectFilterName" data-width="86%" data-live-search="true"></select>
+								<select class="selectpicker form-control" data-dropup-auto="false" id="selectFilterName" data-width="96%" data-live-search="true"></select>
 										<button type="button" class="btn btn-default" onclick="AddFilter()" data-toggle="tooltip" data-placement="top" title="Add Filter."><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></button>
 										<button type="button" class="btn btn-default" onclick="DeleteFilter()" data-toggle="tooltip" data-placement="top" title="Delete Filter."><span class="glyphicon glyphicon-trash" aria-hidden="true"></button>
 								</div>
@@ -352,7 +352,7 @@
 						<div class="row">
 							<h4>Fields</h4>
 									<div class="input-group-btn">
-								<select class="selectpicker form-control" data-dropup-auto="false" id="selectFilterField" data-width="93%" data-live-search="true"></select>
+								<select class="selectpicker form-control" data-dropup-auto="false" id="selectFilterField" data-width="98%" data-live-search="true"></select>
 										<button type="button" class="btn btn-default" onclick="AddFilterExpression()" data-toggle="tooltip" data-placement="top" title="Add expression."><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></button>
 								</div>
 						</div>
@@ -381,7 +381,7 @@
 	<!-- modal -->
 
 	<div class="modal fade" tabindex="-1" role="dialog" id="ExpressionModal" data-keyboard="false" data-backdrop="static">
-		<div class="modal-dialog" role="document">
+		<div class="modal-dialog" style="width: auto; max-width: 100%" role="document">
 			<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -403,7 +403,7 @@
 						<div class="row">
 							<h4>Fields</h4>
 									<div class="input-group-btn">
-								<select class="selectpicker form-control" data-dropup-auto="false" id="selectExpressionField" data-width="86%" data-live-search="true"></select>
+								<select class="selectpicker form-control" data-dropup-auto="false" id="selectExpressionField" data-width="96%" data-live-search="true"></select>
 										<button type="button" class="btn btn-default" onclick="AddExpression()" data-toggle="tooltip" data-placement="top" title="Add expression."><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></button>
 										<button type="button" class="btn btn-default" onclick="AddExpressionData()" data-toggle="tooltip" data-placement="top" title="Add expression [DATA]."><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></button>
 									</div>
@@ -1467,6 +1467,7 @@
 							<li><a href="#" id="downloadViews">Download Views</a></li>
 							<li><a href="#" id="loadViews">Load Views</a></li>
 							<li><a href="#" id="removeViews">Remove Views</a></li>
+							<li><a href="#" id="createView">Create View</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="#" id="updateModel">Update Model</a></li>
 						</ul>
@@ -1566,7 +1567,7 @@
 				<!-- <li role="presentation" class="disabled"><a href="#Translation" aria-controls="translation" role="tab" data-toggle="tab">Translation</a></li> -->
 				<li role="presentation"><a href="#Translation" aria-controls="translation" role="tab" data-toggle="tab">Translation</a></li>
 		    <!-- <li role="presentation"><a href="#Fields" aria-controls="fields" role="tab" data-toggle="tab">Fields</a></li> -->
-				<li id="viewTab" role="presentation" class="disabled"><a href="#View" aria-controls="view" role="tab" data-toggle="tab">View</a></li>
+				<li id="viewTab" role="presentation" class="disabled"><a id="viewTab_click" href="#View" aria-controls="view" role="tab" data-toggle="tab">View</a></li>
 			</ul>
 
 

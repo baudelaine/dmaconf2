@@ -171,6 +171,7 @@ qsCols.push({field:"recurseCount", title: '<i class="glyphicon glyphicon-repeat"
 qsCols.push({field:"addPKRelation", title: '<i class="glyphicon glyphicon-magnet" title="Add PK relation(s)"></i>', formatter: "addPKRelationFormatter", align: "center"});
 qsCols.push({field:"addRelation", title: '<i class="glyphicon glyphicon-plus-sign" title="Add new relation"></i>', formatter: "addRelationFormatter", align: "center"});
 qsCols.push({field:"addField", title: '<i class="glyphicon glyphicon-plus-sign" title="Add new field"></i>', formatter: "addFieldFormatter", align: "center"});
+qsCols.push({field:"addFields", title: '<i class="glyphicon glyphicon-plus-sign" title="Add fields"></i>', formatter: "addFieldsFormatter", align: "center"});
 // qsCols.push({field:"addFolder", title: '<i class="glyphicon glyphicon-folder-open" title="Add new folder name"></i>', formatter: "addFolderFormatter", align: "center"});
 // qsCols.push({field:"addDimensionName", title: '<i class="glyphicon glyphicon-zoom-in" title="Add new dimension name"></i>', formatter: "addDimensionNameFormatter", align: "center"});
 qsCols.push({field:"remove", title: '<i class="glyphicon glyphicon-trash"></i>', formatter: "removeRootTableFormatter", align: "center"});
@@ -352,6 +353,7 @@ $qsTab.on('shown.bs.tab', function(e) {
   $datasTable.bootstrapTable('hideColumn', 'addRelation');
   $datasTable.bootstrapTable('hideColumn', 'addPKRelation');
   $datasTable.bootstrapTable('showColumn', 'addField');
+  $datasTable.bootstrapTable('hideColumn', 'addFields');
   $datasTable.bootstrapTable('showColumn', 'merge');
   // $datasTable.bootstrapTable('showColumn', 'addFolder');
   // $datasTable.bootstrapTable('showColumn', 'addDimensionName');
@@ -396,6 +398,7 @@ $viewTab.on('shown.bs.tab', function(e) {
   $('#ViewsTable').bootstrapTable('hideColumn', 'addRelation');
   $('#ViewsTable').bootstrapTable('hideColumn', 'addPKRelation');
   $('#ViewsTable').bootstrapTable('showColumn', 'addField');
+  $('#ViewsTable').bootstrapTable('showColumn', 'addFields');
   $('#ViewsTable').bootstrapTable('hideColumn', 'merge');
   // $('#ViewsTable').bootstrapTable('hideColumn', 'table_alias');
   // $('#ViewsTable').bootstrapTable('showColumn', 'addFolder');
@@ -437,6 +440,7 @@ $finTab.on('shown.bs.tab', function(e) {
   $datasTable.bootstrapTable('showColumn', 'addRelation');
   $datasTable.bootstrapTable('hideColumn', 'addDimensionName');
   $datasTable.bootstrapTable('hideColumn', 'addField');
+  $datasTable.bootstrapTable('hideColumn', 'addFields');
   $datasTable.bootstrapTable('hideColumn', 'merge');
   $datasTable.bootstrapTable('hideColumn', 'addPKRelation');
   // $datasTable.bootstrapTable('hideColumn', 'addFolder');
@@ -473,6 +477,7 @@ $refTab.on('shown.bs.tab', function(e) {
   $datasTable.bootstrapTable('showColumn', 'addRelation');
   $datasTable.bootstrapTable('showColumn', 'above');
   $datasTable.bootstrapTable('hideColumn', 'addField');
+  $datasTable.bootstrapTable('hideColumn', 'addFields');
   $datasTable.bootstrapTable('hideColumn', 'merge');
   $datasTable.bootstrapTable('showColumn', 'recurseCount');
   $datasTable.bootstrapTable('showColumn', 'nommageRep');
@@ -505,6 +510,7 @@ $secTab.on('shown.bs.tab', function(e) {
   $datasTable.bootstrapTable('hideColumn', 'addDimensionName');
   $datasTable.bootstrapTable('showColumn', 'addRelation');
   $datasTable.bootstrapTable('hideColumn', 'addField');
+  $datasTable.bootstrapTable('hideColumn', 'addFields');
   $datasTable.bootstrapTable('hideColumn', 'merge');
   $datasTable.bootstrapTable('showColumn', 'recurseCount');
   $datasTable.bootstrapTable('showColumn', 'nommageRep');
@@ -2038,6 +2044,14 @@ function addFieldFormatter(value, row, index) {
         '<i class="glyphicon glyphicon-plus-sign"></i>',
         '</a>'
     ].join('');
+}
+
+function addFieldsFormatter(value, row, index) {
+  return [
+      '<a class="addFields" href="javascript:void(0)" title="Add fields">',
+      '<i class="glyphicon glyphicon-plus-sign"></i>',
+      '</a>'
+  ].join('');
 }
 
 // function addFolderFormatter(value, row, index) {
@@ -3916,7 +3930,12 @@ function buildTable($el, cols, data) {
             GetPKRelations(row.table_name, row.table_alias, row.type);
           }
 
-          if(field.match("addField")){
+          if(field == "addFields"){
+            console.log("addFields was clicked");
+            loadSelectExpressionQS();
+          }
+
+          if(field == "addField"){
             $el.bootstrapTable("collapseAllRows")
             $el.bootstrapTable('expandRow', row.index);
 
@@ -3979,6 +3998,7 @@ function buildTable($el, cols, data) {
     $el.bootstrapTable('hideColumn', 'addDimensionName');
     $el.bootstrapTable('hideColumn', 'addDimension');
     $el.bootstrapTable('hideColumn', 'addField');
+    $el.bootstrapTable('hideColumn', 'addFields');
     $el.bootstrapTable('hideColumn', 'merge');
     $el.bootstrapTable('showColumn', '_id');
     $el.bootstrapTable('hideColumn', 'linker');
@@ -7146,6 +7166,47 @@ $('#foldSelect').on('changed.bs.select', function (e, clickedIndex, isSelected, 
 
 });
 
+$("#createView").click(function(){
+	var $id = $(this).attr("id");
+  console.log("$id=" + $id);
+	bootbox.prompt({
+    size: "small",
+    title: "Enter view name",
+    callback: function(result){
+       /* result = String containing user input if OK clicked or null if Cancel clicked */
+      if(result != null){
+          // showalert("", 'View ' + result + ' successfully added.', "alert-success", "bottom");
+          viewName = result;
+          var parms = {viewName: viewName};
+          $.ajax({
+            type: 'POST',
+            url: "GetEmptyView",
+            dataType: 'json',
+            data: JSON.stringify(parms),
+   
+            success: function(data) {
+              console.log(data);
+              showalert("", "View " + viewName + " created successfully.", "alert-success", "bottom");
+              $("#viewTab").removeClass('disabled');
+              $viewTab.prop('disabled',false);
+              var index = $('#ViewsTable').bootstrapTable("getData").length;
+              $('#ViewsTable').bootstrapTable('insertRow', {index: index, row: data.DATAS});
+              console.log($('#ViewsTable').bootstrapTable("getData"));
+              $("#viewTab_click").click();
+            
+            },
+            error: function(data) {
+              showalert("", "Creating view " + viewName + " failed.", "alert-danger", "bottom");
+            }
+          });          
+      }
+      else{
+        showalert("", 'View ' + result + ' already exists.', "alert-info", "bottom");
+      }
+      }
+    })
+});
+
 
 $("#addFold").click(function(){
 	var $id = $(this).attr("id");
@@ -8555,9 +8616,9 @@ $("#ulModelFile").change(function(){
 		success: function(data) {
     console.log(data);
       if(data.STATUS == "OK" && data.DATAS != null){
-        if(data.DATAS.qss){
-          console.log(data.DATAS.qss);
-          $datasTable.bootstrapTable("load", data.DATAS.qss);
+        if(data.DATAS.querySubjects){
+          console.log(data.DATAS.querySubjects);
+          $datasTable.bootstrapTable("load", data.DATAS.querySubjects);
         }
         if(data.DATAS.views){
           $("#viewTab").removeClass('disabled');
