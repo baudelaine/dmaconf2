@@ -32,6 +32,7 @@ var selectedField;
 var selectedQS;
 var currentProject;
 var pKeys = {};
+var fieldsView = {};
 
 // var currentLanguage;
 
@@ -59,6 +60,7 @@ relationCols.push({field:"above", title: '<h4><span class="label label-default">
 // relationCols.push({field:"above", title: "Above", formatter: "aboveFormatter", align: "center", events: "aboveEvents"});
 // relationCols.push({field:"above", title: "Above", formatter: "aboveFormatter", align: "center", events: "aboveEvents"});
 relationCols.push({field:"leftJoin", title: '<h4><span class="label label-default">Left Join<span></h4>', formatter: "boolFormatter", align: "center"});
+relationCols.push({field:"rightJoin", title: '<h4><span class="label label-default">Right Join<span></h4>', formatter: "boolFormatter", align: "center"});
 // relationCols.push({field:"usedForDimensions", title: "Used For Dimensions", formatter: "boolFormatter", align: "center"});
 relationCols.push({field:"usedForDimensions", title: '<h4><span class="label label-default">Used For Dimensions<span></h4>', editable: {
   type: "select", mode: "inline", value: "",
@@ -82,7 +84,6 @@ var usedForDimensionsSelect = {
 };
 
 
-// relationCols.push({field:"rightJoin", title: "Right Join", formatter: "boolFormatter", align: "center"});
 relationCols.push({field:"duplicate", title: '<i class="glyphicon glyphicon-duplicate"></i>', formatter: "duplicateFormatter", align: "center"});
 relationCols.push({field:"remove", title: '<i class="glyphicon glyphicon-trash"></i>', formatter: "removeRelationFormatter", align: "center"});
 // relationCols.push({field:"operate", title: "operate", formatter: "operateRelationFormatter", align: "center", events: "operateRelationEvents"});
@@ -233,7 +234,7 @@ var measure = {
   ]
 };
 
-fieldCols.push({field:"merge", title: '<h4><span class="label label-default">Merge<span>', sortable: false, editable: {type: "textarea", mode: "inline", rows: 2}});
+// fieldCols.push({field:"merge", title: '<h4><span class="label label-default">Merge<span>', sortable: false, editable: {type: "textarea", mode: "inline", rows: 2}});
 
 fieldCols.push({field:"measure", title: '<h4><span class="label label-default">Measure</span>', editable: measure});
 fieldCols.push({field:"dimensions", title: '<h4><span class="label label-default">Dimensions</span>', formatter: "dimensionsFormatter", align: "center"});
@@ -1398,6 +1399,82 @@ $('#selectExpressionQS').on('changed.bs.select', function (e, clickedIndex, isSe
 
   $('#selectExpressionField').selectpicker('refresh');
 
+});
+
+function AddFieldsToView(){
+
+  var viewName = $('#addFieldsViewName').text();
+
+  var selectedQs = $("#addFieldsQS").find("option:selected").val();
+  var selectedQsText = $("#addFieldsQS").find("option:selected").text();
+  var selectedFields = $('#addFieldsField').val();
+
+  if(!selectedQs || !selectedFields){
+    ShowAlert("Select one Query Subject and one Field at least.", "alert-warning", $("#AddfieldsModalAlert"));
+    return;    
+  }
+
+  console.log(viewName);
+  console.log(selectedQs);
+  console.log(selectedQsText);
+  console.log(selectedFields);
+
+  
+  var dataExpression;
+
+  if(selectedQs.startsWith("[FINAL].")){
+    dataExpression = selectedQs.replace("[FINAL].","[DATA].") + ".[" + selectedField + "]";
+  }
+  else{
+    dataExpression = selectedQs;
+    dataExpression = dataExpression.replace("[REF].","");
+    dataExpression = dataExpression.replace("[","");
+    dataExpression = dataExpression.replace("]","");
+    console.log(dataExpression);
+
+    dataExpression = "[DATA].[" + dataExpression.substr(0, dataExpression.indexOf(".")) + 
+      "].[" + dataExpression.substr(dataExpression.indexOf(".") + 1) + "." + selectedField + "]";
+  }
+
+  var expression = $("#taExpression").val();
+
+  if(expression.length > 0){
+    $("#taExpression").val(expression + " " + dataExpression);
+  }
+  else{
+    $("#taExpression").val(dataExpression);
+  }
+  
+}
+
+
+$('#addFieldsQS').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+
+  $('#addFieldsField').empty();
+  $('#addFieldsField').selectpicker('refresh');
+
+  var qss = {};
+  var selectedQs = $(this).find("option:selected").val();
+  var selectedQsText = $(this).find("option:selected").text();
+  console.log(selectedQs);
+  var qs;
+
+  if(selectedQs == "*"){
+    selectedQs = selectedQS._id;
+  }
+
+  $.each($datasTable.bootstrapTable("getData"), function(i, obj){
+    if(obj._id == selectedQs){
+      qs = obj;
+    }
+  });
+
+  $.each(qs.fields, function(i, field){
+    var option = '<option class="fontsize" value="' + field.field_name + '" data-subtext="' + selectedQsText + '">' + field.field_name + '</option>';
+    $('#addFieldsField').append(option);
+  });
+
+  $('#addFieldsField').selectpicker('refresh');
 
   // var parms = {qss: JSON.stringify(qss), selectedQs: selectedQs};
   // console.log(parms);
@@ -1865,8 +1942,58 @@ function loadSelectFilterName(){
   $('#selectFilterTarget').selectpicker('refresh');;
 }
 
-function loadSelectExpressionQS(){
 
+function loadAddFields(){
+  
+  $('#addFieldsQS').empty();
+  $('#addFieldsQS').selectpicker('refresh');
+
+  $('#addFieldsField').empty();
+  $('#addFieldsField').selectpicker('refresh');
+
+  var qss = {};
+  $.each($datasTable.bootstrapTable("getData"), function(i, obj){
+    qss[obj._id] = obj;
+  });
+
+  console.log(qss);
+
+  $.ajax({
+    type: 'POST',
+    url: "GetQSFullPath",
+    dataType: 'json',
+    data: JSON.stringify(qss),
+    success: function(data) {
+    console.log(data);
+    var emptyOption = '<option class="fontsize" value="" data-subtext="' + '' + '"></option>';
+    // var allOption = '<option class="fontsize" value="' + "*" + '" data-subtext="All">' + "*" + '</option>';
+    $('#addFieldsQS').append(emptyOption);
+    // $('#addFieldsQS').append(allOption);
+
+    if(data.DATAS != null && data.DATAS){
+      if(Object.keys(data.DATAS).length > 0){
+        $.each(data.DATAS, function(key, value){
+          var option = '<option class="fontsize" value="' + value + '" data-subtext="' + value + '">' + key + '</option>';
+          $('#addFieldsQS').append(option);
+        })
+      }
+    }
+
+    $('#addFieldsQS').selectpicker('val', "");
+    $('#addFieldsQS').selectpicker('refresh');
+    $("#AddfieldsModal").modal('toggle');
+
+    },
+    error: function(data) {
+      console.log(data);
+    }
+  });
+
+}
+
+
+function loadSelectExpressionQS(){
+  
   $('#selectExpressionQS').empty();
   $('#selectExpressionQS').selectpicker('refresh');
 
@@ -3468,7 +3595,7 @@ function buildRelationTable($el, cols, data, qs){
     $el.bootstrapTable('showColumn', 'sec');
     $el.bootstrapTable('showColumn', 'nommageRep');
     $el.bootstrapTable('hideColumn', 'usedForDimensions');
-    $el.bootstrapTable('showColumn', 'rightJoin');
+    $el.bootstrapTable('hideColumn', 'rightJoin');
     $el.bootstrapTable('showColumn', 'above');
   }
 
@@ -3932,7 +4059,10 @@ function buildTable($el, cols, data) {
 
           if(field == "addFields"){
             console.log("addFields was clicked");
-            loadSelectExpressionQS();
+            console.log(row);
+            var viewName = row.table_alias;
+            $('#addFieldsViewName').text(viewName);
+            loadAddFields();
           }
 
           if(field == "addField"){
@@ -3997,7 +4127,7 @@ function buildTable($el, cols, data) {
     $el.bootstrapTable('hideColumn', 'folder');
     $el.bootstrapTable('hideColumn', 'addDimensionName');
     $el.bootstrapTable('hideColumn', 'addDimension');
-    $el.bootstrapTable('hideColumn', 'addField');
+    $el.bootstrapTable('showColumn', 'addField');
     $el.bootstrapTable('hideColumn', 'addFields');
     $el.bootstrapTable('hideColumn', 'merge');
     $el.bootstrapTable('showColumn', '_id');
@@ -8625,10 +8755,11 @@ $("#ulModelFile").change(function(){
           $viewTab.prop('disabled',false);
           $("#ViewsTable").bootstrapTable("load", data.DATAS.views);
         }
-        $refTab.tab('show');
+        // $refTab.tab('show');
         initGlobals();
-        $finTab.tab('show');
-        $qsTab.tab('show');
+        // $finTab.tab('show');
+        // $qsTab.tab('show');
+        $("#qsTab_click").click();
         if(data.DATAS.querySubjects){
           var langs = Object.keys(data.DATAS.querySubjects[0].labels);
           console.log(langs[0]);
