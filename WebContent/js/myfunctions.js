@@ -3256,9 +3256,9 @@ function buildRelationTable($el, cols, data, qs){
 
             usedForDimensionsSelect.source = source;
 
-            $tableRows.eq(i).find('a').eq(6).editable('destroy');
-            $tableRows.eq(i).find('a').eq(6).editable(usedForDimensionsSelect);
-            $tableRows.eq(i).find('a').eq(6).editable('option', 'defaultValue', '');
+            $tableRows.eq(i).find('a').eq(7).editable('destroy');
+            $tableRows.eq(i).find('a').eq(7).editable(usedForDimensionsSelect);
+            $tableRows.eq(i).find('a').eq(7).editable('option', 'defaultValue', '');
 
           }
 
