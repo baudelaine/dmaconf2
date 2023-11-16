@@ -216,21 +216,23 @@ public class UpdateModelServlet extends HttpServlet {
 			    	Set<String> qs_columnsKeys = new HashSet<String>(qs_columns.keySet());
 			    	System.out.println(qs_id + " -> " + qs_table + " -> " + qs_columnsKeys.size() + " - " + qs_columnsKeys);
 			    	Map<String, Field> current_columns = currents.get(qs_table);
-			    	Set<String> current_columnsKeys = new HashSet<String>(current_columns.keySet());
-			    	Set<String> addedColumnsKeys = new HashSet<String>(current_columnsKeys);
-			    	addedColumnsKeys.removeAll(qs_columnsKeys);
-			    	System.out.println("addedColumnsKeys -> " + addedColumnsKeys.size() + " - " + addedColumnsKeys);
-			    	Set<String> removedColumnsKeys = new HashSet<String>(qs_columnsKeys);
-			    	removedColumnsKeys.removeAll(current_columnsKeys);
-			    	System.out.println("removedColumnsKeys -> " + removedColumnsKeys.size() + " - " + removedColumnsKeys);
-			    	Set<String> retainedColumnsKeys = new HashSet<String>(qs_columnsKeys);
-			    	retainedColumnsKeys.retainAll(current_columnsKeys);
-			    	System.out.println("retainedColumnsKeys -> " + retainedColumnsKeys.size() + " - " + retainedColumnsKeys);
-			    	Map<String, Set<String>> update = new HashMap<String, Set<String>>();
-			    	update.put("added", addedColumnsKeys);
-			    	update.put("removed", removedColumnsKeys);
-			    	update.put("retained", retainedColumnsKeys);
-			    	updates.put(qs_id, update);
+			    	if(current_columns != null) {
+				    	Set<String> current_columnsKeys = new HashSet<String>(current_columns.keySet());
+				    	Set<String> addedColumnsKeys = new HashSet<String>(current_columnsKeys);
+				    	addedColumnsKeys.removeAll(qs_columnsKeys);
+				    	System.out.println("addedColumnsKeys -> " + addedColumnsKeys.size() + " - " + addedColumnsKeys);
+				    	Set<String> removedColumnsKeys = new HashSet<String>(qs_columnsKeys);
+				    	removedColumnsKeys.removeAll(current_columnsKeys);
+				    	System.out.println("removedColumnsKeys -> " + removedColumnsKeys.size() + " - " + removedColumnsKeys);
+				    	Set<String> retainedColumnsKeys = new HashSet<String>(qs_columnsKeys);
+				    	retainedColumnsKeys.retainAll(current_columnsKeys);
+				    	System.out.println("retainedColumnsKeys -> " + retainedColumnsKeys.size() + " - " + retainedColumnsKeys);
+				    	Map<String, Set<String>> update = new HashMap<String, Set<String>>();
+				    	update.put("added", addedColumnsKeys);
+				    	update.put("removed", removedColumnsKeys);
+				    	update.put("retained", retainedColumnsKeys);
+				    	updates.put(qs_id, update);
+			    	}
 //			    	System.out.println(Tools.toJSON(updates));
 				}
 				
