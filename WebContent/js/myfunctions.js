@@ -6225,7 +6225,7 @@ $('#ulXMLModelFile').change(function(){
   console.log(fd);
 
   $.ajax({
-    url: "UploadXMLModel",
+    url: "UploadXML",
     type: "POST",
     data: fd,
     enctype: 'multipart/form-data',
@@ -6235,16 +6235,59 @@ $('#ulXMLModelFile').change(function(){
     success: function(data) {
       console.log(data);
         if(data.STATUS == "OK"){
+
+          var table = $('#tables');
+
+          table.empty();
+
+          $.each(data.TABLES, function(tableName, tableType){
+            var option;
+            if(tableType == "VIEW"){
+              option = '<option class="fontsize" value="' + tableName + '" data-subtext="(' + tableType + ')">' + tableName + '</option>';
+            }
+            if(tableType == "TABLE"){
+              option = '<option class="fontsize" value="' + tableName + '">' + tableName + '</option>';
+            }
+            if(tableType == ""){
+              option = '<option class="fontsize" value="' + tableName + '" data-subtext="(OTHER)">' + tableName + '</option>';
+              console.log(option);
+            }
+            table.append(option);
+          });
+          table.selectpicker('refresh');
           showalert(data.FROM, data.MESSAGE, "alert-success", "bottom");
+
         }
         else{
           showalert(data.FROM, data.MESSAGE, "alert-danger", "bottom");
         }
-		},
+    },
 		error: function(data) {
       console.log(data);
 		}
-  });
+  });  
+
+  // $.ajax({
+  //   url: "UploadXMLModel",
+  //   type: "POST",
+  //   data: fd,
+  //   enctype: 'multipart/form-data',
+  //   // dataType: 'application/text',
+  //   processData: false,  // tell jQuery not to process the data
+  //   contentType: false,   // tell jQuery not to set contentType
+  //   success: function(data) {
+  //     console.log(data);
+  //       if(data.STATUS == "OK"){
+  //         showalert(data.FROM, data.MESSAGE, "alert-success", "bottom");
+  //       }
+  //       else{
+  //         showalert(data.FROM, data.MESSAGE, "alert-danger", "bottom");
+  //       }
+	// 	},
+	// 	error: function(data) {
+  //     console.log(data);
+	// 	}
+  // });
 
   $(this).val('');  
 
