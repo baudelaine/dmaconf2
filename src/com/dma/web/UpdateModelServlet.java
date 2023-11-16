@@ -255,15 +255,17 @@ public class UpdateModelServlet extends HttpServlet {
 							newFields.add(newField);
 						}
 					}
-					if(! updates.get(id).get("added").isEmpty()) {
-						for(String fieldName: updates.get(id).get("added")) {
-							Field newField = currents.get(table).get(fieldName);
-							newFields.add(newField);
-							System.out.println("added " + newField.getField_name());
+					if(updates.get(id) != null) {
+						if(! updates.get(id).get("added").isEmpty()) {
+							for(String fieldName: updates.get(id).get("added")) {
+								Field newField = currents.get(table).get(fieldName);
+								newFields.add(newField);
+								System.out.println("added " + newField.getField_name());
+							}
 						}
-					}
-					if(! updates.get(id).get("removed").isEmpty()) {
-						
+						if(! updates.get(id).get("removed").isEmpty()) {
+							
+						}
 					}
 
 					int fieldPos = newFields.size();
