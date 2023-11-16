@@ -244,10 +244,12 @@ public class UpdateModelServlet extends HttpServlet {
 					for(Field field: fields) {
 						String column = field.getField_name();
 						Field newField = null;
-						if(updates.get(id).get("retained").contains(column)) {
-							newField = field;
-							newField.setFieldPos(currents.get(table).get(column).getFieldPos());
-							System.out.println("retain " + field.getField_name());
+						if(updates.get(id) != null) {
+							if(updates.get(id).get("retained").contains(column)) {
+								newField = field;
+								newField.setFieldPos(currents.get(table).get(column).getFieldPos());
+								System.out.println("retain " + field.getField_name());
+							}
 						}
 						if(newField != null) {
 							newFields.add(newField);
