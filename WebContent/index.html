@@ -44,6 +44,7 @@
 	<!-- </div> -->
 
 
+
 </head>
 <body>
 
@@ -432,45 +433,50 @@
 
 	<div class="modal fade" tabindex="-1" role="dialog" id="AddfieldsModal" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog" style="width: auto; max-width: 100%" role="document">
-			<div class="modal-content">
+		<!-- <div class="modal-dialog" role="document"> -->
+				<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<h4 class="modal-title">Add fields to view <label id="addFieldsViewName">View Name</label></h4>
-			</div><!-- /.modal-header -->
+				</div><!-- /.modal-header -->
 			<div class="modal-body">
 
-						<div class="container-fluid">
-							<div id="modDivLoading"></div>
+					<div class="container-fluid">
+					
+						<div id="modDivLoading"></div>
 
 						<div id="AddfieldsModalAlert"></div>
 
 
 						<div class="row">
 							<h4>Query Subjects</h4>
-							<select class="selectpicker form-control" id="addFieldsQS" data-live-search="true">
+							<select class="selectpicker input-large" id="addFieldsQS" data-live-search="true" data-width="100%">
 							</select>
 						</div>
+					
 						<div class="row">
 							<h4>Fields</h4>
-									<div class="input-group-btn">
-								<select class="selectpicker form-control" multiple data-actions-box="true" data-dropup-auto="false" id="addFieldsField" data-width="98%" data-live-search="true"></select>
-										<button type="button" class="btn btn-default" onclick="AddFieldsToView()" data-toggle="tooltip" data-placement="top" title="Add fields."><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></button>
-									</div>
+									<!-- <div class="input-group-btn"> -->
+								<!-- <select class="selectpicker form-control" multiple data-actions-box="true" data-dropup-auto="false" id="addFieldsField" data-width="98%" data-live-search="true"></select> -->
+								<select class="selectpicker  input-large" multiple data-actions-box="true" data-dropup-auto="false" id="addFieldsField" data-live-search="true"  data-width="100%"></select>
+									<!-- </div> -->
 						</div>
-							<div class="row">
+					
+						<!-- <div class="row">
 										<h4>Expression</h4>
 										<textarea id="addFieldsList" class="form-control" placeholder="..." rows="3"></textarea>
-							</div>
+						</div> -->
 
-						</div>
+					</div>
 
-					</div> <!-- /.modal-body -->
+			</div> <!-- /.modal-body -->
 			<div class="modal-footer">
 				<!-- <button type="button" class="btn btn-primary" onclick="BuildDrillPath()"><span class="glyphicon glyphicon-ok" aria-hidden="true"></button>
 						<button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></button> -->
-						<button type="button" class="btn btn-primary" onclick="AddFieldsToView()">Save</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-			</div><!-- /.modal-footer -->
+							<button type="button" class="btn btn-primary" onclick="AddFieldsToView()">Add</button>
+							<button type="button" class="btn btn-primary" onclick="SaveFieldsToView()">Save</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						</div><!-- /.modal-footer -->
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->
 		</div><!-- /.modal -->
@@ -1502,6 +1508,8 @@
 							<li><a href="#" id="setHiddenINL">Set Hidden (if no label)</a></li>
 							<li class="enabled"><a href="#" id="setHiddenAll">Set Hidden All</a></li>
 							<li><a href="#" id="setHiddenINLAll">Set Hidden (if no label) All</a></li>
+							<li><a href="#" id="setUnHidden">Reset Hidden</a></li>
+							<li><a href="#" id="setUnHiddenAll">Reset Hidden All</a></li>
 							<!-- <li><a href="#" id="removeQSLabels">Remove Labels</a></li> -->
 							<li role="separator" class="divider"></li>
 							<li><a href="#" id="expandQS">Expand All</a></li>

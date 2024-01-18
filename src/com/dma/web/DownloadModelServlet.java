@@ -72,7 +72,7 @@ public class DownloadModelServlet extends HttpServlet {
 				
 				Map<String, List<QuerySubject>> model = new HashMap<String, List<QuerySubject>>();
 				
-				model.put("qss", qss);
+				model.put("querySubjects", qss);
 				model.put("views", views);
 				
 				Path dlDir = Paths.get(prj + "/downloads");

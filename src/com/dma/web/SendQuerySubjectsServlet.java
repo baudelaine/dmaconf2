@@ -1383,6 +1383,17 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 					RS.setCard_right_min("one");
 				}
 				RS.setCard_right_max("one");
+				
+				//Inversion cardinalité right join en ref
+				if (rel.isRightJoin())
+				{
+					RS.setCard_left_min("one");
+					RS.setCard_right_min("zero");
+					RS.setCard_left_max("one");
+					RS.setCard_right_max("many");
+				}
+				//End Inversion cardinalité
+				
 				RS.setParentNamespace(parentNameSpace);
 				rsList.add(RS);
 				

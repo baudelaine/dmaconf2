@@ -1401,6 +1401,45 @@ $('#selectExpressionQS').on('changed.bs.select', function (e, clickedIndex, isSe
 
 });
 
+function SaveFieldsToView(){
+
+  // console.log(fieldsView);
+  var views = $('#ViewsTable').bootstrapTable("getData");
+  var tables = $('#DatasTable').bootstrapTable("getData");
+  var viewName = $('#addFieldsViewName').text();
+
+  var view;
+
+  $.each(views, function(index, obj){
+    if(obj.table_name == viewName){
+      view = obj;
+    }
+  })
+
+  $.each(Object.values(fieldsView), function(i, field){
+
+    $.each(tables, function(i, qs){
+      if(field.qs == qs._id){
+        $.each(qs.fields, function(j, qsField){
+          if(field.field_name == qsField.field_name){
+            var viewField = $.extend({}, qsField);
+            viewField._id = field._id;
+            viewField.expression = field.expression;
+            viewField.fieldPos = 0;
+            view.fields.push(viewField);
+          }
+        })
+      }
+    
+    })
+  
+  })
+
+  $("#AddfieldsModal").modal('toggle');
+
+}
+
+
 function AddFieldsToView(){
 
   var viewName = $('#addFieldsViewName').text();
@@ -1419,31 +1458,71 @@ function AddFieldsToView(){
   console.log(selectedQsText);
   console.log(selectedFields);
 
+  // fieldsView;
+
+  var _id = "";
+  var expression = "";
+
+  if(selectedQsText.startsWith("[FINAL].")){
+    _id = selectedQsText.replace("[FINAL].","");
+    _id = _id.replace("[","");
+    _id = _id.replace("]","");
+    expression = selectedQsText.replace("[FINAL].","[DATA].") + ".[";
+    _id = "FINAL." + _id;
+  }
+  else{
+    _id = selectedQsText;
+    _id = _id.replace("[REF].","");
+    _id = _id.replace("[","");
+    _id = _id.replace("]","");
+    expression = "[DATA].[" + _id.substr(0, _id.indexOf(".")) + 
+      "].[" + _id.substr(_id.indexOf(".") + 1) + ".";
+    _id = "REF." + _id;
+    }
+
   
-  var dataExpression;
+  $.each(selectedFields, function(i, obj){
 
-  if(selectedQs.startsWith("[FINAL].")){
-    dataExpression = selectedQs.replace("[FINAL].","[DATA].") + ".[" + selectedField + "]";
-  }
-  else{
-    dataExpression = selectedQs;
-    dataExpression = dataExpression.replace("[REF].","");
-    dataExpression = dataExpression.replace("[","");
-    dataExpression = dataExpression.replace("]","");
-    console.log(dataExpression);
+    var field = {_id: "", qs: "", field_name: "", expression: ""};
+    _id = _id + "." + obj
+    field._id = _id;
+    field.qs = selectedQs;
+    field.field_name = obj;
+    field.expression = expression + obj + "]";
+    fieldsView[_id] = field;
 
-    dataExpression = "[DATA].[" + dataExpression.substr(0, dataExpression.indexOf(".")) + 
-      "].[" + dataExpression.substr(dataExpression.indexOf(".") + 1) + "." + selectedField + "]";
-  }
+  })
 
-  var expression = $("#taExpression").val();
+  console.log(fieldsView);
+  console.log(Object.keys(fieldsView).length);
 
-  if(expression.length > 0){
-    $("#taExpression").val(expression + " " + dataExpression);
-  }
-  else{
-    $("#taExpression").val(dataExpression);
-  }
+  ShowAlert(Object.keys(fieldsView).length + " field(s) added.", "alert-success", $("#AddfieldsModalAlert"));
+
+  
+  // var dataExpression;
+
+  // if(selectedQsText.startsWith("[FINAL].")){
+  //   dataExpression = selectedQsText.replace("[FINAL].","[DATA].") + ".[" + selectedFields + "]";
+  // }
+  // else{
+  //   dataExpression = selectedQsText;
+  //   dataExpression = dataExpression.replace("[REF].","");
+  //   dataExpression = dataExpression.replace("[","");
+  //   dataExpression = dataExpression.replace("]","");
+  //   console.log(dataExpression);
+
+  //   dataExpression = "[DATA].[" + dataExpression.substr(0, dataExpression.indexOf(".")) + 
+  //     "].[" + dataExpression.substr(dataExpression.indexOf(".") + 1) + "." + selectedFields + "]";
+  // }
+
+  // var expression = $("#addFieldsList").val();
+
+  // if(expression.length > 0){
+  //   $("#addFieldsList").val(expression + " " + dataExpression);
+  // }
+  // else{
+  //   $("#addFieldsList").val(dataExpression);
+  // }
   
 }
 
@@ -1981,7 +2060,9 @@ function loadAddFields(){
 
     $('#addFieldsQS').selectpicker('val', "");
     $('#addFieldsQS').selectpicker('refresh');
+    $("#addFieldsList").val("");
     $("#AddfieldsModal").modal('toggle');
+    fieldsView = {};
 
     },
     error: function(data) {
@@ -6716,6 +6797,28 @@ $("#updateModel").click(function(){
 
 })
 
+$('#setUnHiddenAll').click(function(){
+
+  var qss = $datasTable.bootstrapTable('getData');
+  if(qss.length > 0){
+
+    $.each(qss, function(i, qs){
+      $.each(qs.fields, function(j, field){
+          field.hidden = false;
+      })
+
+    })
+    $refTab.tab('show');
+    $qsTab.tab('show');
+
+  }
+  else{
+    showalert("No Query Subject found.", "alert-warning", "bottom");
+    // $("#qsSelect").selectpicker("toggle");
+  }
+})
+
+
 $('#setHiddenINLAll').click(function(){
 
   var lang = $("#langSelect").find("option:selected").val();
@@ -6741,6 +6844,36 @@ $('#setHiddenINLAll').click(function(){
   else{qs
     showalert("No Query Subject found.", "alert-warning", "bottom");
     // $("#qsSelect").selectpicker("toggle");
+  }
+})
+
+$('#setUnHidden').click(function(){
+
+  var table = $("#qsSelect").find("option:selected").val();
+  if(!table == ""){
+
+    var qsId = $("#qsSelect").find("option:selected").text();
+    var qss = $datasTable.bootstrapTable('getData');
+    var qs;
+    var index;
+    $.each(qss, function(i, o){
+      if(o._id.match(qsId)){
+        qs = o;
+        index = i;
+        console.log(qs);
+        $.each(qs.fields, function(j, field){
+            field.hidden = false;
+        })
+      }
+    })
+    $refTab.tab('show');
+    $qsTab.tab('show');
+    $datasTable.bootstrapTable('expandRow', index);
+
+  }
+  else{
+    showalert("No Query Subject selected.", "Select a Query Subject first.", "alert-warning", "bottom");
+    $("#qsSelect").selectpicker("toggle");
   }
 })
 
