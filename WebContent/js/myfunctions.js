@@ -182,6 +182,7 @@ qsCols.push({field:"linker_ids", title: "linker_ids"});
 var fieldCols = [];
 // fieldCols.push({field:"checkbox", checkbox: "true"});
 fieldCols.push({field:"index", title: '<h4><span class="label label-default">index</span>', formatter: "indexFormatter", sortable: false});
+fieldCols.push({field:"_id", title: '<h4><span class="label label-default">Id</span>', sortable: true});
 fieldCols.push({field:"fieldPos", title: '<h4><span class="label label-default">Pos</span>', sortable: true});
 fieldCols.push({field:"field_name", title: '<h4><span class="label label-default">Name</span>', sortable: true });
 fieldCols.push({field:"alias", title: '<h4><span class="label label-default">Alias</span>', sortable: false, editable: {type: "textarea", mode: "inline", rows: 2}});
