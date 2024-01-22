@@ -182,7 +182,7 @@ qsCols.push({field:"linker_ids", title: "linker_ids"});
 var fieldCols = [];
 // fieldCols.push({field:"checkbox", checkbox: "true"});
 fieldCols.push({field:"index", title: '<h4><span class="label label-default">index</span>', formatter: "indexFormatter", sortable: false});
-fieldCols.push({field:"fieldPos", title: '<h4><span class="label label-default">Pos</span>', sortable: true});
+fieldCols.push({field:"fieldPos", title: '<h4><span class="label label-default">Pos / Id</span>', sortable: true});
 fieldCols.push({field:"field_name", title: '<h4><span class="label label-default">Name</span>', sortable: true });
 fieldCols.push({field:"alias", title: '<h4><span class="label label-default">Alias</span>', sortable: false, editable: {type: "textarea", mode: "inline", rows: 2}});
 fieldCols.push({class:"field_type", field:'field_type', title: '<h4><span class="label label-default">Type</span>', editable: {type: "text", mode: "inline"}, sortable: true});
@@ -1416,7 +1416,7 @@ function SaveFieldsToView(){
     }
   })
 
-  $.each(Object.values(fieldsView), function(i, field){
+  $.each(Object.values(fieldsView), function(key, field){
 
     $.each(tables, function(i, qs){
       if(field.qs == qs._id){
@@ -1425,7 +1425,7 @@ function SaveFieldsToView(){
             var viewField = $.extend({}, qsField);
             viewField._id = field._id;
             viewField.expression = field.expression;
-            viewField.fieldPos = 0;
+            viewField.fieldPos = field.id;
             view.fields.push(viewField);
           }
         })
@@ -1483,13 +1483,16 @@ function AddFieldsToView(){
   
   $.each(selectedFields, function(i, obj){
 
-    var field = {_id: "", qs: "", field_name: "", expression: ""};
-    _id = _id + "." + obj
-    field._id = _id;
+    var field = {_id: "", id: "", qs: "", field_name: "", expression: ""};
+    var temp = _id + "." + obj;
+    var a = temp.split(".");
+    var l = a.length;
+    field.id = a[l-2] + "." + a[l-1];
     field.qs = selectedQs;
     field.field_name = obj;
     field.expression = expression + obj + "]";
-    fieldsView[_id] = field;
+    field._id = _id + "." + obj;
+    fieldsView[_id + "." + obj] = field;
 
   })
 

@@ -72,6 +72,12 @@
 
 			$('select').selectpicker();
 
+			var s = "element0.element1.element2.element3";
+			var a = s.split(".");
+			var l = a.length;
+			console.log(l);
+			console.log(a[l-2] + "." + a[l-1]);
+
 		});
 	</script>
 </body>
