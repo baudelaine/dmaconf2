@@ -182,7 +182,7 @@ qsCols.push({field:"linker_ids", title: "linker_ids"});
 var fieldCols = [];
 // fieldCols.push({field:"checkbox", checkbox: "true"});
 fieldCols.push({field:"index", title: '<h4><span class="label label-default">index</span>', formatter: "indexFormatter", sortable: false});
-fieldCols.push({field:"fieldPos", title: '<h4><span class="label label-default">Pos / Id</span>', sortable: true});
+fieldCols.push({field:"fieldPos", title: '<h4><span class="label label-default">Pos</span>', sortable: true});
 fieldCols.push({field:"field_name", title: '<h4><span class="label label-default">Name</span>', sortable: true });
 fieldCols.push({field:"alias", title: '<h4><span class="label label-default">Alias</span>', sortable: false, editable: {type: "textarea", mode: "inline", rows: 2}});
 fieldCols.push({class:"field_type", field:'field_type', title: '<h4><span class="label label-default">Type</span>', editable: {type: "text", mode: "inline"}, sortable: true});
@@ -1423,9 +1423,9 @@ function SaveFieldsToView(){
         $.each(qs.fields, function(j, qsField){
           if(field.field_name == qsField.field_name){
             var viewField = $.extend({}, qsField);
-            viewField._id = field._id;
+            viewField._id = field.id;
             viewField.expression = field.expression;
-            viewField.fieldPos = field.id;
+            viewField.fieldPos = 0;
             view.fields.push(viewField);
           }
         })
