@@ -6970,6 +6970,79 @@ $("#setHidden").click(function(){
   }  
 })
 
+$("#setHiddenAllFromZip").click(function(){
+  console.log("setHiddenAllFromZip was clicked");
+  $("#isHiddenZipFileModal").modal("toggle");
+})
+
+$("#isHiddenZipFileUpload").click(function(){
+  console.log("isHiddenZipFileUpload was clicked");
+
+  $('#isHiddenZipFile').trigger('click');
+  $("#isHiddenZipFileModal").modal("toggle");
+})
+
+
+$('#isHiddenZipFile').change(function(){
+
+  var csvExt = $('input[name=optionExt]:checked', '#myForm').val(); 
+  var csvCS = $('input[name=optionCS]:checked', '#myForm').val(); 
+  var csvSep = ($('input[name=optionSep]:checked', '#myForm').val()); 
+
+  var file = $(this)[0].files[0];
+  console.log(file);
+
+  var fd = new FormData();
+  fd.append('file', file, 'isHidden.zip');
+
+  var parms = {};
+  parms.csvExt = csvExt;
+  parms.csvCS = csvCS;
+  parms.csvSep = csvSep;
+  console.log(parms);
+
+  fd.append('json', JSON.stringify(parms));
+
+  console.log(fd);
+
+  $.ajax({
+    url: "SetHiddenFromZipFile",
+    type: "POST",
+    data: fd,
+    enctype: 'multipart/form-data',
+    // dataType: 'application/text',
+    processData: false,  // tell jQuery not to process the data
+    contentType: false,   // tell jQuery not to set contentType
+    success: function(data) {
+      if(data.STATUS == "OK"){
+        console.log(data);
+        var isHiddens = data.DATAS;
+        var qss = $('#DatasTable').bootstrapTable("getData");
+        // console.log(qss);
+        $.each(qss, function(i, qs){
+          if(qs.table_name in isHiddens){
+            $.each(qs.fields, function(j, field){
+              if(isHiddens[qs.table_name].includes(field.field_name)){
+                field.hidden = true;
+              }
+            })
+          }
+        })
+      }
+      else{
+        console.log(data);
+        showalert("ERROR: " + data.FROM, data.MESSAGE + "<br>" + data.EXCEPTION + "<br>TROUBLESHOOTING: " + data.TROUBLESHOOTING, "alert-danger", "bottom");
+      }
+    },
+		error: function(data) {
+      console.log(data);
+		}
+  });  
+
+  $(this).val('');  
+
+})
+
 function setHidden(){
 
   var qsId = $("#qsSelect").find("option:selected").text();
