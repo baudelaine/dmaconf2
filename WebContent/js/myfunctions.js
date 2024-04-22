@@ -564,7 +564,7 @@ $traTab.on('shown.bs.tab', function(e) {
 //   }
 // });
 
-$datasTable.on('resetrr-view.bs.table', function(){
+$datasTable.on('reset-view.bs.table', function(){
   // console.log("++++++++++++++on passe dans reset-view");
   // console.log("activeTab=" + activeTab);
   // console.log("previousTab=" + previousTab);
