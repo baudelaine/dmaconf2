@@ -3543,7 +3543,7 @@ function buildRelationTable($el, cols, data, qs){
             var newValue = value == false ? true : false;
             var pkAlias = '[' + row.pktable_alias + ']';
             if(value == true){
-
+              $datasTable.bootstrapTable("filterBy", {});
               var qssBackup = JSON.parse(JSON.stringify($datasTable.bootstrapTable("getData")));
               updateCell($el, row.index, field, newValue);
               UncheckQuerySubject(qssBackup);
@@ -3796,6 +3796,11 @@ function UncheckQuerySubject(qssBackup){
               console.log("KO Kate !");
               // updateCell($el, index, field, false);
               $datasTable.bootstrapTable("load", qssBackup);
+              if(activeTab.match("Final")){
+                $refTab.tab('show');
+                $finTab.tab('show');
+              }
+            
             }
           }
         });        
