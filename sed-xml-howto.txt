@@ -1,0 +1,5 @@
+sed 's:\(<querySubject status="valid"><name locale="en-gb">\)\([[:alnum:]_]\{1,\}\)\(</name>\):\1\U\2\E\3:g' ratp-model.xml > ratp-model-updateQS.xml
+
+sed 's:\(<queryItem><name locale="en-gb">\)\([[:alnum:]_]\{1,\}\)\(</name>\):\1\U\2\E\3:g' ratp-model-updateQS.xml > ratp-model-update.xml
+
+echo '<querySubject status="valid"><name locale="en-gb">workorder</name>' | sed 's:\(<querySubject status="valid"><name locale="en-gb">\)\([[:alnum:]_]\{1,\}\)\(</name>\):\1\U\2\E\3:g'

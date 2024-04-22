@@ -217,7 +217,7 @@ public class CognosSVC {
 						lst.add(e);
 						
 						if(j == m) {
-							m=m+50000;
+							m=m+5000;
 							exitWhile2 = true;
 						}
 						

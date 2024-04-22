@@ -6737,6 +6737,49 @@ $("#ulActionLog").click(function(){
 
 })
 
+$("#updateModelUC").click(function(){
+
+  var model = $('#DatasTable').bootstrapTable("getData");
+  console.log(model);
+  $.each(model, function(i, qs){
+    qs.table_name = qs.table_name.toUpperCase();
+      $.each(qs.fields, function(j, field){
+        field.field_name = field.field_name.toUpperCase();
+      })
+  })
+  console.log(model);
+
+  if(activeTab.match("Query Subject")){
+    $refTab.tab('show');
+    $qsTab.tab('show');
+  }
+  else{
+    $qsTab.tab('show');
+  }
+
+});
+
+$("#updateModelLC").click(function(){
+
+  var model = $('#DatasTable').bootstrapTable("getData");
+  console.log(model);
+  $.each(model, function(i, qs){
+    qs.table_name = qs.table_name.toLowerCase();
+      $.each(qs.fields, function(j, field){
+        field.field_name = field.field_name.toLowerCase();
+      })
+  })
+  console.log(model);
+
+  if(activeTab.match("Query Subject")){
+    $refTab.tab('show');
+    $qsTab.tab('show');
+  }
+  else{
+    $qsTab.tab('show');
+  }
+
+});
 
 $("#updateModel").click(function(){
 

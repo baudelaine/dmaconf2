@@ -2,7 +2,9 @@ package com.dma.svc;
 
 import java.io.File;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -138,7 +140,7 @@ public class FactorySVC {
 		
 	}
 	
-	public void renameQuerySubject(String qs, String name){
+	public void renameQuerySubject(String qs, String name, String namespacePath, Map<String, Map<String, String>> labelMap){
 		try {
 			File xmlFile = new File(csvc.getPathToXML() + "/renameQuerySubject.xml");
 			SAXReader reader = new SAXReader();
@@ -152,6 +154,14 @@ public class FactorySVC {
 
 			System.out.println("renameQuerySubject(" + qs + ", " + name + ")");
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("querySubject/name", "/O/name[" + l + "]/O/" + namespacePath + ".[" + name + "]", name);
+				l++;
+			}
+			//Fin Nommage
 
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
@@ -411,7 +421,7 @@ public class FactorySVC {
 
 	// ceci pour les QS qui pointe directement sur la DB.
 	// il ont besoin du vrai nom de la table et aussi du u_name
-	public void createQuerySubject(String Source, String Destination, String BasedOnQuerySubject, String NameQuerySubject) {
+	public void createQuerySubject(String Source, String Destination, String BasedOnQuerySubject, String NameQuerySubject, Map<String, Map<String, String>> labelMap) {
 		try {
 			File xmlFile = new File(csvc.getPathToXML() + "/createQuerySubject.xml");
 			SAXReader reader = new SAXReader();
@@ -432,13 +442,21 @@ public class FactorySVC {
 //			System.out.println(document.asXML());
 			System.out.println("createQuerySubject(" + Source + ", " + Destination + ", " + BasedOnQuerySubject + ", " + BasedOnQuerySubject + ")");
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("querySubject/name", "/O/name[" + l + "]/O/" + "[" + Destination + "].[" + NameQuerySubject + "]", NameQuerySubject);
+				l++;
+			}
+			//Fin Nommage
 
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
 	}
 	
-	public void createQuerySubjectEmpty(String namespace, String qsName, String locale) {
+	public void createQuerySubjectEmpty(String namespace, String qsName, String locale, Map<String, Map<String, String>> labelMap) {
 		try {
 			File xmlFile = new File(csvc.getPathToXML() + "/createQuerySubjectEmpty.xml");
 			SAXReader reader = new SAXReader();
@@ -465,6 +483,14 @@ public class FactorySVC {
 			
 //			System.out.println(document.asXML());
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("querySubject/name", "/O/name[" + l + "]/O/" + namespace + ".[" + qsName + "]", qsName);
+				l++;
+			}
+			//Fin Nommage
 
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
@@ -607,7 +633,7 @@ public class FactorySVC {
 		}
 	}
 
-	public void createQueryItem(String querySubject, String name, String exp, String locale) {
+	public void createQueryItem(String querySubject, String name, String exp, String locale, Map<String, Map<String, String>> labelMap) {
 		try {
 			
 //			String querySubject = "[DATA].[HISTORIQUE_L]";
@@ -658,6 +684,15 @@ public class FactorySVC {
 			System.out.println("createQueryItem(" + querySubject + ", " + name + ", " + exp + ", " + locale + ")");
 //			System.out.println(document.asXML());
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("queryItem/name", "/O/name[" + l + "]/O/" + querySubject + ".[" + name + "]", name);
+				l++;
+			}
+			//Fin Nommage
+			
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
@@ -687,7 +722,7 @@ public class FactorySVC {
 		}
 	}
 	
-	public void createQueryItemInFolder(String QS, String Folder, String Name, String Exp) {
+	public void createQueryItemInFolder(String QS, String Folder, String Name, String Exp, Map<String, Map<String, String>> labelMap) {
 		try {
 			File xmlFile = new File(csvc.getPathToXML() + "/createQueryItemInFolder.xml");
 			SAXReader reader = new SAXReader();
@@ -734,6 +769,15 @@ public class FactorySVC {
 //			System.out.println(document.asXML());		
 //			System.out.println("createQueryItemInFolder(" + QS + ", " + Folder + ", " + Exp + ")");
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("queryItem/name", "/O/name[" + l + "]/O/" + QS + ".[" + Name + "]", Name);
+				l++;
+			}
+			//Fin Nommage
+			
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
@@ -895,7 +939,7 @@ public class FactorySVC {
 		}
 	}
 
-	public void createSubFolder(String QSRejObj, String Name) {
+	public void createSubFolder(String QSRejObj, String Name, String qsPath, Map<String, Map<String, String>> labelMap) {
 		try {
 			File xmlFile = new File(csvc.getPathToXML() + "/createSubFolder.xml");
 			SAXReader reader = new SAXReader();
@@ -909,6 +953,14 @@ public class FactorySVC {
 
 			System.out.println("createSubFolder(" + QSRejObj + ", " + Name + ")");
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("queryItemFolder/name", "/O/name[" + l + "]/O/" + qsPath + ".[" + Name + "]", Name);
+				l++;
+			}
+			//Fin Nommage
 
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
@@ -933,7 +985,7 @@ public class FactorySVC {
 			lg(ex.getMessage());
 		}
 	}
-	public void createSubFolderInSubFolderIIC(String QSRefObj, String Fint) {
+	public void createSubFolderInSubFolderIIC(String QSRefObj, String Fint, String qsPath, Map<String, Map<String, String>> labelMap) {
 		try {
 			File xmlFile = new File(csvc.getPathToXML() + "/createSubFolder.xml");
 			SAXReader reader = new SAXReader();
@@ -947,6 +999,14 @@ public class FactorySVC {
 
 			System.out.println("createSubFolderInSubFolderIIC( " + QSRefObj + ", " + Fint + ")");
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("queryItemFolder/name", "/O/name[" + l + "]/O/" + qsPath + ".[" + Fint + "]", Fint);
+				l++;
+			}
+			//Fin Nommage
 
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
@@ -1043,7 +1103,7 @@ public class FactorySVC {
 		}
 	
 	// Dimension functions factory
-	public void createMeasureDimension(String handle, String measureDimensionName) {
+	public void createMeasureDimension(String handle, String measureDimensionName, Map<String, Map<String, String>> labelMap) {
 		try {
 	
 			File xmlFile = new File(csvc.getPathToXML() + "/createMeasureDimension.xml");
@@ -1075,12 +1135,21 @@ public class FactorySVC {
 			// System.out.println(document.asXML());
 			System.out.println("createMeasureDimension: handle " + handle + ", measureDimensionName " + measureDimensionName);
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("dimension/name", "/O/name[" + l + "]/O/" + handle + ".[" + measureDimensionName + "]", measureDimensionName);
+				l++;
+			}
+			//Fin Nommage
+			
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
 	}
 
-	public void createMeasure(String dimensionPath, String measureName, String exp) {
+	public void createMeasure(String dimensionPath, String measureName, String exp, Map<String, Map<String, String>> labelMap) {
 		try {
 			
 //			String measureName = "SDIDATA_COUNT";
@@ -1114,12 +1183,21 @@ public class FactorySVC {
 			//System.out.println(document.asXML());
 			System.out.println("createMeasure: dimensionPath " + dimensionPath + ", measureName " + measureName + ", exp " + exp);
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("measure/name", "/O/name[" + l + "]/O/" + dimensionPath + ".[" + measureName + "]", measureName);
+				l++;
+			}
+			//Fin Nommage
+			
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
 	}
 
-	public void createDimension(String handle, String dimensionName) {
+	public void createDimension(String handle, String dimensionName, Map<String, Map<String, String>> labelMap) {
 		try {
 			
 //			namespace = "[DIMENSIONS]";
@@ -1150,6 +1228,15 @@ public class FactorySVC {
 			// System.out.println(document.asXML());
 		    System.out.println("createDimension : handle " + handle + ", dimensionName " + dimensionName);
 			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("dimension/name", "/O/name[" + l + "]/O/" + handle + ".[" + dimensionName + "]", dimensionName);
+				l++;
+			}
+			//Fin Nommage
+			
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
@@ -1201,6 +1288,7 @@ public class FactorySVC {
 			// System.out.println(document.asXML());
 		    
 			csvc.executeModel(document);
+			
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
@@ -1238,6 +1326,7 @@ public class FactorySVC {
 		    
 			// System.out.println(document.asXML());
 			csvc.executeModel(document);
+			
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
 		}
@@ -1390,7 +1479,7 @@ public class FactorySVC {
 	}
 }
 	
-	public void createEmptyHierarchy(String dimensionPath, String hierarchyName) {
+	public void createEmptyHierarchy(String dimensionPath, String hierarchyName, Map<String, Map<String, String>> labelMap) {
 		
 		try {
 //			String dimensionPath = "[DIMENSIONS].[SDIDATA.CREATEDT]";
@@ -1417,6 +1506,15 @@ public class FactorySVC {
 			System.out.println("createEmptyHierarchy(dimensionPath : " +  dimensionPath + " ,hierarchyName : " + hierarchyName + ")");
 		// System.out.println(document.asXML());
 		csvc.executeModel(document);
+		
+		//Nommage autres langues langue dans le FM
+		for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+			int l=1;
+			modify("hierarchy/name", "/O/name[" + l + "]/O/" + dimensionPath +".[" + hierarchyName + "]", hierarchyName);
+			l++;
+		}
+		//Fin Nommage
+		
 	} catch (DocumentException ex) {
 		lg(ex.getMessage());
 	}
@@ -1446,8 +1544,8 @@ public class FactorySVC {
 			handle2.setText(handleLevelName);
 			ElemlevelName.setText(levelName);
 			
-		// System.out.println(document.asXML());
-		csvc.executeModel(document);
+		   // System.out.println(document.asXML());
+		   csvc.executeModel(document);
 	} catch (DocumentException ex) {
 		lg(ex.getMessage());
 	}
@@ -1473,7 +1571,7 @@ public class FactorySVC {
 			}
 		}
 	
-	public void createEmptyHierarchyLevel(String hierarchyPath, String levelName) {
+	public void createEmptyHierarchyLevel(String hierarchyPath, String levelName, Map<String, Map<String, String>> labelMap) {
 		
 		try {
 			
@@ -1496,9 +1594,18 @@ public class FactorySVC {
 
 			System.out.println("createEmptyHierarchyLevel(hierarchyPath: " + hierarchyPath + ",levelName : " + levelName + ")");
 		// System.out.println(document.asXML());
-				csvc.executeModel(document);
+			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("level/name", "/O/name[" + l + "]/O/" + hierarchyPath + ".[" + levelName + "]" , levelName);
+				l++;
+			}
+			//Fin Nommage
+		
 			} catch (DocumentException ex) {
-				lg(ex.getMessage());
+					lg(ex.getMessage());
 			}
 		}
 
@@ -1529,7 +1636,7 @@ public class FactorySVC {
 			}
 		}
 	
-	public void modifyLevelName(String hierarchyPath, String levelOldName, String levelName) {
+	public void modifyLevelName(String hierarchyPath, String levelOldName, String levelName, Map<String, Map<String, String>> labelMap) {
 		
 		try {
 			
@@ -1548,14 +1655,23 @@ public class FactorySVC {
 			ElemlevelName.setText(levelName);
 
 		// System.out.println(document.asXML());
-				csvc.executeModel(document);
+			csvc.executeModel(document);
+			
+			//Nommage autres langues langue dans le FM
+			for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+				int l=1;
+				modify("level/name", "/O/name[" + l + "]/O/" + hierarchyPath + ".[" + levelName + "]", levelName);
+				l++;
+			}
+			//Fin Nommage
+		 
 			} catch (DocumentException ex) {
 				lg(ex.getMessage());
 			}
 		}
 
 	
-	public void createHierarchyLevelQueryItem(String levelPath, String queryItemName, String exp) {
+	public void createHierarchyLevelQueryItem(String levelPath, String queryItemName, String exp, Map<String, Map<String, String>> labelMap) {
 		
 		try {
 //			String levelPath = "[DIMENSIONS].[SDIDATA.CREATEDT].[SDIDATA.CREATEDT (By month)].[YEAR]";
@@ -1584,7 +1700,16 @@ public class FactorySVC {
 		    cdata.addCDATA(root_cdata.asXML());
 
 //		 System.out.println(document.asXML());
-				csvc.executeModel(document);
+			csvc.executeModel(document);
+			
+				//Nommage autres langues langue dans le FM
+				for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+					int l=1;
+					modify("queryItem/name", "/O/name[" + l + "]/O/" + levelPath + ".[" + queryItemName + "]" , queryItemName);
+					l++;
+				}
+			//Fin Nommage
+				
 			} catch (DocumentException ex) {
 				lg(ex.getMessage());
 			}
@@ -1693,7 +1818,7 @@ public class FactorySVC {
 			}
 		}
 	
-	public void createTimeDimension(String dateQueryItemPath, String dimensionName, String dateQueryItemName, String dbEngine, Map<String, String> hierarchies) {
+	public void createTimeDimension(String dateQueryItemPath, String dimensionName, String dateQueryItemName, String dbEngine, Map<String, String> hierarchies, Map<String, Map<String, String>> labelMap) {
 		
 
 	// time dimension
@@ -1704,15 +1829,17 @@ public class FactorySVC {
 			String hierarchyByWeek = hierarchies.get("By week");
 			String hierarchyRollingMonth = hierarchies.get("Rolling month");
 			
-			createDimension("[DIMENSIONAL]", dimensionName);
+			createDimension("[DIMENSIONAL]", dimensionName, labelMap);
+	
 
 	// hierarchy (By month)
 			createDimensionHierarchy("[DIMENSIONAL].[" + dimensionName + "]", dateQueryItemPath);
+			
 			createScopeRelationship("[DIMENSIONAL].[" + dimensionName + "]");
 			
 	// level year
 			modifyHierarchyName("[DIMENSIONAL].[" + dimensionName + "]", dateQueryItemName,dateQueryItemName + " (By month)");
-			modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "YEAR");
+			modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "YEAR", labelMap);
 			
 			String exp = "_year(" + dateQueryItemPath + ")";
 			modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR]", dateQueryItemName, "YEAR_KEY", exp);
@@ -1725,7 +1852,8 @@ public class FactorySVC {
 				exp = "_year (" + dateQueryItemPath + ")";
 			}
 			
-			createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR]", "YEAR", exp);
+			createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR]", "YEAR", exp, labelMap);
+			
 			createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR].[YEAR]");
 			createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR].[YEAR]");
 			createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR].[YEAR_KEY]");
@@ -1733,7 +1861,7 @@ public class FactorySVC {
 			if (!hierarchyByMonth.equals("") && hierarchyByMonth.contains("QUARTER")) {
 	//level quarter
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "QUARTER");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "QUARTER", labelMap);
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 					exp = "to_char(" + dateQueryItemPath + ",'Q')";
 				} else {
@@ -1743,14 +1871,16 @@ public class FactorySVC {
 				}
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[QUARTER]", dateQueryItemName, "QUARTER_KEY", exp);
 				
+				
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 					exp = "to_char(" + dateQueryItemPath + ",'yyyy-Q')";
 				} else {
-					exp = "if (  (#sq($runLocale)#) = 'fr' ) then ('Trimestre') else ('Quarter') || ' ' || if (_month (" + dateQueryItemPath + ") in_range {1:3}) then (1) else ( "
+					exp = "Q || ' ' || if (_month (" + dateQueryItemPath + ") in_range {1:3}) then (1) else ( "
 					+ "if (_month (" + dateQueryItemPath + ") in_range {4:6}) then (2) else ( "
 					+ "if (_month (" + dateQueryItemPath + ") in_range {7:9}) then (3) else (4)))";
 				}
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[QUARTER]", "QUARTER", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[QUARTER]", "QUARTER", exp, labelMap);
+				
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[QUARTER].[QUARTER]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[QUARTER].[QUARTER]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[QUARTER].[QUARTER_KEY]");
@@ -1762,36 +1892,34 @@ public class FactorySVC {
 			} else {
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[YEAR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[" + dateQueryItemName + "]", dateQueryItemPath);
 			}
-			modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "MONTH");
+			modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "MONTH", labelMap);
 			exp = "_month (" + dateQueryItemPath + ")";
 			modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MONTH]", dateQueryItemName, "MONTH_KEY", exp);
 			
 			if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 				exp = "to_char(" + dateQueryItemPath + ",'yyyy/MM')";
 			} else {
-				exp = "_year (  " + dateQueryItemPath + " ) || ' - ' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_month (" + dateQueryItemPath + ")";
+				exp = "_month (" + dateQueryItemPath + ")";
 			}
 			
-			createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MONTH]", "MONTH", exp);
+			createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MONTH]", "MONTH", exp, labelMap);
 			createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MONTH].[MONTH]");
 			createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MONTH].[MONTH]");
 			createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MONTH].[MONTH_KEY]");
 			
 	// level day
 			addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MONTH]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-			modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "DAY");
+			modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "DAY", labelMap);
 			exp = "_day (" + dateQueryItemPath + ")";
 			modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY]", dateQueryItemName, "DAY_KEY", exp);
 			
 			if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 				exp = "to_char(" + dateQueryItemPath + ",'yyyy/MM/dd')";
 			} else {
-				exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-				+ "_month (" + dateQueryItemPath + ") || '-' || if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') ||  _day (" + dateQueryItemPath + ")";
+				exp = "_day (" + dateQueryItemPath + ")";
 			}
 					
-			createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY]", "DAY", exp);
+			createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY]", "DAY", exp, labelMap);
 			createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY].[DAY]");
 			createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY].[DAY]");
 			createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY].[DAY_KEY]");
@@ -1799,7 +1927,7 @@ public class FactorySVC {
 	// level AM/PM
 			if (!hierarchyByMonth.equals("") && hierarchyByMonth.contains("AM/PM")) {
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "AM/PM");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "AM/PM", labelMap);
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 					exp = "to_char(" + dateQueryItemPath + ",'AM')";
 				} else {
@@ -1817,7 +1945,7 @@ public class FactorySVC {
 					+ "if (_hour (  " + dateQueryItemPath + " ) in_range {0:11}) then ('AM')  else ('PM')";
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[AM/PM]", "AM/PM", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[AM/PM]", "AM/PM", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[AM/PM].[AM/PM]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[AM/PM].[AM/PM]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[AM/PM].[AM/PM_KEY]");
@@ -1830,20 +1958,17 @@ public class FactorySVC {
 				} else {
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DAY]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[" + dateQueryItemName + "]", dateQueryItemPath);	
 				}
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "HOUR");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "HOUR", labelMap);
 				exp = "_hour (  " + dateQueryItemPath + " )";
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[HOUR]", dateQueryItemName, "HOUR_KEY", exp);
 				
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 					exp = "to_char(" + dateQueryItemPath + ",'yyyy/MM/dd HH')";
 				} else {
-					exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_month (" + dateQueryItemPath + ") || '-' || if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_day (" + dateQueryItemPath + ")  || ' ' || if ( _hour (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_hour (" + dateQueryItemPath + ")";
+					exp = "_hour (" + dateQueryItemPath + ")";
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[HOUR]", "HOUR", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[HOUR]", "HOUR", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[HOUR].[HOUR]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[HOUR].[HOUR]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[HOUR].[HOUR_KEY]");
@@ -1851,20 +1976,17 @@ public class FactorySVC {
 	// level min
 			if (!hierarchyByMonth.equals("") && hierarchyByMonth.contains("MIN")) {
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[HOUR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "MIN");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "MIN", labelMap);
 				exp = "_minute (  " + dateQueryItemPath + " )";
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MIN]", dateQueryItemName, "MIN_KEY", exp);
 				
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 					exp = "to_char(" + dateQueryItemPath + ",'yyyy/MM/dd HH:mi')";
 				} else {
-					exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_month (" + dateQueryItemPath + ") || '-' || if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_day (" + dateQueryItemPath + ")  || ' ' || if ( _hour (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_hour (" + dateQueryItemPath + ")";
+					exp = "_minute (  " + dateQueryItemPath + " )";
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MIN]", "MIN", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MIN]", "MIN", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MIN].[MIN]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MIN].[MIN]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MIN].[MIN_KEY]");
@@ -1873,7 +1995,7 @@ public class FactorySVC {
 	// level date
 			if (!hierarchyByMonth.equals("") && hierarchyByMonth.contains("DATE")) {
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[MIN]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "DATE");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)]", dateQueryItemName, "DATE", labelMap);
 				exp = dateQueryItemPath;
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DATE]", dateQueryItemName, "DATE_KEY", exp);
 				
@@ -1881,83 +2003,68 @@ public class FactorySVC {
 				//	exp = "to_char(" + dateQueryItemPath + ",'yyyy/MM/dd HH:mi:ss')";
 					exp = dateQueryItemPath;
 				} else {
-					exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_month (" + dateQueryItemPath + ") || '-' || "
-					+ "if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || _day (" + dateQueryItemPath + ")  || ' ' || "
-					+ "if ( _hour (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || _hour (" + dateQueryItemPath + ") || ':' || "
-					+ "if ( _minute (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || _minute (" + dateQueryItemPath + ") || ':' || "
-					+ "if ( _second (" + dateQueryItemPath + ")  > 9) then ('') else ('0') ||  _second (" + dateQueryItemPath + ")";
+					exp = dateQueryItemPath;
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DATE]", "DATE", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DATE]", "DATE", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DATE].[DATE]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DATE].[DATE]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By month)].[DATE].[DATE_KEY]");
 			}
 			
-	// hierarchy by week
+	    // hierarchy by week
 			if (hierarchyByWeek != null && !hierarchyByWeek.equals("")) {
 				addDimensionHierarchy("[DIMENSIONAL].[" + dimensionName + "]", dateQueryItemPath);
 				modifyHierarchyName("[DIMENSIONAL].[" + dimensionName + "]", dateQueryItemName,dateQueryItemName + " (By week)");
 				
-		// Year
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "YEAR");
+		// ISO Year
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "YEAR", labelMap);
 				exp = "if (_month (" + dateQueryItemPath + ") = 12 AND _week_of_year (" + dateQueryItemPath + ") = 1) "
 				+ "then ( _year (" + dateQueryItemPath + ") + 1 ) "
 				+ "else (  _year (" + dateQueryItemPath + ") )";
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[YEAR]", dateQueryItemName, "YEAR_KEY", exp);
 				
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
-					exp = "to_char(if (_month (" + dateQueryItemPath + ") = 12 AND _week_of_year (" + dateQueryItemPath + ") = 1) "
-							+ "then ( _year (" + dateQueryItemPath + ") + 1 ) "
-							+ "else (  _year (" + dateQueryItemPath + ") ))";
+					exp = "to_char(" + dateQueryItemPath + ",'IYYY')";
 				} else {
 					exp = "if (_month (" + dateQueryItemPath + ") = 12 AND _week_of_year (" + dateQueryItemPath + ") = 1) "
 					+ "then ( _year (" + dateQueryItemPath + ") + 1 ) "
 					+ "else (  _year (" + dateQueryItemPath + ") )";
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[YEAR]", "YEAR", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[YEAR]", "YEAR", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[YEAR].[YEAR]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[YEAR].[YEAR]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[YEAR].[YEAR_KEY]");
 	
 		//level week	
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[YEAR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[" + dateQueryItemName + "]", dateQueryItemPath);
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "WEEK");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "WEEK", labelMap);
 				
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
-					exp = "to_char(" + dateQueryItemPath + ",'IW')";
+					exp = "_week_of_year (" + dateQueryItemPath + ")";
 				} else {
-					exp = "if (_month (" + dateQueryItemPath + ") = 12 AND _week_of_year (" + dateQueryItemPath + ") = 1) "
-					+ "then (  _year (" + dateQueryItemPath + ") + 1 ) "
-					+ "else (  _year (" + dateQueryItemPath + ") )  || '-' || _week_of_year (" + dateQueryItemPath + ")";
+					exp = "_week_of_year (" + dateQueryItemPath + ")";
 				}
 				
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[WEEK]", dateQueryItemName, "WEEK_KEY", exp);
 				
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
-					exp = "if (_month (" + dateQueryItemPath + ") = 12 AND _week_of_year (" + dateQueryItemPath + ") = 1) "
-							+ "then (  _year (" + dateQueryItemPath + ") + 1 ) "
-							+ "else (  _year (" + dateQueryItemPath + ") ) || ' - ' || "
-							+ "to_char(" + dateQueryItemPath + ",'IW')";
+					exp = "_week_of_year (" + dateQueryItemPath + ")";
 				} else {
-					exp = "if (_month (" + dateQueryItemPath + ") = 12 AND _week_of_year (" + dateQueryItemPath + ") = 1) "
-							+ "then (  _year (" + dateQueryItemPath + ") + 1 ) "
-							+ "else (  _year (" + dateQueryItemPath + ") ) || ' - ' || if ( _week_of_year(" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-							+ "_week_of_year(" + dateQueryItemPath + ")";
+					exp = "_week_of_year (" + dateQueryItemPath + ")";
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[WEEK]", "WEEK", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[WEEK]", "WEEK", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[WEEK].[WEEK]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[WEEK].[WEEK]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[WEEK].[WEEK_KEY]");
 	
 		//level day_of_week	
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[WEEK]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[" + dateQueryItemName + "]", dateQueryItemPath);
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "DAY_OF_WEEK");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "DAY_OF_WEEK", labelMap);
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
-					exp = "to_char(" + dateQueryItemPath + ",'D')";
+					exp = "_day_of_week (" + dateQueryItemPath + ",1)";
 				} else {
 					exp = "_day_of_week (" + dateQueryItemPath + ",1)";
 				}
@@ -1966,26 +2073,10 @@ public class FactorySVC {
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 					exp = "to_char(  " + dateQueryItemPath + ",'yyyy/MM/dd - Day')";
 				} else {
-					exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-					+ "_month (" + dateQueryItemPath + ") || '-' || "
-					+ "if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') ||  _day (" + dateQueryItemPath + ") || ' ' || "
-					+ "if (_day_of_week (" + dateQueryItemPath + ",1) = 1) "
-					+ "then ( if (  (#sq($runLocale)#) = 'fr' ) then ('Lun') else ('Mon')      ) else ( "
-					+ "if (_day_of_week (" + dateQueryItemPath + ",1) = 2) "
-					+ "then ( if (  (#sq($runLocale)#) = 'fr' ) then ('Mar') else ('Tue')       ) else ( "
-					+ "if (_day_of_week (" + dateQueryItemPath + ",1) = 3) "
-					+ "then ( if (  (#sq($runLocale)#) = 'fr' ) then ('Mer') else ('Wed')      ) else ( "
-					+ "if (_day_of_week (" + dateQueryItemPath + ",1) = 4) "
-					+ "then ( if (  (#sq($runLocale)#) = 'fr' ) then ('Jeu') else ('Thu')        ) else ( "
-					+ "if (_day_of_week (" + dateQueryItemPath + ",1) = 5) "
-					+ "then (  if (  (#sq($runLocale)#) = 'fr' ) then ('Ven') else ('Fri')         ) else ( "
-					+ "if (_day_of_week (" + dateQueryItemPath + ",1) = 6) "
-					+ "then ( if (  (#sq($runLocale)#) = 'fr' ) then ('Sam') else ('Sat')        ) else ( "
-					+ "if (  (#sq($runLocale)#) = 'fr' ) then ('Dim') else ('Sun')        ) "
-					+ ")))))";
+					exp = "_day_of_week (" + dateQueryItemPath + ",1)";
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DAY_OF_WEEK]", "DAY_OF_WEEK", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DAY_OF_WEEK]", "DAY_OF_WEEK", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DAY_OF_WEEK].[DAY_OF_WEEK]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DAY_OF_WEEK].[DAY_OF_WEEK]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DAY_OF_WEEK].[DAY_OF_WEEK_KEY]");
@@ -1993,7 +2084,7 @@ public class FactorySVC {
 				if (hierarchyByWeek.contains("AM/PM")) {
 		// level AM/PM
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DAY_OF_WEEK]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[" + dateQueryItemName + "]", dateQueryItemPath);
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "AM/PM");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "AM/PM", labelMap);
 					if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 						exp = "to_char(" + dateQueryItemPath + ",'AM')";
 					} else {
@@ -2009,7 +2100,7 @@ public class FactorySVC {
 						+ "if (_hour (  " + dateQueryItemPath + " ) in_range {0:11}) then ('AM')  else ('PM')";
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[AM/PM]", "AM/PM", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[AM/PM]", "AM/PM", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[AM/PM].[AM/PM]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[AM/PM].[AM/PM]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[AM/PM].[AM/PM_KEY]");
@@ -2022,20 +2113,17 @@ public class FactorySVC {
 					} else {
 						addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DAY_OF_WEEK]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[" + dateQueryItemName + "]", dateQueryItemPath);
 					}
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "HOUR");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "HOUR", labelMap);
 					exp = "_hour (  " + dateQueryItemPath + " )";
 					modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[HOUR]", dateQueryItemName, "HOUR_KEY", exp);
 					
 					if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 						exp = "to_char(" + dateQueryItemPath + ",'yyyy/MM/dd HH')";
 					} else {
-						exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_month (" + dateQueryItemPath + ") || '-' || if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_day (" + dateQueryItemPath + ")  || ' ' || if ( _hour (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_hour (" + dateQueryItemPath + ")";
+						exp = "_hour (  " + dateQueryItemPath + " )";
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[HOUR]", "HOUR", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[HOUR]", "HOUR", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[HOUR].[HOUR]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[HOUR].[HOUR]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[HOUR].[HOUR_KEY]");
@@ -2044,20 +2132,17 @@ public class FactorySVC {
 				if (hierarchyByWeek.contains("MIN")) {
 			// level min
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[HOUR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[" + dateQueryItemName + "]", dateQueryItemPath);
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "MIN");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "MIN", labelMap);
 					exp = "_minute(  " + dateQueryItemPath + " )";
 					modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[MIN]", dateQueryItemName, "MIN_KEY", exp);
 					
 					if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 						exp = "to_char(" + dateQueryItemPath + ",'yyyy/MM/dd HH:mi')";
 					} else {
-						exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_month (" + dateQueryItemPath + ") || '-' || if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_day (" + dateQueryItemPath + ")  || ' ' || if ( _hour (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_hour (" + dateQueryItemPath + ")";
+						exp = "_minute(  " + dateQueryItemPath + " )";
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[MIN]", "MIN", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[MIN]", "MIN", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[MIN].[MIN]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[MIN].[MIN]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[MIN].[MIN_KEY]");
@@ -2066,22 +2151,17 @@ public class FactorySVC {
 				if (hierarchyByWeek.contains("DATE")) {
 		// level date
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[MIN]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[" + dateQueryItemName + "]", dateQueryItemPath);
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "DATE");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)]", dateQueryItemName, "DATE", labelMap);
 					exp = dateQueryItemPath;
 					modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DATE]", dateQueryItemName, "DATE_KEY", exp);
 					
 					if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 						exp = dateQueryItemPath;
 					} else {
-						exp = "_year (  " + dateQueryItemPath + " ) || '-' || if ( _month (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || "
-						+ "_month (" + dateQueryItemPath + ") || '-' || "
-						+ "if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || _day (" + dateQueryItemPath + ")  || ' ' || "
-						+ "if ( _hour (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || _hour (" + dateQueryItemPath + ") || ':' || "
-						+ "if ( _minute (" + dateQueryItemPath + ")  > 9) then ('') else ('0') || _minute (" + dateQueryItemPath + ") || ':' || "
-						+ "if ( _second (" + dateQueryItemPath + ")  > 9) then ('') else ('0') ||  _second (" + dateQueryItemPath + ")";
+						exp = dateQueryItemPath;
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DATE]", "DATE", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DATE]", "DATE", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DATE].[DATE]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DATE].[DATE]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (By week)].[DATE].[DATE_KEY]");
@@ -2094,24 +2174,24 @@ public class FactorySVC {
 			
 		// level year
 				modifyHierarchyName("[DIMENSIONAL].[" + dimensionName + "]", dateQueryItemName,dateQueryItemName + " (Rolling month)");
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "YEAR");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "YEAR", labelMap);
 				exp = "_year (" + dateQueryItemPath + ")  - _year( current_timestamp )";
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR]", dateQueryItemName, "YEAR_KEY", exp);
 				
 				if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
-					exp = "'Y'  || (_year (" + dateQueryItemPath + ")  - _year( current_timestamp ))";
+					exp = "_year(" + dateQueryItemPath + ")  - _year( _add_months (current_date;-1))";
 				} else {
-					exp = "if (  (#sq($runLocale)#) = 'fr' ) then ('Année') else ('Year')  || (_year (" + dateQueryItemPath + ")  - _year( current_timestamp ))";
+					exp = "'Y ' || (_year(" + dateQueryItemPath + ")  - _year( _add_months (current_date;-1)))";
 				}
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR]", "YEAR", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR]", "YEAR", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR].[YEAR]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR].[YEAR]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR].[YEAR_KEY]");
 	
-				if (hierarchyRollingMonth.contains("QUARTER")) {
+	/*			if (hierarchyRollingMonth.contains("QUARTER")) {
 		//level quarter	
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "QUARTER");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "QUARTER", labelMap);
 					exp = "(_year (" + dateQueryItemPath + ")  - _year( current_timestamp )) * 4 + "
 					+ "if (_month(" + dateQueryItemPath + ") in_range {1 : 3}) then (1) else ( "
 					+ "if (_month(" + dateQueryItemPath + ") in_range {4 : 6}) then (2) else ( "
@@ -2141,7 +2221,7 @@ public class FactorySVC {
 						+ "if (_month( current_timestamp ) in_range {7 : 9}) then (3) else (4))))";
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[QUARTER]", "QUARTER", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[QUARTER]", "QUARTER", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[QUARTER].[QUARTER]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[QUARTER].[QUARTER]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[QUARTER].[QUARTER_KEY]");
@@ -2153,20 +2233,20 @@ public class FactorySVC {
 				} else {
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[YEAR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[" + dateQueryItemName + "]", dateQueryItemPath);
 				}
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "MONTH");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "MONTH", labelMap);
 				exp = "(_year (" + dateQueryItemPath + ")  - _year( current_timestamp )) * 12 + "
 				+ "_month (" + dateQueryItemPath + ") - _month( current_timestamp )";
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MONTH]", dateQueryItemName, "MONTH_KEY", exp);
 				exp = "'M' || ((_year (" + dateQueryItemPath + ")  - _year( current_timestamp )) * 12 + "
 				+ "_month (" + dateQueryItemPath + ")  - _month( current_timestamp ))";
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MONTH]", "MONTH", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MONTH]", "MONTH", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MONTH].[MONTH]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MONTH].[MONTH]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MONTH].[MONTH_KEY]");
 				
 		// level day
 				addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MONTH]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "DAY");
+				modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "DAY", labelMap);
 				exp = "_days_between (" + dateQueryItemPath + ", current_timestamp)";
 				modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY]", dateQueryItemName, "DAY_KEY", exp);
 				
@@ -2177,7 +2257,7 @@ public class FactorySVC {
 					+ "_month (" + dateQueryItemPath + ") || '-' || if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') ||  _day (" + dateQueryItemPath + ")";
 				}
 				
-				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY]", "DAY", exp);
+				createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY]", "DAY", exp, labelMap);
 				createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY].[DAY]");
 				createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY].[DAY]");
 				createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY].[DAY_KEY]");
@@ -2185,7 +2265,7 @@ public class FactorySVC {
 				if (hierarchyRollingMonth.contains("AM/PM")) {
 		// level AM/PM
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "AM/PM");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "AM/PM", labelMap);
 					
 					if (dbEngine.equals("ORA") || dbEngine.equals("DB2")) {
 						exp = "to_char(" + dateQueryItemPath + ",'AM')";
@@ -2201,7 +2281,7 @@ public class FactorySVC {
 						+ "_month (" + dateQueryItemPath + ") || '-' || if ( _day (" + dateQueryItemPath + ")  > 9) then ('') else ('0') ||  _day (" + dateQueryItemPath + ") || ' ' || "
 						+ "if (_hour (  " + dateQueryItemPath + " ) in_range {0:11}) then ('AM')  else ('PM')";
 					}
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[AM/PM]", "AM/PM", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[AM/PM]", "AM/PM", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[AM/PM].[AM/PM]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[AM/PM].[AM/PM]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[AM/PM].[AM/PM_KEY]");
@@ -2214,7 +2294,7 @@ public class FactorySVC {
 					} else {
 						addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DAY]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[" + dateQueryItemName + "]", dateQueryItemPath);
 					}
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "HOUR");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "HOUR", labelMap);
 					exp = "_hour (  " + dateQueryItemPath + " )";
 					modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[HOUR]", dateQueryItemName, "HOUR_KEY", exp);
 					
@@ -2227,7 +2307,7 @@ public class FactorySVC {
 						+ "_hour (" + dateQueryItemPath + ")";
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[HOUR]", "HOUR", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[HOUR]", "HOUR", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[HOUR].[HOUR]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[HOUR].[HOUR]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[HOUR].[HOUR_KEY]");
@@ -2236,7 +2316,7 @@ public class FactorySVC {
 				if (hierarchyRollingMonth.contains("MIN")) {
 		// level min
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[HOUR]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "MIN");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "MIN", labelMap);
 					exp = "_minute(  " + dateQueryItemPath + " )";
 					modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MIN]", dateQueryItemName, "MIN_KEY", exp);
 					
@@ -2249,7 +2329,7 @@ public class FactorySVC {
 						+ "_hour (" + dateQueryItemPath + ")";
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MIN]", "MIN", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MIN]", "MIN", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MIN].[MIN]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MIN].[MIN]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MIN].[MIN_KEY]");
@@ -2258,7 +2338,7 @@ public class FactorySVC {
 				if (hierarchyRollingMonth.contains("DATE")) {
 		// level date
 					addHierarchyLevel("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[MIN]", "[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[" + dateQueryItemName + "]", dateQueryItemPath);
-					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "DATE");
+					modifyLevelName("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)]", dateQueryItemName, "DATE", labelMap);
 					exp = dateQueryItemPath;
 					modifyLevelQueryItemNameExp("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DATE]", dateQueryItemName, "DATE_KEY", exp);
 					
@@ -2273,11 +2353,11 @@ public class FactorySVC {
 						+ "if ( _second (" + dateQueryItemPath + ")  > 9) then ('') else ('0') ||  _second (" + dateQueryItemPath + ")";
 					}
 					
-					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DATE]", "DATE", exp);
+					createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DATE]", "DATE", exp, labelMap);
 					createDimensionRole_MC("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DATE].[DATE]");
 					createDimensionRole_MD("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DATE].[DATE]");
 					createDimensionRole_BK("[DIMENSIONAL].[" + dimensionName + "].[" + dateQueryItemName + " (Rolling month)].[DATE].[DATE_KEY]");
-				}
+				}*/
 			}
 	}
 	

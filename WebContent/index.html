@@ -122,14 +122,14 @@
 									<input
 										type="radio"
 										name="optionCS"
-										value="UTF-8"
-										checked="true"> 
+										value="UTF-8"> 
 								UTF-8 
 								</label> 
 								<label> 
 									<input type="radio"
 										name="optionCS"
-										value="UTF-16"> 
+										value="UTF-16"
+										checked="true"> 
 								UTF-16 
 								</label> 
 							</div>
@@ -138,14 +138,14 @@
 								<input
 									type="radio"
 									name="optionSep"
-									value=";"
-									checked="true"> 
+									value=";"> 
 							; 
 							</label> 
 							<label> 
 								<input type="radio"
 									name="optionSep"
-									value="\t"> 
+									value="\t"
+									checked="true"> 
 							Tab 
 							</label> 
 						</div>
@@ -1637,6 +1637,8 @@
 							<li><a href="#" id="createView">Create View</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="#" id="updateModel">Update Model</a></li>
+							<li><a href="#" id="updateModelUC">Update Model To Uppercase</a></li>
+							<li><a href="#" id="updateModelLC">Update Model To Lowercase</a></li>
 						</ul>
 					</div>
 					<input type="file" name="CSVViewsFile" id="CSVViewsFile" style="display: none;" accept=".csv">

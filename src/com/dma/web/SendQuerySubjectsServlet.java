@@ -409,14 +409,14 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				if (query_subject.getValue().getType().equalsIgnoreCase("Final")){
 					
 					fsvc.copyQuerySubject("[PHYSICALUSED]", "[PHYSICAL].[" + query_subject.getValue().getTable_name() + "]");
-					fsvc.renameQuerySubject("[PHYSICALUSED].[" + query_subject.getValue().getTable_name() + "]", "FINAL_" + query_subject.getValue().getTable_alias());
+					fsvc.renameQuerySubject("[PHYSICALUSED].[" + query_subject.getValue().getTable_name() + "]", "FINAL_" + query_subject.getValue().getTable_alias(), "[PHYSICALUSED]", labelMap);
 					
-					fsvc.createQuerySubject("PHYSICALUSED", "FINAL", "FINAL_" + query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias());
+					fsvc.createQuerySubject("PHYSICALUSED", "FINAL", "FINAL_" + query_subject.getValue().getTable_alias(), query_subject.getValue().getTable_alias(), labelMap);
 					//ajout filter
 					String filterNameSpaceSource = "[FINAL]";
 					if (query_subject.getValue().getFilters()!=null && !query_subject.getValue().getFilters().isEmpty())
 					{
-						fsvc.createQuerySubject("FINAL", "FILTER_FINAL", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
+						fsvc.createQuerySubject("FINAL", "FILTER_FINAL", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias(), labelMap);
 						
 						Map<String, Filter> qsFilters = query_subject.getValue().getFilters();
 						int y = 0;
@@ -430,10 +430,10 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							y++;
 						}
 
-						fsvc.createQuerySubject("FILTER_FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
+						fsvc.createQuerySubject("FILTER_FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias(), labelMap);
 						filterNameSpaceSource = "[FILTER_FINAL]";
 					} else {
-						fsvc.createQuerySubject("FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias());
+						fsvc.createQuerySubject("FINAL", "DATA", query_subject.getValue().getTable_alias() , query_subject.getValue().getTable_alias(), labelMap);
 					}
 					//end filter					//end filter
 					//folder pour les qs Finaux
@@ -462,6 +462,11 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							qiScreenTipMap.put(langue, qiSTM);
 							Map<String, String> qifSTM = new HashMap<String, String>();
 							qifScreenTipMap.put(langue, qifSTM);
+							//ajout langue dans le FM
+							for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+								fsvc.addLocale(langue, cognosDefaultLocale);
+							}
+							//fin ajout langue FM
 						}		
 					}
 					//end init
@@ -524,7 +529,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 						
 						if (field.isCustom()) {
 							
-						fsvc.createQueryItem("[DATA].[" + query_subject.getValue().getTable_alias() + "]", field.getField_name(), field.getExpression(), cognosDefaultLocale);
+						fsvc.createQueryItem("[DATA].[" + query_subject.getValue().getTable_alias() + "]", field.getField_name(), field.getExpression(), cognosDefaultLocale, labelMap);
 							//end regular agg
 						}
 						
@@ -626,7 +631,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 			//add locales
 					int intLang = 1;
 					for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
-						fsvc.addLocale(langueKey.getKey().toLowerCase(), cognosDefaultLocale);
+//						fsvc.addLocale(langueKey.getKey().toLowerCase(), cognosDefaultLocale);
 						
 						//on ecrit les tooltip dans chaque langue pour les QS, QI, QI folder
 						for(Entry<String, String> screenTipMap: qsScreenTipMap.get(langueKey.getKey().toLowerCase()).entrySet()){
@@ -900,7 +905,8 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				
 				
 				
-				fsvc.createQuerySubjectEmpty("[VIEWS]", query_subject.getValue().getTable_name(), cognosDefaultLocale);
+				fsvc.createQuerySubjectEmpty("[VIEWS]", query_subject.getValue().getTable_name(), cognosDefaultLocale, labelMap);
+				
 				for(Field field: query_subject.getValue().getFields()) {
 					
 					if (field.getRole().equals("Field")) {
@@ -922,13 +928,15 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 									if (i > 0) {
 										inFolder = ".[" + folderTab[i - 1] + "]";
 									}
-									fsvc.createSubFolder("[VIEWS].[" + query_subject.getValue().getTable_name() + "]" + inFolder, folder);
+									fsvc.createSubFolder("[VIEWS].[" + query_subject.getValue().getTable_name() + "]" + inFolder, folder, "[VIEWS].[" + query_subject.getValue().getTable_name() + "]", labelMap);
+												
 								}
 							}
-							fsvc.createQueryItemInFolder("[VIEWS].[" + query_subject.getValue().getTable_name() + "]", folderTab[folderTab.length - 1], fieldAlias, field.getExpression());
+							fsvc.createQueryItemInFolder("[VIEWS].[" + query_subject.getValue().getTable_name() + "]", folderTab[folderTab.length - 1], fieldAlias, field.getExpression(), labelMap);
+							
 						
 						} else {
-							fsvc.createQueryItem("[VIEWS].[" + query_subject.getValue().getTable_name() + "]", fieldAlias, field.getExpression(), cognosDefaultLocale);
+							fsvc.createQueryItem("[VIEWS].[" + query_subject.getValue().getTable_name() + "]", fieldAlias, field.getExpression(), cognosDefaultLocale, labelMap);
 						}
 						
 						//Ajout des labels field dans le map
@@ -975,7 +983,8 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 									if (i > 0) {
 										inFolder = ".[" + folderTab[i - 1] + "]";
 									}
-									fsvc.createSubFolder("[VIEWS].[" + query_subject.getValue().getTable_name() + "]" + inFolder, folder);
+									fsvc.createSubFolder("[VIEWS].[" + query_subject.getValue().getTable_name() + "]" + inFolder, folder, "[VIEWS].[" + query_subject.getValue().getTable_name() + "]", labelMap);
+									
 								}
 							}
 							subFolderPath = ".[" + folderTab[folderTab.length - 1] + "]";
@@ -997,7 +1006,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 			repName = "." + f.getAlias();
 		}
 		
-		fsvc.createSubFolder(racineFolderPath, repName);
+		fsvc.createSubFolder(racineFolderPath, repName, qsFinal, labelMap);
 		
 		//Ajout des labels folder dans le map
 		for(Entry<String, Map<String, String>> langLabel: viewsLabelMap.entrySet()){
@@ -1033,13 +1042,15 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							if (i > 0) {
 								inFolder = "." + folderTab[i - 1];
 							}
-							fsvc.createSubFolder(qsFinal + ".[" + repName + inFolder + "]", repName + "." + folder);
+							fsvc.createSubFolder(qsFinal + ".[" + repName + inFolder + "]", repName + "." + folder, qsFinal, labelMap);
 						}
 					}
 
-					fsvc.createQueryItemInFolder(qsFinal, repName + "." + folderTab[folderTab.length - 1], gDirNameCurrent.substring(1) + fieldAlias, f.getExpression() + field.getExpression().substring(1));
+					fsvc.createQueryItemInFolder(qsFinal, repName + "." + folderTab[folderTab.length - 1], gDirNameCurrent.substring(1) + fieldAlias, f.getExpression() + field.getExpression().substring(1), labelMap);
+					
 				} else {
-					fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gDirNameCurrent.substring(1) + fieldAlias, f.getExpression() + field.getExpression().substring(1));
+					fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gDirNameCurrent.substring(1) + fieldAlias, f.getExpression() + field.getExpression().substring(1), labelMap);
+					
 				}
 				
 				//Ajout des labels field dans le map
@@ -1167,10 +1178,10 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				}
 				
 				//creation Objects
-				fsvc.copyQuerySubject("[PHYSICALUSED]", "[PHYSICAL].[" + rel.getPktable_name() + "]");	
-				fsvc.renameQuerySubject("[PHYSICALUSED].[" + rel.getPktable_name() + "]",namespaceName + "_" + pkAlias + String.valueOf(i));
-				fsvc.createQuerySubject("PHYSICALUSED", namespaceName, namespaceName + "_" + pkAlias + String.valueOf(i), qsFinalName + gDirNameCurrent);
+				fsvc.copyQuerySubject("[PHYSICALUSED]", "[PHYSICAL].[" + rel.getPktable_name() + "]");
+				fsvc.renameQuerySubject("[PHYSICALUSED].[" + rel.getPktable_name() + "]",namespaceName + "_" + pkAlias + String.valueOf(i), "[PHYSICALUSED]", labelMap);
 				
+				fsvc.createQuerySubject("PHYSICALUSED", namespaceName, namespaceName + "_" + pkAlias + String.valueOf(i), qsFinalName + gDirNameCurrent, labelMap);				
 				
 				String filterNameSpaceSource = "[" + namespaceName+ "]";
 				//Only for Ref and tra (on ne crée pas de repertoire pour tra, on rentre dans ce if uniquement pour pouvoir changer l'expression du champ à traduire)
@@ -1191,7 +1202,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							if (f.getValue().getTarget().equals("[" + namespaceName + "].[" + qsFinalName + gDirNameCurrent + "]") || f.getValue().getTarget().equals("*")) {
 								
 								if (!isFilterRefCreated) {
-									fsvc.createQuerySubject(namespaceName, "FILTER_" + namespaceName, qsFinalName + gDirNameCurrent, qsFinalName + gDirNameCurrent);
+									fsvc.createQuerySubject(namespaceName, "FILTER_" + namespaceName, qsFinalName + gDirNameCurrent, qsFinalName + gDirNameCurrent, labelMap);
 									filterNameSpaceSource = "[FILTER_" + namespaceName + "]";
 									isFilterRefCreated = true;
 								}
@@ -1227,9 +1238,10 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 					
 					if (!rel.isTra()){
 						if (qSleftType.equals("Final")) {
-							fsvc.createSubFolder("[DATA].[" + qsFinalName + "]", gDirNameCurrent);
+							fsvc.createSubFolder("[DATA].[" + qsFinalName + "]", gDirNameCurrent, "[DATA].[" + qsFinalName + "]", labelMap);
 						} else {
-							fsvc.createSubFolderInSubFolderIIC(rep, gDirNameCurrent);
+							fsvc.createSubFolderInSubFolderIIC(rep, gDirNameCurrent, "[DATA].[" + qsFinalName + "]", labelMap);
+							
 						}
 						//add tooltip
 						/*
@@ -1261,10 +1273,11 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 								String exp = field.getExpression();
 //								exp = StringUtils.replace(exp, "*", filterNameSpaceSource + ".[" + qsFinalName + gDirNameCurrent +"]");
 								exp = StringUtils.replace(exp, "**", "[DATA].[" + qsFinalName + "].[" + gDirNameCurrent.substring(1));
-								fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gFieldName + "." + field.getField_name(), exp);
+								fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gFieldName + "." + field.getField_name(), exp, labelMap);
 						
 							} else {
-							fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gFieldName + "." + field.getField_name(), filterNameSpaceSource + ".[" + qsFinalName + gDirNameCurrent +"].[" + field.getField_name() + "]");
+							fsvc.createQueryItemInFolder(qsFinal, gDirNameCurrent, gFieldName + "." + field.getField_name(), filterNameSpaceSource + ".[" + qsFinalName + gDirNameCurrent +"].[" + field.getField_name() + "]", labelMap);
+							
 							}
 						}
 						
@@ -1424,11 +1437,13 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 						}
 					folderCreated = true;
 				//	fsvc.createMeasureDimension("[DIMENSIONAL].[" + query_subject.getTable_alias() + "]", query_subject.getTable_alias() + " Fact");
-					fsvc.createMeasureDimension("[DIMENSIONAL]", query_subject.getTable_alias() + " Fact"); //without folder
+					fsvc.createMeasureDimension("[DIMENSIONAL]", query_subject.getTable_alias() + " Fact", labelMap); //without folder
+					
 					Map<String, String> m = new HashMap<String, String>();
 					mm.put("[DIMENSIONAL].[" + query_subject.getTable_alias() + " Fact]", m);
 					}
-				fsvc.createMeasure("[DIMENSIONAL].[" + query_subject.getTable_alias() + " Fact" + "]", query_subject.getTable_alias() + "." + field.getField_name(), "[DATA].[" + query_subject.getTable_alias() + "].[" + field.getField_name() + "]");
+				fsvc.createMeasure("[DIMENSIONAL].[" + query_subject.getTable_alias() + " Fact" + "]", query_subject.getTable_alias() + "." + field.getField_name(), "[DATA].[" + query_subject.getTable_alias() + "].[" + field.getField_name() + "]", labelMap);
+				
 				fsvc.modify("measure/regularAggregate", "/O/regularAggregate[0]/O/[DIMENSIONAL].[" + query_subject.getTable_alias() + " Fact" + "].[" + query_subject.getTable_alias() + "." + field.getField_name() + "]", field.getMeasure().toLowerCase());
 				Map<String, String> m = mm.get("[DIMENSIONAL].[" + query_subject.getTable_alias() + " Fact]");
 				m.put(field.getField_name(), "[DIMENSIONAL].[" + query_subject.getTable_alias() + " Fact" + "].[" + query_subject.getTable_alias() + "." + field.getField_name() + "]");
@@ -1799,10 +1814,11 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				path = StringUtils.replace(path, ".", "].[");
 				path = "[DATA].[" + path + "]";
 				System.out.println("createTimeDimension : " + path + ", " + dimension.getKey() + ", " + qiName);
-				fsvc.createTimeDimension(path, dimension.getKey(), qiName, dbEngine, dimension.getValue());
+				fsvc.createTimeDimension(path, dimension.getKey(), qiName, dbEngine, dimension.getValue(), labelMap);
+				
 			} else 
 			{
-				fsvc.createDimension("[DIMENSIONAL]", dimension.getKey());		
+				fsvc.createDimension("[DIMENSIONAL]", dimension.getKey(), labelMap);
 			}
 			
 			// time dimension
@@ -1816,7 +1832,8 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 				for (Entry<String, String> hierarchy: dimension.getValue().entrySet()) {
 					
 					fsvc.createEmptyNewHierarchy("[DIMENSIONAL].[" + dimension.getKey() + "]");
-					fsvc.createEmptyHierarchy("[DIMENSIONAL].[" + dimension.getKey() + "]", hierarchy.getKey());
+					fsvc.createEmptyHierarchy("[DIMENSIONAL].[" + dimension.getKey() + "]", hierarchy.getKey(), labelMap);
+					
 					System.out.println("hierarchy.getKey() : " + hierarchy.getKey());
 					
 					String levels[] = StringUtils.split(hierarchy.getValue(), ";");
@@ -1834,12 +1851,14 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 						String expScope[] = StringUtils.split(exp, ".");
 						String tableScope = StringUtils.replace(expScope[1], "[", "");
 						tableScope = StringUtils.replace(tableScope, "]", "");
-						fsvc.createEmptyHierarchyLevel("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "]", name);
+						fsvc.createEmptyHierarchyLevel("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "]", name, labelMap);
+						
 						
 						//gestion des bk
 						if (hierarchiesFieldsBK.get(exp)!=null && !hierarchiesFieldsBK.get(exp).equals("")) {
 							
-							fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", name + "_KEY", hierarchiesFieldsBK.get(exp));
+							fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", name + "_KEY", hierarchiesFieldsBK.get(exp), labelMap);
+							
 							fsvc.createDimensionRole_BK("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "].[" + name + "_KEY]");
 							//label du champ employé comme BK, si plusieurs champs --> ca ne marchera pas, il faudra créer un champ custom et l'utiliser comme BK.
 							
@@ -1864,13 +1883,14 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							}
 							//end label BK
 						} else {
-							fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", name + "_KEY", exp);
+							fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", name + "_KEY", exp, labelMap);
+							
 							fsvc.createDimensionRole_BK("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "].[" + name + "_KEY]");
 							// set hiddenn
 							fsvc.changeQueryItemProperty("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "].[" + name + "_KEY]", "hidden", "true");
 						}
 						
-						fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", name, exp);
+						fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", name, exp, labelMap);
 						
 						fsvc.createDimensionRole_MC("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "].[" + name + "]");
 						fsvc.createDimensionRole_MD("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "].[" + name + "]");
@@ -1888,7 +1908,7 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 									String nameAtt = nameAttTab[1] + "." + nameAttTab[2];
 									nameAtt = StringUtils.replace(nameAtt, "]", "");
 									System.out.println("nameAtt : " + nameAtt);
-									fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", nameAtt, AttributeListSplit[j]);
+									fsvc.createHierarchyLevelQueryItem("[DIMENSIONAL].[" + dimension.getKey() + "].[" + hierarchy.getKey() + "].[" + name + "]", nameAtt, AttributeListSplit[j], labelMap);
 								}
 							}
 						}
