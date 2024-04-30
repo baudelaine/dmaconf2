@@ -3219,6 +3219,9 @@ function buildRelationTable($el, cols, data, qs){
         row._id = row.key_type + 'K_' + row.pktable_alias + '_' + row.table_alias + '_' + row.type;
         if(field == "pktable_alias"){
           var newValue = row.pktable_alias;
+          // Correction bug ligne 115
+          var newValue = row.pktable_name;
+          // Correction bug ligne 115
           if($activeSubDatasTable != undefined){
             var re = new RegExp("[^.]\\[" + oldValue + "\\]", "gi");
             var re = new RegExp("\\[" + oldValue + "\\]", "gi");
@@ -5436,6 +5439,8 @@ function OpenModel(id){
     }
   });
 
+  console.log(modelName);
+
 	$.ajax({
 		type: 'POST',
 		url: "OpenModel",
@@ -7375,8 +7380,10 @@ function removeDimension(dim){
   $.each(qss, function(i, qs){
     $.each(qs.fields, function(j, field){
       $.each(field.dimensions, function(k, dimension){
-        if(dimension.dimension == dim){
-          field.dimensions.splice(k, 1);
+        if(dimension){
+          if(dimension.dimension == dim){
+            field.dimensions.splice(k, 1);
+          }
         }
       })
     })
