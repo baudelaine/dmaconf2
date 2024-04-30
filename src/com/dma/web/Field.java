@@ -10,6 +10,7 @@ public class Field {
 	String _id = "";
 	String _ref = null;
 	String field_name = "";
+	String field_alias = "";
 	String field_type = "";
 	boolean pk = false;
 	boolean indexed = false;
@@ -238,6 +239,12 @@ public class Field {
 	}
 	public void setOriginalTableAlias(String originalTableAlias) {
 		OriginalTableAlias = originalTableAlias;
+	}
+	public String getField_alias() {
+		return field_alias;
+	}
+	public void setField_alias(String field_alias) {
+		this.field_alias = field_alias;
 	}
 	
 }

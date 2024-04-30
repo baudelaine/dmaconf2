@@ -185,6 +185,7 @@ fieldCols.push({field:"index", title: '<h4><span class="label label-default">ind
 fieldCols.push({field:"_id", title: '<h4><span class="label label-default">Id</span>', sortable: true});
 fieldCols.push({field:"fieldPos", title: '<h4><span class="label label-default">Pos</span>', sortable: true});
 fieldCols.push({field:"field_name", title: '<h4><span class="label label-default">Name</span>', sortable: true });
+fieldCols.push({field:"field_alias", title: '<h4><span class="label label-default">Alias</span>', editable: {type: "text", mode: "inline"}, sortable: true });
 fieldCols.push({field:"alias", title: '<h4><span class="label label-default">Alias</span>', sortable: false, editable: {type: "textarea", mode: "inline", rows: 2}});
 fieldCols.push({class:"field_type", field:'field_type', title: '<h4><span class="label label-default">Type</span>', editable: {type: "text", mode: "inline"}, sortable: true});
 
@@ -615,22 +616,22 @@ $datasTable.on('reset-view.bs.table', function(){
       //     // $tableRows.eq(i).find('a').eq(6).editable('option', 'source', dimensions.source);
       //   }
       // }
-      if(activeTab.match("Query Subject")){
-        if(row.custom != true){
-          $tableRows.eq(i).find('a').eq(0).editable('disable');
-          // console.log($tableRows.eq(i).find('a.remove').val('hidden'));
-          // console.log(row);
-          // $tableRows.eq(i).find('a.remove').prop("disabled",true);
-          $tableRows.eq(i).find('a.remove').remove();
-        }
-        else{
-          $tableRows.eq(i).find('a').eq(0).editable('destroy');
-          // $tableRows.eq(i).find('a').eq(0).editable('setValue', ['VARCHAR']);
-          customFieldType.source = dbDataType;
-          $tableRows.eq(i).find('a').eq(0).editable(customFieldType);
-          $tableRows.eq(i).find('a').eq(0).editable('option', 'defaultValue', '');
-        }
-      }
+      // if(activeTab.match("Query Subject")){
+      //   if(row.custom != true){
+      //     $tableRows.eq(i).find('a').eq(2).editable('disable');
+      //     // console.log($tableRows.eq(i).find('a.remove').val('hidden'));
+      //     // console.log(row);
+      //     // $tableRows.eq(i).find('a.remove').prop("disabled",true);
+      //     $tableRows.eq(i).find('a.remove').remove();
+      //   }
+      //   else{
+      //     $tableRows.eq(i).find('a').eq(0).editable('destroy');
+      //     // $tableRows.eq(i).find('a').eq(0).editable('setValue', ['VARCHAR']);
+      //     customFieldType.source = dbDataType;
+      //     $tableRows.eq(i).find('a').eq(0).editable(customFieldType);
+      //     $tableRows.eq(i).find('a').eq(0).editable('option', 'defaultValue', '');
+      //   }
+      // }
 
     });
   }
@@ -906,7 +907,7 @@ function SetLanguage(language){
     if(!needInit){
         $datasTable.bootstrapTable("filterBy", {});
         $.each($datasTable.bootstrapTable("getData"), function(i, qs){
-          console.log(qs);
+          // console.log(qs);
           if(qs.labels[language]){
             qs.label = qs.labels[language];
           }
@@ -2976,7 +2977,6 @@ function buildFieldTable($el, cols, data, qs){
     cols = $.grep(cols, function(el, idx) {return el.field == "alias"}, true);
     cols = $.grep(cols, function(el, idx) {return el.field == "role"}, true);
     cols = $.grep(cols, function(el, idx) {return el.field == "_id"}, true);
-    // cols = cols.splice(1,1);
   }
 
   if(activeTab.match("View")){
@@ -3068,14 +3068,14 @@ function buildFieldTable($el, cols, data, qs){
               if(activeTab.match("Query Subject") && $activeSubDatasTable == $el){
                 if(!row.custom){
                   // $tableRows.eq(i).find('a').eq(1).editable('destroy');
-                  $tableRows.eq(i).find('a').eq(1).editable('disable');
+                  $tableRows.eq(i).find('a').eq(2).editable('disable');
                   $tableRows.eq(i).find('a.remove').remove();
                 }
                 else{
-                  $tableRows.eq(i).find('a').eq(1).editable('destroy');
+                  $tableRows.eq(i).find('a').eq(2).editable('destroy');
                   customFieldType.source = dbDataType;
-                  $tableRows.eq(i).find('a').eq(1).editable(customFieldType);
-                  $tableRows.eq(i).find('a').eq(1).editable('option', 'defaultValue', '');
+                  $tableRows.eq(i).find('a').eq(2).editable(customFieldType);
+                  $tableRows.eq(i).find('a').eq(2).editable('option', 'defaultValue', '');
                 }
               }
 
