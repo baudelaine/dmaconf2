@@ -2975,6 +2975,8 @@ function buildFieldTable($el, cols, data, qs){
     cols = $.grep(cols, function(el, idx) {return el.field == "folder"}, true);
     cols = $.grep(cols, function(el, idx) {return el.field == "alias"}, true);
     cols = $.grep(cols, function(el, idx) {return el.field == "role"}, true);
+    cols = $.grep(cols, function(el, idx) {return el.field == "_id"}, true);
+    // cols = cols.splice(1,1);
   }
 
   if(activeTab.match("View")){
