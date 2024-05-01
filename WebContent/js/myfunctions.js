@@ -7340,12 +7340,12 @@ function removeLabels(lang){
     qs.label = "";
     qs.description = "";
     $.each(qs.fields, function(j, field){
-      if(field.custom == false){
+      // if(field.custom == false){
         delete field.labels[lang];
         delete field.descriptions[lang];
         field.label = "";
         field.description = "";
-      }
+      // }
     })
     $.each(qs.relations, function(j, rel){
       delete rel.labels[lang];
