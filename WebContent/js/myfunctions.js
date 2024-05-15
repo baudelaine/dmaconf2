@@ -2371,7 +2371,10 @@ $.each(row.relations, function(i, rel){
 
 function removeRelationFormatter(value, row, index) {
 
-  if(!row.fin && !row.ref && !row.sec){
+  // Debut correction bug 93
+  // if(!row.fin && !row.ref && !row.sec){
+  if((!row.fin && !row.ref && !row.sec) || activeTab.match("Final")){
+  // Fin correction bug 93
 
   return [
       '<a class="remove" href="javascript:void(0)" title="Remove">',
@@ -3222,7 +3225,7 @@ function buildRelationTable($el, cols, data, qs){
         if(field == "pktable_alias"){
           var newValue = row.pktable_alias;
           // Correction bug ligne 115
-          var newValue = row.pktable_name;
+          // var newValue = row.pktable_name;
           // Correction bug ligne 115
           if($activeSubDatasTable != undefined){
             var re = new RegExp("[^.]\\[" + oldValue + "\\]", "gi");
@@ -3547,6 +3550,8 @@ function buildRelationTable($el, cols, data, qs){
 
             var newValue = value == false ? true : false;
             var pkAlias = '[' + row.pktable_alias + ']';
+            console.log(row);
+
             if(value == true){
               $datasTable.bootstrapTable("filterBy", {});
               var qssBackup = JSON.parse(JSON.stringify($datasTable.bootstrapTable("getData")));
@@ -3610,23 +3615,25 @@ function buildRelationTable($el, cols, data, qs){
             }
             if(value == false){
 
-              var re = new RegExp("[^\\.]\\[" + row.pktable_alias + "\\]", "gi");
-              var re = new RegExp("\\[" + row.pktable_alias + "\\]", "gi");
+              // Debut Correction bug ligne 115
+              var re = new RegExp("[^\\.]\\[" + row.pktable_alias + "\\]\\.\\[", "gi");
+              // var re = new RegExp("\\[" + row.pktable_alias + "\\]", "gi");
 
               console.log(row);
 
               if(!row.fin && activeTab == "Final"){
-                row.relationship = row.relationship.replace(re, "[FINAL].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, " [FINAL].[" + row.pktable_alias + "].[");
               }
               if(!row.ref && activeTab == "Reference"){
-                row.relationship = row.relationship.replace(re, "[REF].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, " [REF].[" + row.pktable_alias + "].[");
               }
               if(!row.sec && activeTab == "Security"){
-                row.relationship = row.relationship.replace(re, "[SEC].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, " [SEC].[" + row.pktable_alias + "].[");
               }
               if(!row.tra && activeTab == "Translation"){
-                row.relationship = row.relationship.replace(re, "[TRA].[" + row.pktable_alias + "]");
+                row.relationship = row.relationship.replace(re, " [TRA].[" + row.pktable_alias + "].[");
               }
+              // Fin Correction bug ligne 115
               updateCell($el, row.index, field, newValue);
               ChangeIcon(row, qs, "Identifier");
               if(row.fin && activeTab == "Final"){

@@ -1,0 +1,1 @@
+find /opt/dma/ -type f -name '*.java' -newermt "2024-05-01" -exec ls -Alhtr '{}' \;
