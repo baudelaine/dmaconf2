@@ -3224,9 +3224,6 @@ function buildRelationTable($el, cols, data, qs){
         row._id = row.key_type + 'K_' + row.pktable_alias + '_' + row.table_alias + '_' + row.type;
         if(field == "pktable_alias"){
           var newValue = row.pktable_alias;
-          // Correction bug ligne 115
-          // var newValue = row.pktable_name;
-          // Correction bug ligne 115
           if($activeSubDatasTable != undefined){
             var re = new RegExp("[^.]\\[" + oldValue + "\\]", "gi");
             var re = new RegExp("\\[" + oldValue + "\\]", "gi");
@@ -3519,6 +3516,19 @@ function buildRelationTable($el, cols, data, qs){
                 showalert("buildSubTable()", row._id + " is checked.", "alert-warning", "bottom");
               }
             }
+            // Debut correction bug 93
+             if(activeTab.match("Final")){
+              if(row.fin || row.ref){
+                showalert("buildSubTable()", row._id + " is checked. But it will be drop anyway !", "alert-danger", "bottom");
+                $datasTable.bootstrapTable("filterBy", {});
+                var qssBackup = JSON.parse(JSON.stringify($datasTable.bootstrapTable("getData")));
+                updateCell($el, row.index, field, newValue);
+                UncheckQuerySubject(qssBackup);
+                row.relationship = row.relationship.split("[FINAL]." + pkAlias).join(pkAlias);
+                row.fin = false;
+              }
+            }
+            // Fin correction bug 93
             return;
 
           case "fin":
@@ -3615,7 +3625,7 @@ function buildRelationTable($el, cols, data, qs){
             }
             if(value == false){
 
-              // Debut Correction bug ligne 115
+              // Debut Correction bug ligne 114
               var re = new RegExp("[^\\.]\\[" + row.pktable_alias + "\\]\\.\\[", "gi");
               // var re = new RegExp("\\[" + row.pktable_alias + "\\]", "gi");
 
@@ -3633,7 +3643,7 @@ function buildRelationTable($el, cols, data, qs){
               if(!row.tra && activeTab == "Translation"){
                 row.relationship = row.relationship.replace(re, " [TRA].[" + row.pktable_alias + "].[");
               }
-              // Fin Correction bug ligne 115
+              // Fin Correction bug ligne 114
               updateCell($el, row.index, field, newValue);
               ChangeIcon(row, qs, "Identifier");
               if(row.fin && activeTab == "Final"){
