@@ -97,8 +97,16 @@ public class UploadCSVServlet extends HttpServlet {
 					    	if(fileName.startsWith("columnLabel") && line.split(";").length >= 3) {
 					    		lines.add(line.replaceAll("\"", ""));
 					    	}
-					    	if(fileName.startsWith("columnDescription") && line.split(";").length >= 3) {
-					    		lines.add(line.replaceAll("\"", ""));
+					    	if(fileName.startsWith("columnDescription")){
+					    		if (line.split(";").length == 4) {
+					    			String firstCol = line.split(";")[0];
+					    			String secondCol = line.split(";")[1];
+					    			String thirdCol = line.split(";")[2] + " : " + line.split(";")[3];
+					    			line = firstCol + ";" + secondCol + ";" + thirdCol;
+					    		}
+					    		if (line.split(";").length == 3) {
+					    			lines.add(line.replaceAll("\"", ""));
+					    		}
 					    	}
 					    	if(fileName.equalsIgnoreCase("relation.csv") && line.split(";").length >= 7) {
 					    		lines.add(line.replaceAll("\"", ""));
