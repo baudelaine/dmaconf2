@@ -9,6 +9,6 @@ fi
 
 rm -rf WebContent/WEB-INF/classes/*
 
-javac -cp wlp/*:WebContent/WEB-INF/lib/* -d WebContent/WEB-INF/classes/ src/com/dma/web/*.java src/com/dma/svc/*.java src/com/dma/cognos/*.java src/com/dma/properties/*.java 
+javac -cp wlp/*:WebContent/WEB-INF/lib/* -d WebContent/WEB-INF/classes/ src/com/dma/web/*.java src/com/dma/svc/*.java src/com/dma/cognos/*.java src/com/dma/properties/*.java src/com/dma/datamodule/*.java
 
 exit 0

@@ -5169,13 +5169,17 @@ function promptPublish(){
   }
 
   var html = [
-    '<header><h3>Publish model</h3>',
+    '<header><h4>Publish model</h4>',
     '<hr />',
     '<div id="publishAlert"></div>',
     '</header><body>',
-    '<form><div class="form-group">',
+    '<form id="publishForm"><div class="form-group">',
         '<label for="projectName">Name</label>',
         '<input type="text" class="form-control" id="projectName" placeholder="my model"></div>',
+        // '<div class="row">',
+        '<label><input type="radio" name="optionMdl" value="fm" checked="true"> FM </label>&nbsp;&nbsp;',
+        '<label><input type="radio" name="optionMdl" value="dm"> DM </label>',
+        // '</div>',
       '<div class="checkbox">',
         '<label><input type="checkbox" id="applyActionLogs">Apply Action Logs</label>',
       '</div>',
@@ -5190,18 +5194,20 @@ function promptPublish(){
       console.log(projectName);
       var applyActionLogs = $("#applyActionLogs").prop('checked');
       console.log(applyActionLogs);
+      var modelType = ($('input[name=optionMdl]:checked', '#publishForm').val());
+      console.log(modelType);
       if(projectName.length == 0){
         ShowAlert("Give the model a name.", "alert-warning", $("#publishAlert"));              
         return false;
       }
-      Publish(projectName, applyActionLogs);
+      Publish(projectName, applyActionLogs, modelType);
     }
 
   });
 
 }
 
-function Publish(projectName, applyActionLogs){
+function Publish(projectName, applyActionLogs, modelType){
 
   $datasTable.bootstrapTable("filterBy", {});
 	var data = $datasTable.bootstrapTable('getData');
@@ -5211,17 +5217,31 @@ function Publish(projectName, applyActionLogs){
     return;
   }
 
-  var view = $('#ViewsTable').bootstrapTable("getData");
+  var url;
+  var view;
+  var parms;
 
-  var parms = {"projectName": projectName,
-  "applyActionLogs": applyActionLogs,
-  "data": JSON.stringify(data),
-  "view": JSON.stringify(view)
-  };
+  if(modelType == "fm"){
+    url = "SendQuerySubjects";
+    view = $('#ViewsTable').bootstrapTable("getData");
+    parms = {"projectName": projectName,
+    "applyActionLogs": applyActionLogs,
+    "data": JSON.stringify(data),
+    "view": JSON.stringify(view)
+    };
+  }
+
+  if(modelType == "dm"){
+    url = "SendQuerySubjectsDM";
+    parms = {"projectName": projectName,
+    "applyActionLogs": false,
+    "data": JSON.stringify(data),
+    };
+  }
 
   $.ajax({
     type: 'POST',
-    url: "SendQuerySubjects",
+    url: url,
     dataType: 'json',
     data: JSON.stringify(parms),
 
@@ -5230,26 +5250,31 @@ function Publish(projectName, applyActionLogs){
       console.log(data);
       if(data.STATUS == "OK"){
         showalert("Publish()", data.MESSAGE, "alert-success", "bottom");
-        parms = {"publishedModelName": projectName};
-        $.ajax({
-          type: 'POST',
-          url: "ZipPublishedModel",
-          dataType: 'json',
-          data: JSON.stringify(parms),
-      
-          success: function(data) {
-            // $('#DatasTable').bootstrapTable('load', data);
-            console.log(data);
-            if(data.STATUS == "OK"){
-              showalert(data.FROM, data.MESSAGE, "alert-success", "bottom");
-              window.location.href = "DLPublishedModel";
-              // window.location.href = "DLActionLogFile";
+        if(modelType == "fm"){
+          parms = {"publishedModelName": projectName};
+          $.ajax({
+            type: 'POST',
+            url: "ZipPublishedModel",
+            dataType: 'json',
+            data: JSON.stringify(parms),
+        
+            success: function(data) {
+              // $('#DatasTable').bootstrapTable('load', data);
+              console.log(data);
+              if(data.STATUS == "OK"){
+                showalert(data.FROM, data.MESSAGE, "alert-success", "bottom");
+                window.location.href = "DLPublishedModel";
+                // window.location.href = "DLActionLogFile";
+              }
+            },
+            error: function(data) {
+              showalert("ERROR", "Uknown error occured.", "alert-danger", "bottom");
             }
-          },
-          error: function(data) {
-            showalert("ERROR", "Uknown error occured.", "alert-danger", "bottom");
-          }
-        });
+          });
+        }
+        if(modelType == "dm"){
+          window.location.href = "DLPublishedModel";
+        }
       
       }
       else{
@@ -6335,7 +6360,15 @@ $('#ulXMLModelFile').change(function(){
   console.log(file);
 
   var fd = new FormData();
-  fd.append('file', file, 'model.xml');
+
+  var ext = file.name.split('.').pop();
+  console.log(ext);
+  if(ext=="json"){
+    fd.append('file', file, 'dm.json');
+  }
+  else{
+    fd.append('file', file, 'model.xml');
+  }
   console.log(fd);
 
   $.ajax({

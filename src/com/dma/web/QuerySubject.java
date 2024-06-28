@@ -34,6 +34,7 @@ public class QuerySubject {
 	String hiddenQuery = "SELECT $TABLE.$FIELD FROM $TABLE WHERE $TABLE.$FIELD IS NOT NULL AND $TABLE.$FIELD != '0'";
 	boolean tableExists = true;
 	boolean root = false;
+	String idForExpression;
 	
 	
 	public String getFolder() {
@@ -66,6 +67,7 @@ public class QuerySubject {
 	public void setRecCount(long recCount) {
 		this.recCount = recCount;
 	}
+	@SuppressWarnings("removal")
 	public void incRelationCount(String qs_id){
 		if(relationCount.get(qs_id) == null){
 			relationCount.put(qs_id, new Integer(1));
@@ -209,6 +211,12 @@ public class QuerySubject {
 	}
 	public void setRoot(boolean root) {
 		this.root = root;
+	}
+	public String getIdForExpression() {
+		return idForExpression;
+	}
+	public void setIdForExpression(String idForExpression) {
+		this.idForExpression = idForExpression;
 	}
 	
 }

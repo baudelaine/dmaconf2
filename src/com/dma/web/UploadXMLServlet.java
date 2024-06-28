@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,6 +40,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import com.dma.datamodule.DM;
+import com.dma.datamodule.QueryItemDM;
+import com.dma.datamodule.QuerySubjectDM;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 
 /**
@@ -89,144 +95,196 @@ public class UploadXMLServlet extends HttpServlet {
 				for (FileItem item : items) {
 					if (!item.isFormField()) {
 						// item is the file (and not a field)
-						Path xml = Paths.get(prj + "/" + item.getName());
-						Files.copy(new BufferedInputStream(item.getInputStream()), xml, StandardCopyOption.REPLACE_EXISTING);
-						xml.toFile().setReadable(true, false);
-						xml.toFile().setWritable(true, false);
+						Path path = Paths.get(prj + "/" + item.getName());
+						Files.copy(new BufferedInputStream(item.getInputStream()), path, StandardCopyOption.REPLACE_EXISTING);
+						path.toFile().setReadable(true, false);
+						path.toFile().setWritable(true, false);
 					}
 				}
 			}
 
-			Path path = Paths.get(prj + "/model.xml");
+			Path xml = Paths.get(prj + "/model.xml");
+			Path json = Paths.get(prj + "/dm.json");
 			
-			if(!Files.exists(path)) {
+			if(!Files.exists(xml) && !Files.exists(json)) {
 				result.put("STATUS", "KO");
-				throw new Exception("model.xml not found.");
+				throw new Exception("Neither model.xml nor dm.json found.");
 			}
 			else {
-				try {
-					
-					
-					@SuppressWarnings("deprecation")
-					String xml = IOUtils.toString(new FileInputStream(path.toFile()));
-					
-					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder builder = factory.newDocumentBuilder();
-					Document document = builder.parse(new InputSource(new StringReader(xml)));
-					
-					XPathFactory xfact = XPathFactory.newInstance();
-					XPath xpath = xfact.newXPath();
-					
-//					NodeList nodeList = null;
-					
-					NodeList nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace[1]/querySubject", document, XPathConstants.NODESET);
-//					if(nodeList.getLength() == 0) {
-//						nodeList = (NodeList) xpath.evaluate("/project/namespace/querySubject", document, XPathConstants.NODESET);
-//					}	
-	
-					Map<String, QuerySubject> querySubjects = new HashMap<String, QuerySubject>(); 
-					
-					for(int index = 0; index < nodeList.getLength(); index++){
-						Node qss = nodeList.item(index);
-						String table_name = getTextContent(qss, "name");
-//						System.out.println(table_name);
-						QuerySubject querySubject = new QuerySubject();
-						querySubject.setTable_name(table_name);
+
+				if(Files.exists(json)) {
+					try {
+						DM dm = (DM) Tools.fromJSON(json.toFile(), new TypeReference<DM>(){});
+						Map<String, QuerySubject> querySubjects = new HashMap<String, QuerySubject>(); 
 						
-						// Get tableType in definition/dbQuery
-						NodeList qssChildNodes = qss.getChildNodes();
-						for(int i = 0; i < qssChildNodes.getLength(); i++){
-							Node qssChildNode = qssChildNodes.item(i);
-							if(qssChildNode.getNodeName() == "definition") {
-								NodeList defNodes = qssChildNode.getChildNodes();
-								for(int j = 0; j < defNodes.getLength(); j++){
-									Node defNode = defNodes.item(j);
-									if(defNode.getNodeName() == "dbQuery") {
-										String table_type = getTextContent(defNode, "tableType");
-//										System.out.println(table_type);
-										querySubject.setType(table_type.toUpperCase());
-									}
-								}
-							}
-						}
-						
-						
-						
-						
-						NodeList qs = qss.getChildNodes();
-						List<Field> fields = new ArrayList<Field>();
-						int fieldPos = 1;
-						for(int i = 0; i < qs.getLength(); i++){
-							if(qs.item(i).getNodeName().equalsIgnoreCase("queryItem")) {
-								Node qis = qs.item(i);
-								NodeList qi = qis.getChildNodes();
+						for(QuerySubjectDM qs: dm.getQuerySubject()) {
+							String qsName = qs.getLabel();
+							String qsType = "TABLE";
+							String qsIdForExpression = qs.getIdForExpression();
+							QuerySubject querySubject = new QuerySubject();
+							querySubject.setTable_name(qsName);
+							querySubject.setType(qsType);
+							querySubject.setIdForExpression(qsIdForExpression);
+							List<Field> fields = new ArrayList<Field>();
+							for(Map<String, QueryItemDM> map: qs.getItem()) {
+								QueryItemDM qi = map.get("queryItem");
 								Field field = new Field();
-								field.setFieldPos(fieldPos++);
-								for(int j = 0; j < qi.getLength(); j++) {
-									System.out.println("\t" + qi.item(j).getNodeName() + "\t" + qi.item(j).getTextContent());
-									switch(qi.item(j).getNodeName()) {
-										case "name":
-											field.setField_name(qi.item(j).getTextContent());
-											break;
-										case "datatype":
-											field.setField_type(qi.item(j).getTextContent());
-											break;
-									}
-								}
+								String qiName = qi.getIdentifier();
+								String qiType = qi.getDatatype();
+								String qiIdForExpression = qi.getIdForExpression();
+								field.setField_name(qiName);
+								field.setField_type(qiType);
+								field.setIdForExpression(qiIdForExpression);
 								fields.add(field);
 							}
 							querySubject.setFields(fields);
+							querySubjects.put(qsName, querySubject);
 						}
-						querySubjects.put(table_name, querySubject);
-					}				
-					request.getSession().setAttribute("QSFromXML", querySubjects);
-	
-					Map<String, String> tables = new HashMap<String, String>();
-					for(Entry<String, QuerySubject> qs: querySubjects.entrySet()) {
-						tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
-					}
-				    result.put("TABLES", tables);
-				    result.put("QSFromXML", querySubjects);
-					
-//					result.put("TABLES", querySubjects.keySet());
-
-					Path relationsPath = Paths.get(prj + "/relation.csv");
-					
-					if(! Files.exists(relationsPath)) {
-				    
-						nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/relationship", document, XPathConstants.NODESET);
 						
-						List<String> relations = new ArrayList<String>();
+						Map<String, String> tables = new HashMap<String, String>();
+						for(Entry<String, QuerySubject> qs: querySubjects.entrySet()) {
+							tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
+						}
+					    
+						request.getSession().setAttribute("QSFromXML", querySubjects);
+
+						result.put("TABLES", tables);
+					    result.put("QSFromXML", querySubjects);
+					    
+					    
+						result.put("MESSAGE", "dm.json uploaded successfully.");
+						result.put("STATUS", "OK");
+						
+					}
+					catch (Exception e) {
+						throw new Exception("Error when parsing json file.");
+					}
+					
+				}
+				
+				if(Files.exists(xml) && !Files.exists(json)) {
+					try {
+						
+						String s = IOUtils.toString(new FileInputStream(xml.toFile()),StandardCharsets.UTF_8);
+						
+						DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+						DocumentBuilder builder = factory.newDocumentBuilder();
+						Document document = builder.parse(new InputSource(new StringReader(s)));
+						
+						XPathFactory xfact = XPathFactory.newInstance();
+						XPath xpath = xfact.newXPath();
+						
+	//					NodeList nodeList = null;
+						
+						NodeList nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace[1]/querySubject", document, XPathConstants.NODESET);
+	//					if(nodeList.getLength() == 0) {
+	//						nodeList = (NodeList) xpath.evaluate("/project/namespace/querySubject", document, XPathConstants.NODESET);
+	//					}	
+		
+						Map<String, QuerySubject> querySubjects = new HashMap<String, QuerySubject>(); 
 						
 						for(int index = 0; index < nodeList.getLength(); index++){
 							Node qss = nodeList.item(index);
-							NodeList qs = qss.getChildNodes();
-							for(int i = 0; i < qs.getLength(); i++){
-								if(qs.item(i).getNodeName().equalsIgnoreCase("expression")) {
-									if(qs.item(i).getTextContent().contains("[PHYSICAL]")) {
-										String exp = "";
-										exp = qs.item(i).getTextContent();
-										exp = exp.replace("[PHYSICAL].", "");
-										exp = exp.replaceAll("[\\[\\]]", "");
-										relations.addAll(getCSV(exp));
-										
+							String table_name = getTextContent(qss, "name");
+	//						System.out.println(table_name);
+							QuerySubject querySubject = new QuerySubject();
+							querySubject.setTable_name(table_name);
+							
+							// Get tableType in definition/dbQuery
+							NodeList qssChildNodes = qss.getChildNodes();
+							for(int i = 0; i < qssChildNodes.getLength(); i++){
+								Node qssChildNode = qssChildNodes.item(i);
+								if(qssChildNode.getNodeName() == "definition") {
+									NodeList defNodes = qssChildNode.getChildNodes();
+									for(int j = 0; j < defNodes.getLength(); j++){
+										Node defNode = defNodes.item(j);
+										if(defNode.getNodeName() == "dbQuery") {
+											String table_type = getTextContent(defNode, "tableType");
+	//										System.out.println(table_type);
+											querySubject.setType(table_type.toUpperCase());
+										}
 									}
 								}
 							}
 							
-						}
+							
+							
+							
+							NodeList qs = qss.getChildNodes();
+							List<Field> fields = new ArrayList<Field>();
+							int fieldPos = 1;
+							for(int i = 0; i < qs.getLength(); i++){
+								if(qs.item(i).getNodeName().equalsIgnoreCase("queryItem")) {
+									Node qis = qs.item(i);
+									NodeList qi = qis.getChildNodes();
+									Field field = new Field();
+									field.setFieldPos(fieldPos++);
+									for(int j = 0; j < qi.getLength(); j++) {
+	//									System.out.println("\t" + qi.item(j).getNodeName() + "\t" + qi.item(j).getTextContent());
+										switch(qi.item(j).getNodeName()) {
+											case "name":
+												field.setField_name(qi.item(j).getTextContent());
+												break;
+											case "datatype":
+												field.setField_type(qi.item(j).getTextContent());
+												break;
+										}
+									}
+									fields.add(field);
+								}
+								querySubject.setFields(fields);
+							}
+							querySubjects.put(table_name, querySubject);
+						}				
+						request.getSession().setAttribute("QSFromXML", querySubjects);
 		
-						List<String> header = Arrays.asList("FK_NAME;PK_NAME;FKTABLE_NAME;PKTABLE_NAME;KEY_SEQ;FKCOLUMN_NAME;PKCOLUMN_NAME");
-						Files.write(relationsPath, header);
-						Files.write(relationsPath, relations, StandardOpenOption.APPEND);
-						relationsPath.toFile().setReadable(true, false);
+						Map<String, String> tables = new HashMap<String, String>();
+						for(Entry<String, QuerySubject> qs: querySubjects.entrySet()) {
+							tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
+						}
+					    result.put("TABLES", tables);
+					    result.put("QSFromXML", querySubjects);
+						
+	//					result.put("TABLES", querySubjects.keySet());
+	
+						Path relationsPath = Paths.get(prj + "/relation.csv");
+						
+						if(! Files.exists(relationsPath)) {
+					    
+							nodeList = (NodeList) xpath.evaluate("/project/namespace/namespace/relationship", document, XPathConstants.NODESET);
+							
+							List<String> relations = new ArrayList<String>();
+							
+							for(int index = 0; index < nodeList.getLength(); index++){
+								Node qss = nodeList.item(index);
+								NodeList qs = qss.getChildNodes();
+								for(int i = 0; i < qs.getLength(); i++){
+									if(qs.item(i).getNodeName().equalsIgnoreCase("expression")) {
+										if(qs.item(i).getTextContent().contains("[PHYSICAL]")) {
+											String exp = "";
+											exp = qs.item(i).getTextContent();
+											exp = exp.replace("[PHYSICAL].", "");
+											exp = exp.replaceAll("[\\[\\]]", "");
+											relations.addAll(getCSV(exp));
+											
+										}
+									}
+								}
+								
+							}
+			
+							List<String> header = Arrays.asList("FK_NAME;PK_NAME;FKTABLE_NAME;PKTABLE_NAME;KEY_SEQ;FKCOLUMN_NAME;PKCOLUMN_NAME");
+							Files.write(relationsPath, header);
+							Files.write(relationsPath, relations, StandardOpenOption.APPEND);
+							relationsPath.toFile().setReadable(true, false);
+						}
+						result.put("MESSAGE", "model.xml uploaded successfully.");
+						result.put("STATUS", "OK");
+						
 					}
-					result.put("MESSAGE", "model.xml uploaded successfully.");
-					result.put("STATUS", "OK");
-					
-				}
-				catch (Exception e) {
-					throw new Exception("Error when parsing XML file.");
+					catch (Exception e) {
+						throw new Exception("Error when parsing XML file.");
+					}
 				}
 			}
 

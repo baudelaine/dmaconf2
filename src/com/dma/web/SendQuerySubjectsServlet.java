@@ -463,9 +463,9 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							Map<String, String> qifSTM = new HashMap<String, String>();
 							qifScreenTipMap.put(langue, qifSTM);
 							//ajout langue dans le FM
-							for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
-								fsvc.addLocale(langue, cognosDefaultLocale);
-							}
+
+							fsvc.addLocale(langue, cognosDefaultLocale);
+
 							//fin ajout langue FM
 						}		
 					}
@@ -532,6 +532,13 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 						fsvc.createQueryItem("[DATA].[" + query_subject.getValue().getTable_alias() + "]", field.getField_name(), field.getExpression(), cognosDefaultLocale, labelMap);
 							//end regular agg
 						}
+						
+						//add expression if filled for standard fields
+						if (!field.isCustom() && !field.getExpression().equals("")) {
+							
+							fsvc.modifyQueryItem("[DATA].[" + query_subject.getValue().getTable_alias() + "].[" + field.getField_name() + "]", field.getExpression(), "expression");
+							}
+						//end add expression for standard fields
 						
 						//test cas ou la langue n'existe pas dans le map
 						for(Entry<String, Map<String, String>> langLabel: labelMap.entrySet()){

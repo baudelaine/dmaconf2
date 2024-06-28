@@ -7,9 +7,11 @@ public class DM {
 
 	String version;
 	String container;
-	String expressionLocale;
+	List<String> use;
 	List<UseSpecDM> useSpec = new ArrayList<UseSpecDM>();
+	String expressionLocale;
 	List<QuerySubjectDM> querySubject = new ArrayList<QuerySubjectDM>();
+	List<RelationshipDM> relationship = new ArrayList<RelationshipDM>();
 	
 	public String getVersion() {
 		return version;
@@ -22,6 +24,12 @@ public class DM {
 	}
 	public void setContainer(String container) {
 		this.container = container;
+	}
+	public List<String> getUse() {
+		return use;
+	}
+	public void setUse(List<String> use) {
+		this.use = use;
 	}
 	public String getExpressionLocale() {
 		return expressionLocale;
@@ -40,5 +48,11 @@ public class DM {
 	}
 	public void setQuerySubject(List<QuerySubjectDM> querySubject) {
 		this.querySubject = querySubject;
+	}
+	public List<RelationshipDM> getRelationship() {
+		return relationship;
+	}
+	public void setRelationship(List<RelationshipDM> relationship) {
+		this.relationship = relationship;
 	}
 }

@@ -681,7 +681,7 @@ public class FactorySVC {
 			
 			xp.setText(str);
 			
-			System.out.println("createQueryItem(" + querySubject + ", " + name + ", " + exp + ", " + locale + ")");
+//			System.out.println("createQueryItem(" + querySubject + ", " + name + ", " + exp + ", " + locale + ")");
 //			System.out.println(document.asXML());
 			csvc.executeModel(document);
 			
@@ -712,10 +712,33 @@ public class FactorySVC {
 
 			mpath.setText("queryItem/" + obj);
 			path.setText("/O/expression[0]/O/" + qiPath);
-			eexp.setText(exp);
+			
+			exp = StringUtils.replace(exp, "<", "&lt;");
+			exp = StringUtils.replace(exp, ">", "&gt;");
+			
+			//gestion des refobj
+			String str = eexp.getStringValue();
+			String refobjMaker[] = StringUtils.splitByWholeSeparator(str, "expToReplace");
+			String lRefobj = refobjMaker[0];
+			String rRefobj = refobjMaker[1];
+			String splitExp[] = StringUtils.splitByWholeSeparator(exp, "].[");
+			str = "";
+			for (int i = 0 ; i < splitExp.length ; i++) {
+				String strAdd = "";
+				strAdd = StringUtils.replace(splitExp[i], "]", "]" + rRefobj);
+				strAdd = StringUtils.replace(strAdd, "[", lRefobj + "[");
+				if (i != 0) {
+					str = str + "].[" + strAdd;
+				} else {
+					str = strAdd;
+				}
+			}
+			// end gestion refobj
+			
+			eexp.setText(str);
 
 		//	System.out.println(document.asXML());
-			System.out.println("modifyQueryItem(" + qiPath + ", " + exp + ", " + obj);
+		//	System.out.println("modifyQueryItem(" + qiPath + ", " + exp + ", " + obj);
 			csvc.executeModel(document);
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
@@ -807,7 +830,7 @@ public class FactorySVC {
 			elemHandleValue.setText(handleValue);
 			elemValue.setText(value);
 
-//			 System.out.println(document.asXML());
+//			System.out.println(document.asXML());
 //			System.out.println("changeQueryitemProperty(" + queryItemPath + ", " + property + ", " + value + ")");
 			csvc.executeModel(document);
 		} catch (DocumentException ex) {
@@ -1629,7 +1652,7 @@ public class FactorySVC {
 			ElemValue.setText(value);
 
 		// System.out.println(document.asXML());
-				System.out.println("modify( " + handleMappingpath + ", " + handleValue + ", " + value + ") ");
+		//		System.out.println("modify( " + handleMappingpath + ", " + handleValue + ", " + value + ") ");
 				csvc.executeModel(document);
 			} catch (DocumentException ex) {
 				lg(ex.getMessage());

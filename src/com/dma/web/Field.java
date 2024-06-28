@@ -41,6 +41,7 @@ public class Field {
 	int fieldPos = 0;
 	String OriginalTableAlias = "";
 	String merge = "";
+	String idForExpression;
 
 	public String getMerge() {
 		return merge;
@@ -245,6 +246,12 @@ public class Field {
 	}
 	public void setField_alias(String field_alias) {
 		this.field_alias = field_alias;
+	}
+	public String getIdForExpression() {
+		return idForExpression;
+	}
+	public void setIdForExpression(String idForExpression) {
+		this.idForExpression = idForExpression;
 	}
 	
 }

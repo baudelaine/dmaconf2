@@ -155,7 +155,7 @@ public class GetCsvLabelsServlet extends HttpServlet {
 						else {
 							sql = "SELECT " + selectClause + " FROM tableLabel where " + whereClause + " in " + inClause;
 						}
-						System.out.println("sql=" + sql);
+//						System.out.println("sql=" + sql);
 						csvRst = csvStmt.executeQuery(sql);
 						while(csvRst.next()){
 							tlMap.put(csvRst.getString("Table_Name"), csvRst.getString("Table_Label"));

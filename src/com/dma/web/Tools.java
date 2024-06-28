@@ -31,9 +31,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Tools {
 	
@@ -94,6 +96,10 @@ public class Tools {
 		try{
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+//		mapper.enable(SerializationFeature.INDENT_OUTPUT);
+		mapper.setSerializationInclusion(Include.NON_NULL);
+	
 		StringWriter sw = new StringWriter();
 		String jsonResult = null;
 		mapper.writeValue(sw, o);

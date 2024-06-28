@@ -65,9 +65,10 @@ public class ZipPublishedModelServlet extends HttpServlet {
 			parms = Tools.fromJSON(request.getInputStream());
 			result.put("PARMS", parms);
 
-			if(parms != null && parms.get("publishedModelName") != null) {
+			if(parms != null && parms.get("publishedModelName") != null && parms.get("modelType") != null) {
 				
 				String publishedModelName = (String) parms.get("publishedModelName");
+				String modelType = (String) parms.get("modelType");
 				
 				Path publishedModelPath = Paths.get((String) request.getServletContext().getAttribute("cognosModelsPath") + "/" +
 						user + "/" + publishedModelName);
