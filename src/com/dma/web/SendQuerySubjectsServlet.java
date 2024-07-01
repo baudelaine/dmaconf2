@@ -463,9 +463,9 @@ public class SendQuerySubjectsServlet extends HttpServlet {
 							Map<String, String> qifSTM = new HashMap<String, String>();
 							qifScreenTipMap.put(langue, qifSTM);
 							//ajout langue dans le FM
-
-							fsvc.addLocale(langue, cognosDefaultLocale);
-
+							for(Entry<String, Map<String, String>> langueKey: labelMap.entrySet()){
+								fsvc.addLocale(langue, cognosDefaultLocale);
+							}
 							//fin ajout langue FM
 						}		
 					}

@@ -4,8 +4,10 @@ import java.util.List;
 
 public class RelationshipDM {
 	
+	String joinFilterType;
 	String identifier;
 	String label;
+	List<String> propertyOverride;
 	String idForExpression;
 	
 	RelationshipLeftDM left;
@@ -46,6 +48,18 @@ public class RelationshipDM {
 	}
 	public void setLink(List<RelationshipLinkDM> link) {
 		this.link = link;
+	}
+	public String getJoinFilterType() {
+		return joinFilterType;
+	}
+	public void setJoinFilterType(String joinFilterType) {
+		this.joinFilterType = joinFilterType;
+	}
+	public List<String> getPropertyOverride() {
+		return propertyOverride;
+	}
+	public void setPropertyOverride(List<String> propertyOverride) {
+		this.propertyOverride = propertyOverride;
 	}
 
 }

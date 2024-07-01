@@ -1,17 +1,26 @@
 package com.dma.datamodule;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DM {
 
 	String version;
 	String container;
 	List<String> use;
-	List<UseSpecDM> useSpec = new ArrayList<UseSpecDM>();
+	List<UseSpecDM> useSpec;
 	String expressionLocale;
-	List<QuerySubjectDM> querySubject = new ArrayList<QuerySubjectDM>();
-	List<RelationshipDM> relationship = new ArrayList<RelationshipDM>();
+	List<QuerySubjectDM> querySubject;
+	List<RelationshipDM> relationship;
+	List<MetadataTreeViewDM> metadataTreeView;
+	List<DrillGroupDM> drillGroup;
+	List<ParameterValueSetDM> parameterValueSet;
+	String dataRetrievalMode;
+	String refActiveParameterValueSet;
+	String identifier;
+	String label;
+	List<Map<String, String>> property;
+	List<String> propertyOverride;
 	
 	public String getVersion() {
 		return version;
@@ -55,4 +64,59 @@ public class DM {
 	public void setRelationship(List<RelationshipDM> relationship) {
 		this.relationship = relationship;
 	}
+	public List<MetadataTreeViewDM> getMetadataTreeView() {
+		return metadataTreeView;
+	}
+	public void setMetadataTreeView(List<MetadataTreeViewDM> metadataTreeView) {
+		this.metadataTreeView = metadataTreeView;
+	}
+	public List<DrillGroupDM> getDrillGroup() {
+		return drillGroup;
+	}
+	public void setDrillGroup(List<DrillGroupDM> drillGroup) {
+		this.drillGroup = drillGroup;
+	}
+	public List<ParameterValueSetDM> getParameterValueSet() {
+		return parameterValueSet;
+	}
+	public void setParameterValueSet(List<ParameterValueSetDM> parameterValueSet) {
+		this.parameterValueSet = parameterValueSet;
+	}
+	public String getDataRetrievalMode() {
+		return dataRetrievalMode;
+	}
+	public void setDataRetrievalMode(String dataRetrievalMode) {
+		this.dataRetrievalMode = dataRetrievalMode;
+	}
+	public String getRefActiveParameterValueSet() {
+		return refActiveParameterValueSet;
+	}
+	public void setRefActiveParameterValueSet(String refActiveParameterValueSet) {
+		this.refActiveParameterValueSet = refActiveParameterValueSet;
+	}
+	public String getIdentifier() {
+		return identifier;
+	}
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	public List<Map<String, String>> getProperty() {
+		return property;
+	}
+	public void setProperty(List<Map<String, String>> property) {
+		this.property = property;
+	}
+	public List<String> getPropertyOverride() {
+		return propertyOverride;
+	}
+	public void setPropertyOverride(List<String> propertyOverride) {
+		this.propertyOverride = propertyOverride;
+	}
+	
 }

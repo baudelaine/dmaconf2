@@ -26,11 +26,13 @@ public class TestDM0 {
 				int fieldCount = qs.getItem().size();
 				System.out.println(qs.getLabel() + " -> " + fieldCount);
 				for(Map<String, QueryItemDM> map: qs.getItem()) {
-					System.out.println(map.get("queryItem").getIdentifier());
+					QueryItemDM qi = map.get("queryItem");
+					System.out.println("\t" + qi.getIdentifier());
 				}
 			}
 			System.out.println(Tools.toJSON(dm.getQuerySubject().get(1).getItem().get(0)));
 			System.out.println(Tools.toJSON(dm.getRelationship()));
+			System.out.println(Tools.toJSON(dm.getMetadataTreeView()));
 			Files.write(output, (Tools.toJSON(dm)).getBytes(charset));
 		}
 	}

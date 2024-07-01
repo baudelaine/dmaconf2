@@ -738,7 +738,7 @@ public class FactorySVC {
 			eexp.setText(str);
 
 		//	System.out.println(document.asXML());
-		//	System.out.println("modifyQueryItem(" + qiPath + ", " + exp + ", " + obj);
+			System.out.println("modifyQueryItem(" + qiPath + ", " + exp + ", " + obj);
 			csvc.executeModel(document);
 		} catch (DocumentException ex) {
 			lg(ex.getMessage());
@@ -830,7 +830,7 @@ public class FactorySVC {
 			elemHandleValue.setText(handleValue);
 			elemValue.setText(value);
 
-//			System.out.println(document.asXML());
+//			 System.out.println(document.asXML());
 //			System.out.println("changeQueryitemProperty(" + queryItemPath + ", " + property + ", " + value + ")");
 			csvc.executeModel(document);
 		} catch (DocumentException ex) {

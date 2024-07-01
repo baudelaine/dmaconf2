@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.dma.datamodule.DM;
+import com.dma.datamodule.RelationshipDM;
+import com.dma.datamodule.RelationshipLeftDM;
+import com.dma.datamodule.RelationshipLinkDM;
+import com.dma.datamodule.RelationshipRightDM;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -120,8 +125,54 @@ public class SendQuerySubjectsServletDM extends HttpServlet {
 				
 				if(dm != null) {
 					
-					dm.setRelationship(null);
+					// Start working with dm from qsList
+					
+					Map<String, String> idForExpressions = new HashMap<String, String>();
+					for(QuerySubject qs: qsList) {
+						idForExpressions.put(qs.getTable_alias(), qs.getIdForExpression());
+						idForExpressions.put(qs.getTable_name(), qs.getIdForExpression());
+					}
+					
+					if(dm.getRelationship() == null) {
+						dm.setRelationship(new ArrayList<RelationshipDM>());
+					}
+					
+					for(QuerySubject qs: qsList) {
+						for(Relation rel: qs.getRelations()) {
+							if(rel.isFin() || rel.isRef() || rel.isSec() || rel.isTra()) {
+								RelationshipDM relDM = new RelationshipDM();
+								RelationshipLeftDM left = new RelationshipLeftDM();
+								left.setRef(idForExpressions.get(qs.getTable_alias()));
+								left.setMaxcard("one");
+								left.setMincard("one");
+								relDM.setLeft(left);
+								RelationshipRightDM right = new RelationshipRightDM();
+								right.setRef(idForExpressions.get(rel.getPktable_alias()));
+								right.setMaxcard("many");
+								right.setMincard("one");
+								relDM.setRight(right);
+								List<RelationshipLinkDM> links = new ArrayList<RelationshipLinkDM>(); 
+								for(Seq seq: rel.getSeqs()) {
+									RelationshipLinkDM link = new RelationshipLinkDM();
+									link.setLeftRef(seq.getColumn_name());
+									link.setRightRef(seq.getPkcolumn_name());
+									link.setComparisonOperator("equalTo");
+									links.add(link);
+								}
+								relDM.setLink(links);
+								relDM.setJoinFilterType("none");
+								relDM.setIdentifier(idForExpressions.get(qs.getTable_alias()) + "_" + idForExpressions.get(rel.getPktable_alias()));
+								relDM.setLabel(idForExpressions.get(qs.getTable_alias()) + "<-->" + idForExpressions.get(rel.getPktable_alias()));
+								relDM.setPropertyOverride(Arrays.asList("NEW"));
+								relDM.setIdForExpression(idForExpressions.get(qs.getTable_alias()) + "_" + idForExpressions.get(rel.getPktable_alias()));
+								dm.getRelationship().add(relDM);
+							}
+						}
+					}
 
+					// End working with DM qsList
+					
+					
 					Path json = Paths.get("/tmp/" + user + "-" + projectName + ".json");
 					Path zip = Paths.get("/tmp/" + user + "-" + projectName + ".zip");
 					

@@ -180,8 +180,9 @@ public class GetQuerySubjectsServlet extends HttpServlet {
 		QuerySubject result = new QuerySubject();
 		
 		if(qsFromXML != null) {
-			result.setTable_name(qsFromXML.get(table).getTable_name());
-			result.set_id(alias + result.getType());
+			if(qsFromXML.get(table) != null) {
+				result = (qsFromXML.get(table));
+			}
 		}
 		else {
 			result.setTable_name(table);
