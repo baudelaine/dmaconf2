@@ -13,6 +13,7 @@ public class QuerySubject {
 	String _ref = null;
 	String table_name = "";
 	String table_alias = "";
+	String table_type = "";
 	String type = "";
 	boolean visible = false;
 	String filter = "";
@@ -217,6 +218,12 @@ public class QuerySubject {
 	}
 	public void setIdForExpression(String idForExpression) {
 		this.idForExpression = idForExpression;
+	}
+	public String getTable_type() {
+		return table_type;
+	}
+	public void setTable_type(String table_type) {
+		this.table_type = table_type;
 	}
 	
 }

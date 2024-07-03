@@ -69,6 +69,7 @@ public class SetHiddenAllServlet extends HttpServlet {
 			
 			if(parms != null && parms.get("qss") != null) {
 				
+				@SuppressWarnings("unchecked")
 				List<QuerySubject> qss = (List<QuerySubject>) Tools.fromJSON(parms.get("qss").toString(), new TypeReference<List<QuerySubject>>(){});
 				
 				for(QuerySubject qs: qss) {	

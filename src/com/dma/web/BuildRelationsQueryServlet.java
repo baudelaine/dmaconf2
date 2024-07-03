@@ -100,10 +100,12 @@ public class BuildRelationsQueryServlet extends HttpServlet {
 					
 					while (rst0.next()) {
 
-				    	String table_name = rst0.getString("TABLE_NAME");
+				    	@SuppressWarnings("unused")
+						String table_name = rst0.getString("TABLE_NAME");
 					
 					
-				    	PreparedStatement stmt = con.prepareStatement(query);
+				    	@SuppressWarnings("unused")
+						PreparedStatement stmt = con.prepareStatement(query);
 					
 					}
 					if(rst0 != null) {rst0.close();}

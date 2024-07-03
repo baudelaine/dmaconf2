@@ -1,1 +1,1 @@
-find /opt/dma/ -type f -name '*.java' -newermt "2024-05-01" -exec ls -Alhtr '{}' \;
+find /opt/dma/ -type f -name '*.*' ! -name '*.class' -newermt "2024-07-02" -exec ls -Altr '{}' \;

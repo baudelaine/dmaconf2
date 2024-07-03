@@ -1,12 +1,15 @@
 package com.dma.frameworkmanager;
 
-public class DataSource {
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+@JacksonXmlRootElement(localName = "dataSource")
+public class DataSourceXML {
 
 	String name= "";
 	String cmDataSource = "";
 	String catalog = "";
 	String schema = "";
-	DataSourceType type = new DataSourceType();
+	DataSourceTypeXML type = new DataSourceTypeXML();
 	
 	public String getName() {
 		return name;
@@ -32,10 +35,10 @@ public class DataSource {
 	public void setSchema(String schema) {
 		this.schema = schema;
 	}
-	public DataSourceType getType() {
+	public DataSourceTypeXML getType() {
 		return type;
 	}
-	public void setType(DataSourceType type) {
+	public void setType(DataSourceTypeXML type) {
 		this.type = type;
 	}
 	

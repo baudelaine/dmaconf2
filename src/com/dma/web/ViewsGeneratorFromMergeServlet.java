@@ -285,6 +285,7 @@ public class ViewsGeneratorFromMergeServlet extends HttpServlet {
 		doGet(request, response);
 	}
 
+	@SuppressWarnings("removal")
 	protected void f1(String qsAlias, String qsAliasInc, String gDirName, String qsFinal, String qsFinalName, Map<String, Integer> recurseCount, String qSleftType, String leftFilterNameSpace, String mergeView, String gDirNameView) {
 		
 		Map<String, Integer> copyRecurseCount = new HashMap<String, Integer>();

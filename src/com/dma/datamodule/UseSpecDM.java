@@ -1,6 +1,5 @@
 package com.dma.datamodule;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UseSpecDM {

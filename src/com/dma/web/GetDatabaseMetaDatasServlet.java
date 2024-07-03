@@ -426,7 +426,7 @@ public class GetDatabaseMetaDatasServlet extends HttpServlet {
 					
 		            DBMDTable table = new DBMDTable();
 		            table.setTable_name(qs.getTable_name());
-		            table.setTable_type(qs.getType());
+		            table.setTable_type(qs.getTable_type());
 		            if(isCsvExp) {
 			    		table.setTable_importedKeysCount(FKSeqCount);
 			    		table.setTable_exportedKeysCount(PKSeqCount);

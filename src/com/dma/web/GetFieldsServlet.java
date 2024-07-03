@@ -123,7 +123,6 @@ public class GetFieldsServlet extends HttpServlet {
 			    		}
 			    		else {
 		    		    	field_desc = field_remarks;
-		    	    		field_remarks = field_remarks;
 			    		}
 			        	
 			        	Field field = new Field();

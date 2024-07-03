@@ -88,6 +88,8 @@ public class UploadXMLServlet extends HttpServlet {
 			Path prj = Paths.get((String) request.getSession().getAttribute("projectPath"));
 			result.put("PRJ", prj.toString());
 
+			Path xml = Paths.get(prj + "/model.xml");
+			Path json = Paths.get(prj + "/dm.json");
 			
 			if(ServletFileUpload.isMultipartContent(request)){
 				
@@ -96,6 +98,14 @@ public class UploadXMLServlet extends HttpServlet {
 					if (!item.isFormField()) {
 						// item is the file (and not a field)
 						Path path = Paths.get(prj + "/" + item.getName());
+						
+						if(path.compareTo(xml) == 0) {
+							Files.deleteIfExists(json);
+						}
+						if(path.compareTo(json) == 0) {
+							Files.delete(xml);
+						}
+						
 						Files.copy(new BufferedInputStream(item.getInputStream()), path, StandardCopyOption.REPLACE_EXISTING);
 						path.toFile().setReadable(true, false);
 						path.toFile().setWritable(true, false);
@@ -103,9 +113,6 @@ public class UploadXMLServlet extends HttpServlet {
 				}
 			}
 
-			Path xml = Paths.get(prj + "/model.xml");
-			Path json = Paths.get(prj + "/dm.json");
-			
 			if(!Files.exists(xml) && !Files.exists(json)) {
 				result.put("STATUS", "KO");
 				throw new Exception("Neither model.xml nor dm.json found.");
@@ -123,7 +130,7 @@ public class UploadXMLServlet extends HttpServlet {
 							String qsIdForExpression = qs.getIdForExpression();
 							QuerySubject querySubject = new QuerySubject();
 							querySubject.setTable_name(qsName);
-							querySubject.setType(qsType);
+							querySubject.setTable_type(qsType);
 							querySubject.setIdForExpression(qsIdForExpression);
 							List<Field> fields = new ArrayList<Field>();
 							for(Map<String, QueryItemDM> map: qs.getItem()) {
@@ -201,7 +208,7 @@ public class UploadXMLServlet extends HttpServlet {
 										if(defNode.getNodeName() == "dbQuery") {
 											String table_type = getTextContent(defNode, "tableType");
 	//										System.out.println(table_type);
-											querySubject.setType(table_type.toUpperCase());
+											querySubject.setTable_type(table_type.toUpperCase());
 										}
 									}
 								}
@@ -240,7 +247,7 @@ public class UploadXMLServlet extends HttpServlet {
 		
 						Map<String, String> tables = new HashMap<String, String>();
 						for(Entry<String, QuerySubject> qs: querySubjects.entrySet()) {
-							tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
+							tables.put(qs.getValue().getTable_name(), qs.getValue().getTable_type());
 						}
 					    result.put("TABLES", tables);
 					    result.put("QSFromXML", querySubjects);

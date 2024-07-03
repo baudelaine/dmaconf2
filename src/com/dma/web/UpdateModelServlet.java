@@ -8,14 +8,13 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -83,6 +82,7 @@ public class UpdateModelServlet extends HttpServlet {
 				Map<String, Set<String>> fieldsToUpdate = new HashMap<String, Set<String>>();
 
 				Map<String, List<Field>> customFields = new HashMap<String, List<Field>>();
+				@SuppressWarnings("unused")
 				Map<String, Map<String, Field>> modelFields = new HashMap<String, Map<String, Field>>();
 
 				Map<String, Map<String, Field>> dbMap = new HashMap<String, Map<String, Field>>();
@@ -90,6 +90,7 @@ public class UpdateModelServlet extends HttpServlet {
 				Map<String, Map<String, Field>> currents = new HashMap<String, Map<String, Field>>();
 
 				Map<String, Map<String, Set<String>>> updates = new HashMap<String, Map<String, Set<String>>>();
+				@SuppressWarnings("unused")
 				List<QuerySubject> newQss = new ArrayList<QuerySubject>();
 				
 				

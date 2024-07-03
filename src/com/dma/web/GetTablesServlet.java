@@ -108,7 +108,7 @@ public class GetTablesServlet extends HttpServlet {
 			}
 			else {
 				for(Entry<String, QuerySubject> qs: qsFromXML.entrySet()) {
-					tables.put(qs.getValue().getTable_name(), qs.getValue().getType());
+					tables.put(qs.getValue().getTable_name(), qs.getValue().getTable_type());
 				}
 			    result.put("TABLES", tables);
 			}

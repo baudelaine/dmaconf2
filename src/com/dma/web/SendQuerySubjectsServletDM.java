@@ -143,12 +143,12 @@ public class SendQuerySubjectsServletDM extends HttpServlet {
 								RelationshipDM relDM = new RelationshipDM();
 								RelationshipLeftDM left = new RelationshipLeftDM();
 								left.setRef(idForExpressions.get(qs.getTable_alias()));
-								left.setMaxcard("one");
+								left.setMaxcard("many");
 								left.setMincard("one");
 								relDM.setLeft(left);
 								RelationshipRightDM right = new RelationshipRightDM();
 								right.setRef(idForExpressions.get(rel.getPktable_alias()));
-								right.setMaxcard("many");
+								right.setMaxcard("one");
 								right.setMincard("one");
 								relDM.setRight(right);
 								List<RelationshipLinkDM> links = new ArrayList<RelationshipLinkDM>(); 

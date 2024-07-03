@@ -7,8 +7,11 @@ import java.util.Map;
 
 public class RefMap {
 	
+	@SuppressWarnings("removal")
 	Integer count = new Integer(0);
+	@SuppressWarnings("removal")
 	Integer inc = new Integer(0);
+	@SuppressWarnings("removal")
 	Integer treeCount = new Integer(0);
 	Map<String, Boolean> tree = new HashMap<String, Boolean>();
 	Map<String, List<String>> dirList = new HashMap<String, List<String>>();

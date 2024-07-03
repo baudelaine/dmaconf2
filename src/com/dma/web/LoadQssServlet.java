@@ -119,6 +119,7 @@ public class LoadQssServlet extends HttpServlet {
 			
 			if(parms != null && parms.get("lang") != null && parms.get("qss") != null) {
 				
+				@SuppressWarnings("unchecked")
 				List<QuerySubject> existingQss = (List<QuerySubject>) Tools.fromJSON(parms.get("qss").toString(), new TypeReference<List<QuerySubject>>(){});				
 
 				Map<String, QuerySubject> newQss = new HashMap<String, QuerySubject>();

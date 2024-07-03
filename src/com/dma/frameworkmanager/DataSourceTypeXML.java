@@ -1,12 +1,16 @@
 package com.dma.frameworkmanager;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-public class DataSourceType {
+@JacksonXmlRootElement(localName = "type")
+public class DataSourceTypeXML {
 
-	String queryType = "";
+	String queryType = "relational";
 	@JacksonXmlProperty(localName = "interface")
-	String dbEngine = "";
+	@JsonProperty("interface")
+	String dbEngine = "D2";
 	
 	public String getQueryType() {
 		return queryType;

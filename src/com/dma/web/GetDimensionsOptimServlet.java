@@ -37,7 +37,7 @@ public class GetDimensionsOptimServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unused")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -53,10 +53,12 @@ public class GetDimensionsOptimServlet extends HttpServlet {
 			
 			if(parms != null && parms.get("dimensions") != null && parms.get("qss") != null && parms.get("selectedQs") != null) {
 			
+				@SuppressWarnings("unchecked")
 				Map<String, QuerySubject> query_subjects = 
 						(Map<String, QuerySubject>) Tools.fromJSON(parms.get("qss").toString(), new TypeReference<Map<String, QuerySubject>>(){});
 				
 				
+				@SuppressWarnings("unchecked")
 				List<String> dims = (List<String>) Tools.fromJSON(parms.get("dimensions").toString(), new TypeReference<List<String>>(){});
 				
 				String selectedQs = parms.get("selectedQs").toString();
@@ -121,6 +123,7 @@ public class GetDimensionsOptimServlet extends HttpServlet {
 				}
 
 
+				@SuppressWarnings("unchecked")
 				Map<String, DBMDTable> dbmd = (Map<String, DBMDTable>) request.getSession().getAttribute("dbmd");
 				
 		        if(false){

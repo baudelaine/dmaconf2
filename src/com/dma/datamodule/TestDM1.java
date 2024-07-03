@@ -1,8 +1,6 @@
 package com.dma.datamodule;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +23,7 @@ public class TestDM1 {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		Charset charset = StandardCharsets.UTF_8;
+//		Charset charset = StandardCharsets.UTF_8;
 		Path dmaMdl = Paths.get("/home/fr054721/Documents/datacc/latestDM/dmamdl3.json");
 		Path cogDM = Paths.get("/home/fr054721/Documents/datacc/latestDM/DataModule.json");
 		Path output = Paths.get("/home/fr054721/Documents/datacc/latestDM/DataModule-from-pojo.json");
@@ -72,12 +70,12 @@ public class TestDM1 {
 						RelationshipDM relDM = new RelationshipDM();
 						RelationshipLeftDM left = new RelationshipLeftDM();
 						left.setRef(idForExpressions.get(qs.getTable_alias()));
-						left.setMaxcard("one");
+						left.setMaxcard("many");
 						left.setMincard("one");
 						relDM.setLeft(left);
 						RelationshipRightDM right = new RelationshipRightDM();
 						right.setRef(idForExpressions.get(rel.getPktable_alias()));
-						right.setMaxcard("many");
+						right.setMaxcard("one");
 						right.setMincard("one");
 						relDM.setRight(right);
 						List<RelationshipLinkDM> links = new ArrayList<RelationshipLinkDM>(); 
